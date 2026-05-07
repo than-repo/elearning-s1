@@ -1,0 +1,17 @@
+generator client2 {
+    provider = "prisma-client"
+    output   = "../generated2/prisma"
+}
+
+datasource db2 {
+    provider = "mysql"
+}
+
+model User2 {
+    id        Int    @id @default(autoincrement())
+    name      String
+    teacher   User2  @relation("StudentTeacher", fields: [teacherId], references: [id])
+    teacherId Int    @unique
+
+    student User2[] @relation("StudentTeacher")
+}

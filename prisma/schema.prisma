@@ -1,0 +1,289 @@
+// prisma/schema.prisma
+
+// ====================== 1. GENERATOR & DATASOURCE ======================
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ====================== 2. ENUMS ======================
+enum GenderEnum {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum UserRole {
+  LEARNER
+  INSTRUCTOR
+  REVIEWER
+  ADMIN
+}
+
+enum AuthProviderEnum {
+  LOCAL
+  GOOGLE
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  BANK_TRANSFER
+  E_WALLET
+  PAYPAL
+  VN_PAY
+  FREE
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum CourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCE
+  ALL_LEVELS
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum MediaTypeEnum {
+  VIDEO
+  DOCUMENT
+  IMAGE
+  AUDIO
+  OTHER
+}
+
+// ====================== MODELS ======================
+// ====================== 3. AUTH MODELS ======================
+
+model User {
+  id            String      @id @default(uuid())
+  fullName      String
+  email         String      @unique
+  passwordHash  String?
+  phoneNumber   String?
+  dateOfBirth   DateTime?
+  gender        GenderEnum?
+  avatarUrl     String?
+  role          UserRole    @default(LEARNER)
+  isActive      Boolean     @default(true)
+  emailVerified Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  lastLoginAt   DateTime?
+
+  // Relations
+  identities    UserIdentity[]
+  refreshTokens RefreshToken[]
+
+  payments          Payment[]
+  courseInstructors CourseInstructor[] // as instructor
+
+  @@map("users")
+}
+
+model UserIdentity {
+  id           String           @id @default(uuid())
+  userId       String
+  provider     AuthProviderEnum
+  providerId   String
+  accessToken  String?
+  refreshToken String?
+  createdAt    DateTime         @default(now())
+  lastUsedAt   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([userId, provider, providerId])
+  @@map("user_identities")
+}
+
+model RefreshToken {
+  id         String   @id @default(uuid())
+  userId     String
+  tokenHash  String   @unique
+  expiresAt  DateTime
+  deviceInfo String?
+  ipAddress  String?
+  isRevoked  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+// ====================== 4. COURSE MODELS ======================
+
+model CourseInstructor {
+  id           String    @id @default(uuid())
+  courseId     String
+  instructorId String
+  isPrimary    Boolean   @default(true)
+  order        Int       @default(0)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  course     Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  instructor User   @relation(fields: [instructorId], references: [id], onDelete: Restrict)
+
+  @@unique([courseId, instructorId])
+  @@map("course_instructors")
+}
+
+model Course {
+  id                       String       @id @default(uuid())
+  title                    String
+  slug                     String       @unique
+  shortDescription         String
+  description              String?
+  whatYouWillLearn         Json? // string[] - Json (MySQL compatible)
+  thumbnailUrl             String?
+  level                    CourseLevel
+  status                   CourseStatus @default(DRAFT)
+  price                    Float?
+  language                 String?
+  estimatedDurationMinutes Int?
+  startDate                DateTime?
+  endDate                  DateTime?
+  schedule                 Json?
+  isActive                 Boolean      @default(true)
+  createdAt                DateTime     @default(now())
+  updatedAt                DateTime     @updatedAt
+  deletedAt                DateTime?
+
+  // Relations
+  sections    CourseSection[]
+  enrollments Enrollment[]
+
+  instructors CourseInstructor[]
+
+  @@map("courses")
+}
+
+model CourseSection {
+  id           String    @id @default(uuid())
+  courseId     String
+  title        String
+  description  String?
+  sectionIndex Int
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+
+  @@map("course_sections")
+}
+
+model Lesson {
+  id          String    @id @default(uuid())
+  sectionId   String
+  title       String
+  description String?
+  lessonIndex Int
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  section CourseSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  files   FileMedia[]
+
+  @@map("lessons")
+}
+
+model FileMedia {
+  id          String        @id @default(uuid())
+  lessonId    String
+  url         String
+  type        MediaTypeEnum
+  filename    String?
+  mimeType    String?
+  sizeInBytes Int?
+
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@map("file_media")
+}
+
+// ====================== 5. BILLING MODELS ======================
+model Enrollment {
+  id                 String           @id @default(uuid())
+  userId             String
+  courseId           String
+  paymentId          String?          @unique
+  status             EnrollmentStatus @default(ACTIVE)
+  progressPercentage Float            @default(0)
+  enrolledAt         DateTime?
+  completedAt        DateTime?
+  isActive           Boolean          @default(true)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  deletedAt          DateTime?
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  payment Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, courseId])
+  @@map("enrollments")
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  userId            String
+  courseId          String
+  amount            Float
+  currency          String        @default("VND")
+  paymentMethod     PaymentMethod
+  status            PaymentStatus @default(PENDING)
+  provider          String?
+  providerPaymentId String?
+  providerMetadata  Json?
+  isActive          Boolean       @default(true)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  deletedAt         DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  enrollment Enrollment?
+
+  @@map("payments")
+}
