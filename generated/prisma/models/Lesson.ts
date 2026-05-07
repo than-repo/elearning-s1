@@ -249,7 +249,7 @@ export type LessonWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Lesson"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Lesson"> | Date | string | null
   section?: Prisma.XOR<Prisma.CourseSectionScalarRelationFilter, Prisma.CourseSectionWhereInput>
-  attachments?: Prisma.FileMediaListRelationFilter
+  files?: Prisma.FileMediaListRelationFilter
 }
 
 export type LessonOrderByWithRelationInput = {
@@ -263,7 +263,7 @@ export type LessonOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   section?: Prisma.CourseSectionOrderByWithRelationInput
-  attachments?: Prisma.FileMediaOrderByRelationAggregateInput
+  files?: Prisma.FileMediaOrderByRelationAggregateInput
   _relevance?: Prisma.LessonOrderByRelevanceInput
 }
 
@@ -281,7 +281,7 @@ export type LessonWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Lesson"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Lesson"> | Date | string | null
   section?: Prisma.XOR<Prisma.CourseSectionScalarRelationFilter, Prisma.CourseSectionWhereInput>
-  attachments?: Prisma.FileMediaListRelationFilter
+  files?: Prisma.FileMediaListRelationFilter
 }, "id">
 
 export type LessonOrderByWithAggregationInput = {
@@ -326,7 +326,7 @@ export type LessonCreateInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   section: Prisma.CourseSectionCreateNestedOneWithoutLessonsInput
-  attachments?: Prisma.FileMediaCreateNestedManyWithoutLessonInput
+  files?: Prisma.FileMediaCreateNestedManyWithoutLessonInput
 }
 
 export type LessonUncheckedCreateInput = {
@@ -339,7 +339,7 @@ export type LessonUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  attachments?: Prisma.FileMediaUncheckedCreateNestedManyWithoutLessonInput
+  files?: Prisma.FileMediaUncheckedCreateNestedManyWithoutLessonInput
 }
 
 export type LessonUpdateInput = {
@@ -352,7 +352,7 @@ export type LessonUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   section?: Prisma.CourseSectionUpdateOneRequiredWithoutLessonsNestedInput
-  attachments?: Prisma.FileMediaUpdateManyWithoutLessonNestedInput
+  files?: Prisma.FileMediaUpdateManyWithoutLessonNestedInput
 }
 
 export type LessonUncheckedUpdateInput = {
@@ -365,7 +365,7 @@ export type LessonUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  attachments?: Prisma.FileMediaUncheckedUpdateManyWithoutLessonNestedInput
+  files?: Prisma.FileMediaUncheckedUpdateManyWithoutLessonNestedInput
 }
 
 export type LessonCreateManyInput = {
@@ -510,18 +510,18 @@ export type LessonUncheckedUpdateManyWithoutSectionNestedInput = {
   deleteMany?: Prisma.LessonScalarWhereInput | Prisma.LessonScalarWhereInput[]
 }
 
-export type LessonCreateNestedOneWithoutAttachmentsInput = {
-  create?: Prisma.XOR<Prisma.LessonCreateWithoutAttachmentsInput, Prisma.LessonUncheckedCreateWithoutAttachmentsInput>
-  connectOrCreate?: Prisma.LessonCreateOrConnectWithoutAttachmentsInput
+export type LessonCreateNestedOneWithoutFilesInput = {
+  create?: Prisma.XOR<Prisma.LessonCreateWithoutFilesInput, Prisma.LessonUncheckedCreateWithoutFilesInput>
+  connectOrCreate?: Prisma.LessonCreateOrConnectWithoutFilesInput
   connect?: Prisma.LessonWhereUniqueInput
 }
 
-export type LessonUpdateOneRequiredWithoutAttachmentsNestedInput = {
-  create?: Prisma.XOR<Prisma.LessonCreateWithoutAttachmentsInput, Prisma.LessonUncheckedCreateWithoutAttachmentsInput>
-  connectOrCreate?: Prisma.LessonCreateOrConnectWithoutAttachmentsInput
-  upsert?: Prisma.LessonUpsertWithoutAttachmentsInput
+export type LessonUpdateOneRequiredWithoutFilesNestedInput = {
+  create?: Prisma.XOR<Prisma.LessonCreateWithoutFilesInput, Prisma.LessonUncheckedCreateWithoutFilesInput>
+  connectOrCreate?: Prisma.LessonCreateOrConnectWithoutFilesInput
+  upsert?: Prisma.LessonUpsertWithoutFilesInput
   connect?: Prisma.LessonWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.LessonUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.LessonUpdateWithoutAttachmentsInput>, Prisma.LessonUncheckedUpdateWithoutAttachmentsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.LessonUpdateToOneWithWhereWithoutFilesInput, Prisma.LessonUpdateWithoutFilesInput>, Prisma.LessonUncheckedUpdateWithoutFilesInput>
 }
 
 export type LessonCreateWithoutSectionInput = {
@@ -533,7 +533,7 @@ export type LessonCreateWithoutSectionInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  attachments?: Prisma.FileMediaCreateNestedManyWithoutLessonInput
+  files?: Prisma.FileMediaCreateNestedManyWithoutLessonInput
 }
 
 export type LessonUncheckedCreateWithoutSectionInput = {
@@ -545,7 +545,7 @@ export type LessonUncheckedCreateWithoutSectionInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  attachments?: Prisma.FileMediaUncheckedCreateNestedManyWithoutLessonInput
+  files?: Prisma.FileMediaUncheckedCreateNestedManyWithoutLessonInput
 }
 
 export type LessonCreateOrConnectWithoutSectionInput = {
@@ -589,7 +589,7 @@ export type LessonScalarWhereInput = {
   deletedAt?: Prisma.DateTimeNullableFilter<"Lesson"> | Date | string | null
 }
 
-export type LessonCreateWithoutAttachmentsInput = {
+export type LessonCreateWithoutFilesInput = {
   id?: string
   title: string
   description?: string | null
@@ -601,7 +601,7 @@ export type LessonCreateWithoutAttachmentsInput = {
   section: Prisma.CourseSectionCreateNestedOneWithoutLessonsInput
 }
 
-export type LessonUncheckedCreateWithoutAttachmentsInput = {
+export type LessonUncheckedCreateWithoutFilesInput = {
   id?: string
   sectionId: string
   title: string
@@ -613,23 +613,23 @@ export type LessonUncheckedCreateWithoutAttachmentsInput = {
   deletedAt?: Date | string | null
 }
 
-export type LessonCreateOrConnectWithoutAttachmentsInput = {
+export type LessonCreateOrConnectWithoutFilesInput = {
   where: Prisma.LessonWhereUniqueInput
-  create: Prisma.XOR<Prisma.LessonCreateWithoutAttachmentsInput, Prisma.LessonUncheckedCreateWithoutAttachmentsInput>
+  create: Prisma.XOR<Prisma.LessonCreateWithoutFilesInput, Prisma.LessonUncheckedCreateWithoutFilesInput>
 }
 
-export type LessonUpsertWithoutAttachmentsInput = {
-  update: Prisma.XOR<Prisma.LessonUpdateWithoutAttachmentsInput, Prisma.LessonUncheckedUpdateWithoutAttachmentsInput>
-  create: Prisma.XOR<Prisma.LessonCreateWithoutAttachmentsInput, Prisma.LessonUncheckedCreateWithoutAttachmentsInput>
+export type LessonUpsertWithoutFilesInput = {
+  update: Prisma.XOR<Prisma.LessonUpdateWithoutFilesInput, Prisma.LessonUncheckedUpdateWithoutFilesInput>
+  create: Prisma.XOR<Prisma.LessonCreateWithoutFilesInput, Prisma.LessonUncheckedCreateWithoutFilesInput>
   where?: Prisma.LessonWhereInput
 }
 
-export type LessonUpdateToOneWithWhereWithoutAttachmentsInput = {
+export type LessonUpdateToOneWithWhereWithoutFilesInput = {
   where?: Prisma.LessonWhereInput
-  data: Prisma.XOR<Prisma.LessonUpdateWithoutAttachmentsInput, Prisma.LessonUncheckedUpdateWithoutAttachmentsInput>
+  data: Prisma.XOR<Prisma.LessonUpdateWithoutFilesInput, Prisma.LessonUncheckedUpdateWithoutFilesInput>
 }
 
-export type LessonUpdateWithoutAttachmentsInput = {
+export type LessonUpdateWithoutFilesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -641,7 +641,7 @@ export type LessonUpdateWithoutAttachmentsInput = {
   section?: Prisma.CourseSectionUpdateOneRequiredWithoutLessonsNestedInput
 }
 
-export type LessonUncheckedUpdateWithoutAttachmentsInput = {
+export type LessonUncheckedUpdateWithoutFilesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sectionId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -673,7 +673,7 @@ export type LessonUpdateWithoutSectionInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  attachments?: Prisma.FileMediaUpdateManyWithoutLessonNestedInput
+  files?: Prisma.FileMediaUpdateManyWithoutLessonNestedInput
 }
 
 export type LessonUncheckedUpdateWithoutSectionInput = {
@@ -685,7 +685,7 @@ export type LessonUncheckedUpdateWithoutSectionInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  attachments?: Prisma.FileMediaUncheckedUpdateManyWithoutLessonNestedInput
+  files?: Prisma.FileMediaUncheckedUpdateManyWithoutLessonNestedInput
 }
 
 export type LessonUncheckedUpdateManyWithoutSectionInput = {
@@ -705,11 +705,11 @@ export type LessonUncheckedUpdateManyWithoutSectionInput = {
  */
 
 export type LessonCountOutputType = {
-  attachments: number
+  files: number
 }
 
 export type LessonCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachments?: boolean | LessonCountOutputTypeCountAttachmentsArgs
+  files?: boolean | LessonCountOutputTypeCountFilesArgs
 }
 
 /**
@@ -725,7 +725,7 @@ export type LessonCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exten
 /**
  * LessonCountOutputType without action
  */
-export type LessonCountOutputTypeCountAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type LessonCountOutputTypeCountFilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.FileMediaWhereInput
 }
 
@@ -741,7 +741,7 @@ export type LessonSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   updatedAt?: boolean
   deletedAt?: boolean
   section?: boolean | Prisma.CourseSectionDefaultArgs<ExtArgs>
-  attachments?: boolean | Prisma.Lesson$attachmentsArgs<ExtArgs>
+  files?: boolean | Prisma.Lesson$filesArgs<ExtArgs>
   _count?: boolean | Prisma.LessonCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lesson"]>
 
@@ -762,7 +762,7 @@ export type LessonSelectScalar = {
 export type LessonOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sectionId" | "title" | "description" | "lessonIndex" | "isActive" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["lesson"]>
 export type LessonInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   section?: boolean | Prisma.CourseSectionDefaultArgs<ExtArgs>
-  attachments?: boolean | Prisma.Lesson$attachmentsArgs<ExtArgs>
+  files?: boolean | Prisma.Lesson$filesArgs<ExtArgs>
   _count?: boolean | Prisma.LessonCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -770,7 +770,7 @@ export type $LessonPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Lesson"
   objects: {
     section: Prisma.$CourseSectionPayload<ExtArgs>
-    attachments: Prisma.$FileMediaPayload<ExtArgs>[]
+    files: Prisma.$FileMediaPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1123,7 +1123,7 @@ readonly fields: LessonFieldRefs;
 export interface Prisma__LessonClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   section<T extends Prisma.CourseSectionDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CourseSectionDefaultArgs<ExtArgs>>): Prisma.Prisma__CourseSectionClient<runtime.Types.Result.GetResult<Prisma.$CourseSectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  attachments<T extends Prisma.Lesson$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Lesson$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FileMediaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  files<T extends Prisma.Lesson$filesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Lesson$filesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FileMediaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1510,9 +1510,9 @@ export type LessonDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
 }
 
 /**
- * Lesson.attachments
+ * Lesson.files
  */
-export type Lesson$attachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Lesson$filesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the FileMedia
    */

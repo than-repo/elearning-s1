@@ -387,13 +387,13 @@ export const ModelName = {
   User: 'User',
   UserIdentity: 'UserIdentity',
   RefreshToken: 'RefreshToken',
-  Course: 'Course',
   CourseInstructor: 'CourseInstructor',
+  Course: 'Course',
   CourseSection: 'CourseSection',
   Lesson: 'Lesson',
   FileMedia: 'FileMedia',
-  Payment: 'Payment',
-  Enrollment: 'Enrollment'
+  Enrollment: 'Enrollment',
+  Payment: 'Payment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -409,7 +409,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "userIdentity" | "refreshToken" | "course" | "courseInstructor" | "courseSection" | "lesson" | "fileMedia" | "payment" | "enrollment"
+    modelProps: "user" | "userIdentity" | "refreshToken" | "courseInstructor" | "course" | "courseSection" | "lesson" | "fileMedia" | "enrollment" | "payment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -611,72 +611,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    Course: {
-      payload: Prisma.$CoursePayload<ExtArgs>
-      fields: Prisma.CourseFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.CourseFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.CourseFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload>
-        }
-        findFirst: {
-          args: Prisma.CourseFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.CourseFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload>
-        }
-        findMany: {
-          args: Prisma.CourseFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload>[]
-        }
-        create: {
-          args: Prisma.CourseCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload>
-        }
-        createMany: {
-          args: Prisma.CourseCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        delete: {
-          args: Prisma.CourseDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload>
-        }
-        update: {
-          args: Prisma.CourseUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload>
-        }
-        deleteMany: {
-          args: Prisma.CourseDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.CourseUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        upsert: {
-          args: Prisma.CourseUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload>
-        }
-        aggregate: {
-          args: Prisma.CourseAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateCourse>
-        }
-        groupBy: {
-          args: Prisma.CourseGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.CourseGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.CourseCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.CourseCountAggregateOutputType> | number
-        }
-      }
-    }
     CourseInstructor: {
       payload: Prisma.$CourseInstructorPayload<ExtArgs>
       fields: Prisma.CourseInstructorFieldRefs
@@ -740,6 +674,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CourseInstructorCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CourseInstructorCountAggregateOutputType> | number
+        }
+      }
+    }
+    Course: {
+      payload: Prisma.$CoursePayload<ExtArgs>
+      fields: Prisma.CourseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CourseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CourseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload>
+        }
+        findFirst: {
+          args: Prisma.CourseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CourseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload>
+        }
+        findMany: {
+          args: Prisma.CourseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload>[]
+        }
+        create: {
+          args: Prisma.CourseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload>
+        }
+        createMany: {
+          args: Prisma.CourseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.CourseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload>
+        }
+        update: {
+          args: Prisma.CourseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload>
+        }
+        deleteMany: {
+          args: Prisma.CourseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CourseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.CourseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoursePayload>
+        }
+        aggregate: {
+          args: Prisma.CourseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCourse>
+        }
+        groupBy: {
+          args: Prisma.CourseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CourseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CourseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CourseCountAggregateOutputType> | number
         }
       }
     }
@@ -941,72 +941,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    Payment: {
-      payload: Prisma.$PaymentPayload<ExtArgs>
-      fields: Prisma.PaymentFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.PaymentFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.PaymentFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload>
-        }
-        findFirst: {
-          args: Prisma.PaymentFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.PaymentFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload>
-        }
-        findMany: {
-          args: Prisma.PaymentFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload>[]
-        }
-        create: {
-          args: Prisma.PaymentCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload>
-        }
-        createMany: {
-          args: Prisma.PaymentCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        delete: {
-          args: Prisma.PaymentDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload>
-        }
-        update: {
-          args: Prisma.PaymentUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload>
-        }
-        deleteMany: {
-          args: Prisma.PaymentDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.PaymentUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        upsert: {
-          args: Prisma.PaymentUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload>
-        }
-        aggregate: {
-          args: Prisma.PaymentAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregatePayment>
-        }
-        groupBy: {
-          args: Prisma.PaymentGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.PaymentGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.PaymentCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.PaymentCountAggregateOutputType> | number
-        }
-      }
-    }
     Enrollment: {
       payload: Prisma.$EnrollmentPayload<ExtArgs>
       fields: Prisma.EnrollmentFieldRefs
@@ -1073,6 +1007,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Payment: {
+      payload: Prisma.$PaymentPayload<ExtArgs>
+      fields: Prisma.PaymentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PaymentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PaymentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload>
+        }
+        findFirst: {
+          args: Prisma.PaymentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PaymentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload>
+        }
+        findMany: {
+          args: Prisma.PaymentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload>[]
+        }
+        create: {
+          args: Prisma.PaymentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload>
+        }
+        createMany: {
+          args: Prisma.PaymentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.PaymentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload>
+        }
+        update: {
+          args: Prisma.PaymentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload>
+        }
+        deleteMany: {
+          args: Prisma.PaymentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PaymentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.PaymentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentPayload>
+        }
+        aggregate: {
+          args: Prisma.PaymentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePayment>
+        }
+        groupBy: {
+          args: Prisma.PaymentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PaymentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1126,8 +1126,7 @@ export const UserScalarFieldEnum = {
   emailVerified: 'emailVerified',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  lastLoginAt: 'lastLoginAt',
-  deletedAt: 'deletedAt'
+  lastLoginAt: 'lastLoginAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -1140,7 +1139,6 @@ export const UserIdentityScalarFieldEnum = {
   providerId: 'providerId',
   accessToken: 'accessToken',
   refreshToken: 'refreshToken',
-  profileData: 'profileData',
   createdAt: 'createdAt',
   lastUsedAt: 'lastUsedAt'
 } as const
@@ -1160,6 +1158,21 @@ export const RefreshTokenScalarFieldEnum = {
 } as const
 
 export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum]
+
+
+export const CourseInstructorScalarFieldEnum = {
+  id: 'id',
+  courseId: 'courseId',
+  instructorId: 'instructorId',
+  isPrimary: 'isPrimary',
+  order: 'order',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type CourseInstructorScalarFieldEnum = (typeof CourseInstructorScalarFieldEnum)[keyof typeof CourseInstructorScalarFieldEnum]
 
 
 export const CourseScalarFieldEnum = {
@@ -1185,21 +1198,6 @@ export const CourseScalarFieldEnum = {
 } as const
 
 export type CourseScalarFieldEnum = (typeof CourseScalarFieldEnum)[keyof typeof CourseScalarFieldEnum]
-
-
-export const CourseInstructorScalarFieldEnum = {
-  id: 'id',
-  courseId: 'courseId',
-  instructorId: 'instructorId',
-  isPrimary: 'isPrimary',
-  order: 'order',
-  isActive: 'isActive',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
-} as const
-
-export type CourseInstructorScalarFieldEnum = (typeof CourseInstructorScalarFieldEnum)[keyof typeof CourseInstructorScalarFieldEnum]
 
 
 export const CourseSectionScalarFieldEnum = {
@@ -1239,11 +1237,28 @@ export const FileMediaScalarFieldEnum = {
   type: 'type',
   filename: 'filename',
   mimeType: 'mimeType',
-  sizeInBytes: 'sizeInBytes',
-  createdAt: 'createdAt'
+  sizeInBytes: 'sizeInBytes'
 } as const
 
 export type FileMediaScalarFieldEnum = (typeof FileMediaScalarFieldEnum)[keyof typeof FileMediaScalarFieldEnum]
+
+
+export const EnrollmentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  courseId: 'courseId',
+  paymentId: 'paymentId',
+  status: 'status',
+  progressPercentage: 'progressPercentage',
+  enrolledAt: 'enrolledAt',
+  completedAt: 'completedAt',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type EnrollmentScalarFieldEnum = (typeof EnrollmentScalarFieldEnum)[keyof typeof EnrollmentScalarFieldEnum]
 
 
 export const PaymentScalarFieldEnum = {
@@ -1266,24 +1281,6 @@ export const PaymentScalarFieldEnum = {
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
 
 
-export const EnrollmentScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  courseId: 'courseId',
-  paymentId: 'paymentId',
-  status: 'status',
-  progressPercentage: 'progressPercentage',
-  enrolledAt: 'enrolledAt',
-  completedAt: 'completedAt',
-  isActive: 'isActive',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
-} as const
-
-export type EnrollmentScalarFieldEnum = (typeof EnrollmentScalarFieldEnum)[keyof typeof EnrollmentScalarFieldEnum]
-
-
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1298,13 +1295,6 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
-
-
-export const JsonNullValueInput = {
-  JsonNull: JsonNull
-} as const
-
-export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const NullsOrder = {
@@ -1325,23 +1315,6 @@ export const UserOrderByRelevanceFieldEnum = {
 } as const
 
 export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
-
-
-export const JsonNullValueFilter = {
-  DbNull: DbNull,
-  JsonNull: JsonNull,
-  AnyNull: AnyNull
-} as const
-
-export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-} as const
-
-export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
 export const UserIdentityOrderByRelevanceFieldEnum = {
@@ -1366,6 +1339,32 @@ export const RefreshTokenOrderByRelevanceFieldEnum = {
 export type RefreshTokenOrderByRelevanceFieldEnum = (typeof RefreshTokenOrderByRelevanceFieldEnum)[keyof typeof RefreshTokenOrderByRelevanceFieldEnum]
 
 
+export const CourseInstructorOrderByRelevanceFieldEnum = {
+  id: 'id',
+  courseId: 'courseId',
+  instructorId: 'instructorId'
+} as const
+
+export type CourseInstructorOrderByRelevanceFieldEnum = (typeof CourseInstructorOrderByRelevanceFieldEnum)[keyof typeof CourseInstructorOrderByRelevanceFieldEnum]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+} as const
+
+export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
 export const CourseOrderByRelevanceFieldEnum = {
   id: 'id',
   title: 'title',
@@ -1377,15 +1376,6 @@ export const CourseOrderByRelevanceFieldEnum = {
 } as const
 
 export type CourseOrderByRelevanceFieldEnum = (typeof CourseOrderByRelevanceFieldEnum)[keyof typeof CourseOrderByRelevanceFieldEnum]
-
-
-export const CourseInstructorOrderByRelevanceFieldEnum = {
-  id: 'id',
-  courseId: 'courseId',
-  instructorId: 'instructorId'
-} as const
-
-export type CourseInstructorOrderByRelevanceFieldEnum = (typeof CourseInstructorOrderByRelevanceFieldEnum)[keyof typeof CourseInstructorOrderByRelevanceFieldEnum]
 
 
 export const CourseSectionOrderByRelevanceFieldEnum = {
@@ -1419,6 +1409,16 @@ export const FileMediaOrderByRelevanceFieldEnum = {
 export type FileMediaOrderByRelevanceFieldEnum = (typeof FileMediaOrderByRelevanceFieldEnum)[keyof typeof FileMediaOrderByRelevanceFieldEnum]
 
 
+export const EnrollmentOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  courseId: 'courseId',
+  paymentId: 'paymentId'
+} as const
+
+export type EnrollmentOrderByRelevanceFieldEnum = (typeof EnrollmentOrderByRelevanceFieldEnum)[keyof typeof EnrollmentOrderByRelevanceFieldEnum]
+
+
 export const PaymentOrderByRelevanceFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -1429,16 +1429,6 @@ export const PaymentOrderByRelevanceFieldEnum = {
 } as const
 
 export type PaymentOrderByRelevanceFieldEnum = (typeof PaymentOrderByRelevanceFieldEnum)[keyof typeof PaymentOrderByRelevanceFieldEnum]
-
-
-export const EnrollmentOrderByRelevanceFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  courseId: 'courseId',
-  paymentId: 'paymentId'
-} as const
-
-export type EnrollmentOrderByRelevanceFieldEnum = (typeof EnrollmentOrderByRelevanceFieldEnum)[keyof typeof EnrollmentOrderByRelevanceFieldEnum]
 
 
 
@@ -1462,9 +1452,9 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
 
 
 /**
- * Reference to a field of type 'Gender'
+ * Reference to a field of type 'GenderEnum'
  */
-export type EnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender'>
+export type EnumGenderEnumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'GenderEnum'>
     
 
 
@@ -1483,9 +1473,16 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
- * Reference to a field of type 'AuthProvider'
+ * Reference to a field of type 'AuthProviderEnum'
  */
-export type EnumAuthProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuthProvider'>
+export type EnumAuthProviderEnumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuthProviderEnum'>
+    
+
+
+/**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
     
 
 
@@ -1525,16 +1522,16 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
 
 
 /**
- * Reference to a field of type 'Int'
+ * Reference to a field of type 'MediaTypeEnum'
  */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+export type EnumMediaTypeEnumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MediaTypeEnum'>
     
 
 
 /**
- * Reference to a field of type 'MediaType'
+ * Reference to a field of type 'EnrollmentStatus'
  */
-export type EnumMediaTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MediaType'>
+export type EnumEnrollmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EnrollmentStatus'>
     
 
 
@@ -1549,13 +1546,6 @@ export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'PaymentStatus'
  */
 export type EnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus'>
-    
-
-
-/**
- * Reference to a field of type 'EnrollmentStatus'
- */
-export type EnumEnrollmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EnrollmentStatus'>
     
 
 /**
@@ -1671,13 +1661,13 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   userIdentity?: Prisma.UserIdentityOmit
   refreshToken?: Prisma.RefreshTokenOmit
-  course?: Prisma.CourseOmit
   courseInstructor?: Prisma.CourseInstructorOmit
+  course?: Prisma.CourseOmit
   courseSection?: Prisma.CourseSectionOmit
   lesson?: Prisma.LessonOmit
   fileMedia?: Prisma.FileMediaOmit
-  payment?: Prisma.PaymentOmit
   enrollment?: Prisma.EnrollmentOmit
+  payment?: Prisma.PaymentOmit
 }
 
 /* Types for Logging */

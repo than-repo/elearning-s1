@@ -1,0 +1,86 @@
+src/
+├── app.module.ts
+├── main.ts
+│
+├── common/                          # Shared across the whole app (enterprise foundation)
+│   ├── decorators/
+│   ├── dto/                         # Global DTOs (e.g. PaginationDto)
+│   ├── filters/                     # Global exception filter
+│   ├── guards/                      # RolesGuard, JwtAuthGuard, etc.
+│   ├── interceptors/
+│   ├── pipes/
+│   ├── utils/
+│   └── constants.ts
+│
+├── config/                          # App, DB, AWS, etc. configuration
+│   └── configuration.ts
+│
+├── core/                            # Infrastructure (Prisma, storage, email, etc.)
+│   ├── database/
+│   │   ├── prisma.service.ts
+│   │   ├── prisma.module.ts         # Global module
+│   │   └── prisma.repository.ts     # Optional base repository
+│   ├── storage/                     # S3 / local file upload service (for FileMedia)
+│   └── mailer/                      # (future)
+│
+├── features/                        # ← All business domains live here
+│   ├── auth/
+│   │   ├── auth.module.ts
+│   │   ├── auth.controller.ts
+│   │   ├── auth.service.ts
+│   │   ├── strategies/
+│   │   ├── guards/
+│   │   ├── dtos/
+│   │   └── entities/                # Optional (you can import Prisma types directly)
+│   │
+│   ├── users/
+│   │   ├── users.module.ts
+│   │   ├── users.controller.ts      # Profile + admin CRUD
+│   │   ├── users.service.ts
+│   │   ├── dtos/
+│   │   ├── repositories/            # Optional: UserRepository
+│   │   └── tests/
+│   │
+│   ├── courses/                     # Biggest domain → can have sub-folders
+│   │   ├── courses.module.ts
+│   │   ├── courses.controller.ts    # /courses
+│   │   ├── courses.service.ts
+│   │   ├── course-instructors.controller.ts  # or service only
+│   │   ├── course-instructors.service.ts
+│   │   ├── sections/
+│   │   │   ├── sections.controller.ts
+│   │   │   └── sections.service.ts
+│   │   ├── lessons/
+│   │   │   ├── lessons.controller.ts
+│   │   │   └── lessons.service.ts
+│   │   ├── media/                   # FileMedia upload & management
+│   │   │   ├── media.controller.ts
+│   │   │   └── media.service.ts
+│   │   ├── dtos/
+│   │   ├── repositories/
+│   │   └── courses.gateway.ts       # WebSocket for live sessions (future)
+│   │
+│   ├── enrollments/
+│   │   ├── enrollments.module.ts
+│   │   ├── enrollments.controller.ts
+│   │   ├── enrollments.service.ts
+│   │   ├── dtos/
+│   │   └── repositories/
+│   │
+│   ├── payments/                    # or call it `billing/` if you prefer
+│   │   ├── payments.module.ts
+│   │   ├── payments.controller.ts
+│   │   ├── payments.service.ts
+│   │   ├── dtos/
+│   │   ├── repositories/
+│   │   ├── payment-gateway/         # VN_PAY, PayPal, etc. adapters
+│   │   └── webhooks.controller.ts
+│   │
+│   └── admin/                       # Optional: admin-only endpoints (or use role guards)
+│       ├── admin.module.ts
+│       └── admin.controller.ts
+│
+├── shared/                          # Cross-cutting modules (if needed later)
+│   └── shared.module.ts
+│
+└── utils/                           # Global utilities

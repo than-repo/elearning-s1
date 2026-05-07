@@ -10,8 +10,8 @@ datasource db2 {
 model User2 {
     id        Int    @id @default(autoincrement())
     name      String
-    teacher   User2  @relation("StudentTeacher", fields: [teacherId], references: [id])
-    teacherId Int    @unique
+    teacher   User2? @relation("StudentTeacher", fields: [teacherId], references: [id])
+    teacherId Int?   @unique
 
     student User2[] @relation("StudentTeacher")
 }

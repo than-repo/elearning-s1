@@ -27,7 +27,7 @@ export type AggregateUserIdentity = {
 export type UserIdentityMinAggregateOutputType = {
   id: string | null
   userId: string | null
-  provider: $Enums.AuthProvider | null
+  provider: $Enums.AuthProviderEnum | null
   providerId: string | null
   accessToken: string | null
   refreshToken: string | null
@@ -38,7 +38,7 @@ export type UserIdentityMinAggregateOutputType = {
 export type UserIdentityMaxAggregateOutputType = {
   id: string | null
   userId: string | null
-  provider: $Enums.AuthProvider | null
+  provider: $Enums.AuthProviderEnum | null
   providerId: string | null
   accessToken: string | null
   refreshToken: string | null
@@ -53,7 +53,6 @@ export type UserIdentityCountAggregateOutputType = {
   providerId: number
   accessToken: number
   refreshToken: number
-  profileData: number
   createdAt: number
   lastUsedAt: number
   _all: number
@@ -89,7 +88,6 @@ export type UserIdentityCountAggregateInputType = {
   providerId?: true
   accessToken?: true
   refreshToken?: true
-  profileData?: true
   createdAt?: true
   lastUsedAt?: true
   _all?: true
@@ -170,13 +168,12 @@ export type UserIdentityGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 export type UserIdentityGroupByOutputType = {
   id: string
   userId: string
-  provider: $Enums.AuthProvider
+  provider: $Enums.AuthProviderEnum
   providerId: string
   accessToken: string | null
   refreshToken: string | null
-  profileData: runtime.JsonValue | null
   createdAt: Date
-  lastUsedAt: Date
+  lastUsedAt: Date | null
   _count: UserIdentityCountAggregateOutputType | null
   _min: UserIdentityMinAggregateOutputType | null
   _max: UserIdentityMaxAggregateOutputType | null
@@ -203,13 +200,12 @@ export type UserIdentityWhereInput = {
   NOT?: Prisma.UserIdentityWhereInput | Prisma.UserIdentityWhereInput[]
   id?: Prisma.StringFilter<"UserIdentity"> | string
   userId?: Prisma.StringFilter<"UserIdentity"> | string
-  provider?: Prisma.EnumAuthProviderFilter<"UserIdentity"> | $Enums.AuthProvider
+  provider?: Prisma.EnumAuthProviderEnumFilter<"UserIdentity"> | $Enums.AuthProviderEnum
   providerId?: Prisma.StringFilter<"UserIdentity"> | string
   accessToken?: Prisma.StringNullableFilter<"UserIdentity"> | string | null
   refreshToken?: Prisma.StringNullableFilter<"UserIdentity"> | string | null
-  profileData?: Prisma.JsonNullableFilter<"UserIdentity">
   createdAt?: Prisma.DateTimeFilter<"UserIdentity"> | Date | string
-  lastUsedAt?: Prisma.DateTimeFilter<"UserIdentity"> | Date | string
+  lastUsedAt?: Prisma.DateTimeNullableFilter<"UserIdentity"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -220,29 +216,27 @@ export type UserIdentityOrderByWithRelationInput = {
   providerId?: Prisma.SortOrder
   accessToken?: Prisma.SortOrderInput | Prisma.SortOrder
   refreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
-  profileData?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  lastUsedAt?: Prisma.SortOrder
+  lastUsedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   _relevance?: Prisma.UserIdentityOrderByRelevanceInput
 }
 
 export type UserIdentityWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  userId_provider?: Prisma.UserIdentityUserIdProviderCompoundUniqueInput
+  userId_provider_providerId?: Prisma.UserIdentityUserIdProviderProviderIdCompoundUniqueInput
   AND?: Prisma.UserIdentityWhereInput | Prisma.UserIdentityWhereInput[]
   OR?: Prisma.UserIdentityWhereInput[]
   NOT?: Prisma.UserIdentityWhereInput | Prisma.UserIdentityWhereInput[]
   userId?: Prisma.StringFilter<"UserIdentity"> | string
-  provider?: Prisma.EnumAuthProviderFilter<"UserIdentity"> | $Enums.AuthProvider
+  provider?: Prisma.EnumAuthProviderEnumFilter<"UserIdentity"> | $Enums.AuthProviderEnum
   providerId?: Prisma.StringFilter<"UserIdentity"> | string
   accessToken?: Prisma.StringNullableFilter<"UserIdentity"> | string | null
   refreshToken?: Prisma.StringNullableFilter<"UserIdentity"> | string | null
-  profileData?: Prisma.JsonNullableFilter<"UserIdentity">
   createdAt?: Prisma.DateTimeFilter<"UserIdentity"> | Date | string
-  lastUsedAt?: Prisma.DateTimeFilter<"UserIdentity"> | Date | string
+  lastUsedAt?: Prisma.DateTimeNullableFilter<"UserIdentity"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id" | "userId_provider">
+}, "id" | "userId_provider_providerId">
 
 export type UserIdentityOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -251,9 +245,8 @@ export type UserIdentityOrderByWithAggregationInput = {
   providerId?: Prisma.SortOrder
   accessToken?: Prisma.SortOrderInput | Prisma.SortOrder
   refreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
-  profileData?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  lastUsedAt?: Prisma.SortOrder
+  lastUsedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserIdentityCountOrderByAggregateInput
   _max?: Prisma.UserIdentityMaxOrderByAggregateInput
   _min?: Prisma.UserIdentityMinOrderByAggregateInput
@@ -265,96 +258,88 @@ export type UserIdentityScalarWhereWithAggregatesInput = {
   NOT?: Prisma.UserIdentityScalarWhereWithAggregatesInput | Prisma.UserIdentityScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"UserIdentity"> | string
   userId?: Prisma.StringWithAggregatesFilter<"UserIdentity"> | string
-  provider?: Prisma.EnumAuthProviderWithAggregatesFilter<"UserIdentity"> | $Enums.AuthProvider
+  provider?: Prisma.EnumAuthProviderEnumWithAggregatesFilter<"UserIdentity"> | $Enums.AuthProviderEnum
   providerId?: Prisma.StringWithAggregatesFilter<"UserIdentity"> | string
   accessToken?: Prisma.StringNullableWithAggregatesFilter<"UserIdentity"> | string | null
   refreshToken?: Prisma.StringNullableWithAggregatesFilter<"UserIdentity"> | string | null
-  profileData?: Prisma.JsonNullableWithAggregatesFilter<"UserIdentity">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserIdentity"> | Date | string
-  lastUsedAt?: Prisma.DateTimeWithAggregatesFilter<"UserIdentity"> | Date | string
+  lastUsedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"UserIdentity"> | Date | string | null
 }
 
 export type UserIdentityCreateInput = {
   id?: string
-  provider: $Enums.AuthProvider
+  provider: $Enums.AuthProviderEnum
   providerId: string
   accessToken?: string | null
   refreshToken?: string | null
-  profileData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  lastUsedAt?: Date | string
+  lastUsedAt?: Date | string | null
   user: Prisma.UserCreateNestedOneWithoutIdentitiesInput
 }
 
 export type UserIdentityUncheckedCreateInput = {
   id?: string
   userId: string
-  provider: $Enums.AuthProvider
+  provider: $Enums.AuthProviderEnum
   providerId: string
   accessToken?: string | null
   refreshToken?: string | null
-  profileData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  lastUsedAt?: Date | string
+  lastUsedAt?: Date | string | null
 }
 
 export type UserIdentityUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  provider?: Prisma.EnumAuthProviderEnumFieldUpdateOperationsInput | $Enums.AuthProviderEnum
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
   accessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  profileData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastUsedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutIdentitiesNestedInput
 }
 
 export type UserIdentityUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  provider?: Prisma.EnumAuthProviderEnumFieldUpdateOperationsInput | $Enums.AuthProviderEnum
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
   accessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  profileData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastUsedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserIdentityCreateManyInput = {
   id?: string
   userId: string
-  provider: $Enums.AuthProvider
+  provider: $Enums.AuthProviderEnum
   providerId: string
   accessToken?: string | null
   refreshToken?: string | null
-  profileData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  lastUsedAt?: Date | string
+  lastUsedAt?: Date | string | null
 }
 
 export type UserIdentityUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  provider?: Prisma.EnumAuthProviderEnumFieldUpdateOperationsInput | $Enums.AuthProviderEnum
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
   accessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  profileData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastUsedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserIdentityUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  provider?: Prisma.EnumAuthProviderEnumFieldUpdateOperationsInput | $Enums.AuthProviderEnum
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
   accessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  profileData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastUsedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserIdentityListRelationFilter = {
@@ -373,9 +358,10 @@ export type UserIdentityOrderByRelevanceInput = {
   search: string
 }
 
-export type UserIdentityUserIdProviderCompoundUniqueInput = {
+export type UserIdentityUserIdProviderProviderIdCompoundUniqueInput = {
   userId: string
-  provider: $Enums.AuthProvider
+  provider: $Enums.AuthProviderEnum
+  providerId: string
 }
 
 export type UserIdentityCountOrderByAggregateInput = {
@@ -385,7 +371,6 @@ export type UserIdentityCountOrderByAggregateInput = {
   providerId?: Prisma.SortOrder
   accessToken?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
-  profileData?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastUsedAt?: Prisma.SortOrder
 }
@@ -454,30 +439,28 @@ export type UserIdentityUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.UserIdentityScalarWhereInput | Prisma.UserIdentityScalarWhereInput[]
 }
 
-export type EnumAuthProviderFieldUpdateOperationsInput = {
-  set?: $Enums.AuthProvider
+export type EnumAuthProviderEnumFieldUpdateOperationsInput = {
+  set?: $Enums.AuthProviderEnum
 }
 
 export type UserIdentityCreateWithoutUserInput = {
   id?: string
-  provider: $Enums.AuthProvider
+  provider: $Enums.AuthProviderEnum
   providerId: string
   accessToken?: string | null
   refreshToken?: string | null
-  profileData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  lastUsedAt?: Date | string
+  lastUsedAt?: Date | string | null
 }
 
 export type UserIdentityUncheckedCreateWithoutUserInput = {
   id?: string
-  provider: $Enums.AuthProvider
+  provider: $Enums.AuthProviderEnum
   providerId: string
   accessToken?: string | null
   refreshToken?: string | null
-  profileData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  lastUsedAt?: Date | string
+  lastUsedAt?: Date | string | null
 }
 
 export type UserIdentityCreateOrConnectWithoutUserInput = {
@@ -512,57 +495,52 @@ export type UserIdentityScalarWhereInput = {
   NOT?: Prisma.UserIdentityScalarWhereInput | Prisma.UserIdentityScalarWhereInput[]
   id?: Prisma.StringFilter<"UserIdentity"> | string
   userId?: Prisma.StringFilter<"UserIdentity"> | string
-  provider?: Prisma.EnumAuthProviderFilter<"UserIdentity"> | $Enums.AuthProvider
+  provider?: Prisma.EnumAuthProviderEnumFilter<"UserIdentity"> | $Enums.AuthProviderEnum
   providerId?: Prisma.StringFilter<"UserIdentity"> | string
   accessToken?: Prisma.StringNullableFilter<"UserIdentity"> | string | null
   refreshToken?: Prisma.StringNullableFilter<"UserIdentity"> | string | null
-  profileData?: Prisma.JsonNullableFilter<"UserIdentity">
   createdAt?: Prisma.DateTimeFilter<"UserIdentity"> | Date | string
-  lastUsedAt?: Prisma.DateTimeFilter<"UserIdentity"> | Date | string
+  lastUsedAt?: Prisma.DateTimeNullableFilter<"UserIdentity"> | Date | string | null
 }
 
 export type UserIdentityCreateManyUserInput = {
   id?: string
-  provider: $Enums.AuthProvider
+  provider: $Enums.AuthProviderEnum
   providerId: string
   accessToken?: string | null
   refreshToken?: string | null
-  profileData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  lastUsedAt?: Date | string
+  lastUsedAt?: Date | string | null
 }
 
 export type UserIdentityUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  provider?: Prisma.EnumAuthProviderEnumFieldUpdateOperationsInput | $Enums.AuthProviderEnum
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
   accessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  profileData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastUsedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserIdentityUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  provider?: Prisma.EnumAuthProviderEnumFieldUpdateOperationsInput | $Enums.AuthProviderEnum
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
   accessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  profileData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastUsedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserIdentityUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumAuthProviderFieldUpdateOperationsInput | $Enums.AuthProvider
+  provider?: Prisma.EnumAuthProviderEnumFieldUpdateOperationsInput | $Enums.AuthProviderEnum
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
   accessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  profileData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastUsedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -574,7 +552,6 @@ export type UserIdentitySelect<ExtArgs extends runtime.Types.Extensions.Internal
   providerId?: boolean
   accessToken?: boolean
   refreshToken?: boolean
-  profileData?: boolean
   createdAt?: boolean
   lastUsedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -589,12 +566,11 @@ export type UserIdentitySelectScalar = {
   providerId?: boolean
   accessToken?: boolean
   refreshToken?: boolean
-  profileData?: boolean
   createdAt?: boolean
   lastUsedAt?: boolean
 }
 
-export type UserIdentityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "provider" | "providerId" | "accessToken" | "refreshToken" | "profileData" | "createdAt" | "lastUsedAt", ExtArgs["result"]["userIdentity"]>
+export type UserIdentityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "provider" | "providerId" | "accessToken" | "refreshToken" | "createdAt" | "lastUsedAt", ExtArgs["result"]["userIdentity"]>
 export type UserIdentityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -607,13 +583,12 @@ export type $UserIdentityPayload<ExtArgs extends runtime.Types.Extensions.Intern
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string
-    provider: $Enums.AuthProvider
+    provider: $Enums.AuthProviderEnum
     providerId: string
     accessToken: string | null
     refreshToken: string | null
-    profileData: runtime.JsonValue | null
     createdAt: Date
-    lastUsedAt: Date
+    lastUsedAt: Date | null
   }, ExtArgs["result"]["userIdentity"]>
   composites: {}
 }
@@ -986,11 +961,10 @@ export interface Prisma__UserIdentityClient<T, Null = never, ExtArgs extends run
 export interface UserIdentityFieldRefs {
   readonly id: Prisma.FieldRef<"UserIdentity", 'String'>
   readonly userId: Prisma.FieldRef<"UserIdentity", 'String'>
-  readonly provider: Prisma.FieldRef<"UserIdentity", 'AuthProvider'>
+  readonly provider: Prisma.FieldRef<"UserIdentity", 'AuthProviderEnum'>
   readonly providerId: Prisma.FieldRef<"UserIdentity", 'String'>
   readonly accessToken: Prisma.FieldRef<"UserIdentity", 'String'>
   readonly refreshToken: Prisma.FieldRef<"UserIdentity", 'String'>
-  readonly profileData: Prisma.FieldRef<"UserIdentity", 'Json'>
   readonly createdAt: Prisma.FieldRef<"UserIdentity", 'DateTime'>
   readonly lastUsedAt: Prisma.FieldRef<"UserIdentity", 'DateTime'>
 }

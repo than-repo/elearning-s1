@@ -12,8 +12,6 @@
 
 import * as process from 'node:process'
 import * as path from 'node:path'
-import { fileURLToPath } from 'node:url'
-globalThis['__dirname'] = path.dirname(fileURLToPath(import.meta.url))
 
 import * as runtime from "@prisma/client/runtime/client"
 import * as $Enums from "./enums.js"
@@ -57,15 +55,15 @@ export type UserIdentity = Prisma.UserIdentityModel
  */
 export type RefreshToken = Prisma.RefreshTokenModel
 /**
- * Model Course
- * 
- */
-export type Course = Prisma.CourseModel
-/**
  * Model CourseInstructor
  * 
  */
 export type CourseInstructor = Prisma.CourseInstructorModel
+/**
+ * Model Course
+ * 
+ */
+export type Course = Prisma.CourseModel
 /**
  * Model CourseSection
  * 
@@ -82,12 +80,12 @@ export type Lesson = Prisma.LessonModel
  */
 export type FileMedia = Prisma.FileMediaModel
 /**
- * Model Payment
- * 
- */
-export type Payment = Prisma.PaymentModel
-/**
  * Model Enrollment
  * 
  */
 export type Enrollment = Prisma.EnrollmentModel
+/**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel

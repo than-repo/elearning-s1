@@ -9,6 +9,16 @@
 * 🟢 You can import this file directly.
 */
 
+export const GenderEnum = {
+  MALE: 'MALE',
+  FEMALE: 'FEMALE',
+  OTHER: 'OTHER',
+  PREFER_NOT_TO_SAY: 'PREFER_NOT_TO_SAY'
+} as const
+
+export type GenderEnum = (typeof GenderEnum)[keyof typeof GenderEnum]
+
+
 export const UserRole = {
   LEARNER: 'LEARNER',
   INSTRUCTOR: 'INSTRUCTOR',
@@ -19,29 +29,40 @@ export const UserRole = {
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
-export const Gender = {
-  MALE: 'MALE',
-  FEMALE: 'FEMALE',
-  OTHER: 'OTHER',
-  PREFER_NOT_TO_SAY: 'PREFER_NOT_TO_SAY'
-} as const
-
-export type Gender = (typeof Gender)[keyof typeof Gender]
-
-
-export const AuthProvider = {
+export const AuthProviderEnum = {
   LOCAL: 'LOCAL',
-  GOOGLE: 'GOOGLE',
-  FACEBOOK: 'FACEBOOK'
+  GOOGLE: 'GOOGLE'
 } as const
 
-export type AuthProvider = (typeof AuthProvider)[keyof typeof AuthProvider]
+export type AuthProviderEnum = (typeof AuthProviderEnum)[keyof typeof AuthProviderEnum]
+
+
+export const PaymentMethod = {
+  CREDIT_CARD: 'CREDIT_CARD',
+  BANK_TRANSFER: 'BANK_TRANSFER',
+  E_WALLET: 'E_WALLET',
+  PAYPAL: 'PAYPAL',
+  VN_PAY: 'VN_PAY',
+  FREE: 'FREE'
+} as const
+
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
+
+
+export const EnrollmentStatus = {
+  ACTIVE: 'ACTIVE',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type EnrollmentStatus = (typeof EnrollmentStatus)[keyof typeof EnrollmentStatus]
 
 
 export const CourseLevel = {
   BEGINNER: 'BEGINNER',
   INTERMEDIATE: 'INTERMEDIATE',
-  ADVANCED: 'ADVANCED',
+  ADVANCE: 'ADVANCE',
   ALL_LEVELS: 'ALL_LEVELS'
 } as const
 
@@ -72,43 +93,21 @@ export type DayOfWeek = (typeof DayOfWeek)[keyof typeof DayOfWeek]
 
 export const PaymentStatus = {
   PENDING: 'PENDING',
-  SUCCESS: 'SUCCESS',
+  COMPLETED: 'COMPLETED',
   FAILED: 'FAILED',
-  CANCELLED: 'CANCELLED',
-  REFUNDED: 'REFUNDED'
+  REFUNDED: 'REFUNDED',
+  CANCELLED: 'CANCELLED'
 } as const
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
 
 
-export const PaymentMethod = {
-  CREDIT_CARD: 'CREDIT_CARD',
-  BANK_TRANSFER: 'BANK_TRANSFER',
-  E_WALLET: 'E_WALLET',
-  PAYPAL: 'PAYPAL',
-  VN_PAY: 'VN_PAY',
-  FREE: 'FREE'
-} as const
-
-export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
-
-
-export const EnrollmentStatus = {
-  ACTIVE: 'ACTIVE',
-  COMPLETED: 'COMPLETED',
-  CANCELLED: 'CANCELLED',
-  EXPIRED: 'EXPIRED'
-} as const
-
-export type EnrollmentStatus = (typeof EnrollmentStatus)[keyof typeof EnrollmentStatus]
-
-
-export const MediaType = {
+export const MediaTypeEnum = {
   VIDEO: 'VIDEO',
-  PDF: 'PDF',
+  DOCUMENT: 'DOCUMENT',
   IMAGE: 'IMAGE',
   AUDIO: 'AUDIO',
   OTHER: 'OTHER'
 } as const
 
-export type MediaType = (typeof MediaType)[keyof typeof MediaType]
+export type MediaTypeEnum = (typeof MediaTypeEnum)[keyof typeof MediaTypeEnum]

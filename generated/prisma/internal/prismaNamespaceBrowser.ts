@@ -54,13 +54,13 @@ export const ModelName = {
   User: 'User',
   UserIdentity: 'UserIdentity',
   RefreshToken: 'RefreshToken',
-  Course: 'Course',
   CourseInstructor: 'CourseInstructor',
+  Course: 'Course',
   CourseSection: 'CourseSection',
   Lesson: 'Lesson',
   FileMedia: 'FileMedia',
-  Payment: 'Payment',
-  Enrollment: 'Enrollment'
+  Enrollment: 'Enrollment',
+  Payment: 'Payment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -93,8 +93,7 @@ export const UserScalarFieldEnum = {
   emailVerified: 'emailVerified',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  lastLoginAt: 'lastLoginAt',
-  deletedAt: 'deletedAt'
+  lastLoginAt: 'lastLoginAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -107,7 +106,6 @@ export const UserIdentityScalarFieldEnum = {
   providerId: 'providerId',
   accessToken: 'accessToken',
   refreshToken: 'refreshToken',
-  profileData: 'profileData',
   createdAt: 'createdAt',
   lastUsedAt: 'lastUsedAt'
 } as const
@@ -127,6 +125,21 @@ export const RefreshTokenScalarFieldEnum = {
 } as const
 
 export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum]
+
+
+export const CourseInstructorScalarFieldEnum = {
+  id: 'id',
+  courseId: 'courseId',
+  instructorId: 'instructorId',
+  isPrimary: 'isPrimary',
+  order: 'order',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type CourseInstructorScalarFieldEnum = (typeof CourseInstructorScalarFieldEnum)[keyof typeof CourseInstructorScalarFieldEnum]
 
 
 export const CourseScalarFieldEnum = {
@@ -152,21 +165,6 @@ export const CourseScalarFieldEnum = {
 } as const
 
 export type CourseScalarFieldEnum = (typeof CourseScalarFieldEnum)[keyof typeof CourseScalarFieldEnum]
-
-
-export const CourseInstructorScalarFieldEnum = {
-  id: 'id',
-  courseId: 'courseId',
-  instructorId: 'instructorId',
-  isPrimary: 'isPrimary',
-  order: 'order',
-  isActive: 'isActive',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
-} as const
-
-export type CourseInstructorScalarFieldEnum = (typeof CourseInstructorScalarFieldEnum)[keyof typeof CourseInstructorScalarFieldEnum]
 
 
 export const CourseSectionScalarFieldEnum = {
@@ -206,11 +204,28 @@ export const FileMediaScalarFieldEnum = {
   type: 'type',
   filename: 'filename',
   mimeType: 'mimeType',
-  sizeInBytes: 'sizeInBytes',
-  createdAt: 'createdAt'
+  sizeInBytes: 'sizeInBytes'
 } as const
 
 export type FileMediaScalarFieldEnum = (typeof FileMediaScalarFieldEnum)[keyof typeof FileMediaScalarFieldEnum]
+
+
+export const EnrollmentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  courseId: 'courseId',
+  paymentId: 'paymentId',
+  status: 'status',
+  progressPercentage: 'progressPercentage',
+  enrolledAt: 'enrolledAt',
+  completedAt: 'completedAt',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type EnrollmentScalarFieldEnum = (typeof EnrollmentScalarFieldEnum)[keyof typeof EnrollmentScalarFieldEnum]
 
 
 export const PaymentScalarFieldEnum = {
@@ -233,24 +248,6 @@ export const PaymentScalarFieldEnum = {
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
 
 
-export const EnrollmentScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  courseId: 'courseId',
-  paymentId: 'paymentId',
-  status: 'status',
-  progressPercentage: 'progressPercentage',
-  enrolledAt: 'enrolledAt',
-  completedAt: 'completedAt',
-  isActive: 'isActive',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
-} as const
-
-export type EnrollmentScalarFieldEnum = (typeof EnrollmentScalarFieldEnum)[keyof typeof EnrollmentScalarFieldEnum]
-
-
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -265,13 +262,6 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
-
-
-export const JsonNullValueInput = {
-  JsonNull: JsonNull
-} as const
-
-export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const NullsOrder = {
@@ -292,23 +282,6 @@ export const UserOrderByRelevanceFieldEnum = {
 } as const
 
 export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
-
-
-export const JsonNullValueFilter = {
-  DbNull: DbNull,
-  JsonNull: JsonNull,
-  AnyNull: AnyNull
-} as const
-
-export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-} as const
-
-export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
 export const UserIdentityOrderByRelevanceFieldEnum = {
@@ -333,6 +306,32 @@ export const RefreshTokenOrderByRelevanceFieldEnum = {
 export type RefreshTokenOrderByRelevanceFieldEnum = (typeof RefreshTokenOrderByRelevanceFieldEnum)[keyof typeof RefreshTokenOrderByRelevanceFieldEnum]
 
 
+export const CourseInstructorOrderByRelevanceFieldEnum = {
+  id: 'id',
+  courseId: 'courseId',
+  instructorId: 'instructorId'
+} as const
+
+export type CourseInstructorOrderByRelevanceFieldEnum = (typeof CourseInstructorOrderByRelevanceFieldEnum)[keyof typeof CourseInstructorOrderByRelevanceFieldEnum]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+} as const
+
+export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
 export const CourseOrderByRelevanceFieldEnum = {
   id: 'id',
   title: 'title',
@@ -344,15 +343,6 @@ export const CourseOrderByRelevanceFieldEnum = {
 } as const
 
 export type CourseOrderByRelevanceFieldEnum = (typeof CourseOrderByRelevanceFieldEnum)[keyof typeof CourseOrderByRelevanceFieldEnum]
-
-
-export const CourseInstructorOrderByRelevanceFieldEnum = {
-  id: 'id',
-  courseId: 'courseId',
-  instructorId: 'instructorId'
-} as const
-
-export type CourseInstructorOrderByRelevanceFieldEnum = (typeof CourseInstructorOrderByRelevanceFieldEnum)[keyof typeof CourseInstructorOrderByRelevanceFieldEnum]
 
 
 export const CourseSectionOrderByRelevanceFieldEnum = {
@@ -386,6 +376,16 @@ export const FileMediaOrderByRelevanceFieldEnum = {
 export type FileMediaOrderByRelevanceFieldEnum = (typeof FileMediaOrderByRelevanceFieldEnum)[keyof typeof FileMediaOrderByRelevanceFieldEnum]
 
 
+export const EnrollmentOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  courseId: 'courseId',
+  paymentId: 'paymentId'
+} as const
+
+export type EnrollmentOrderByRelevanceFieldEnum = (typeof EnrollmentOrderByRelevanceFieldEnum)[keyof typeof EnrollmentOrderByRelevanceFieldEnum]
+
+
 export const PaymentOrderByRelevanceFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -396,14 +396,4 @@ export const PaymentOrderByRelevanceFieldEnum = {
 } as const
 
 export type PaymentOrderByRelevanceFieldEnum = (typeof PaymentOrderByRelevanceFieldEnum)[keyof typeof PaymentOrderByRelevanceFieldEnum]
-
-
-export const EnrollmentOrderByRelevanceFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  courseId: 'courseId',
-  paymentId: 'paymentId'
-} as const
-
-export type EnrollmentOrderByRelevanceFieldEnum = (typeof EnrollmentOrderByRelevanceFieldEnum)[keyof typeof EnrollmentOrderByRelevanceFieldEnum]
 
