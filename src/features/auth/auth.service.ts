@@ -19,7 +19,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
-  private readonly PASSWORD_SALT_ROUNDS = 12; // ← consistent with repository
+  private readonly PASSWORD_SALT_ROUNDS = 12; // consistent with repository
 
   constructor(
     private readonly authRepository: AuthRepository,
@@ -92,8 +92,9 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(payload);
 
-    const refreshExpiresIn =
-      this.configService.getOrThrow<string>('JWT_EXPIRES_IN');
+    const refreshExpiresIn = this.configService.getOrThrow<string>(
+      'REFRESH_TOKEN_EXPIRES_IN',
+    );
     const expiresAt = this.calculateExpiry(refreshExpiresIn);
 
     const { refreshToken } = await this.authRepository.createRefreshToken({
@@ -142,21 +143,68 @@ export class AuthService {
   }
 
   //REFRESH TOKEN METHOD
-  async refreshToken(dto: RefreshTokenDto): Promise<AuthResponseDto> {
-    // 1. Validate the refresh token
+  async refreshToken(refreshToken: string): Promise<AuthResponseDto> {
+    if (!refreshToken || typeof refreshToken !== 'string') {
+      throw new UnauthorizedException('Invalid refresh token format');
+    }
     const refreshTokenRecord =
-      await this.authRepository.findRefreshTokenByToken(dto.refreshToken);
+      await this.authRepository.findRefreshTokenByToken(refreshToken);
 
-    if (!refreshTokenRecord || !refreshTokenRecord.user) {
+    if (!refreshTokenRecord?.user) {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
-    const user = refreshTokenRecord.user;
-
-    // 2. Revoke old token (token rotation - security best practice)
     await this.authRepository.revokeToken(refreshTokenRecord.id);
 
-    // 3. Generate brand new tokens
+    return this.generateAuthResponse(refreshTokenRecord.user);
+  }
+
+  async validateGoogleUser(
+    profile: any,
+    accessToken: string,
+    refreshToken: string,
+  ) {
+    const email = profile.emails?.[0]?.value?.toLowerCase();
+    const googleId = profile.id;
+    const fullName =
+      profile.displayName ||
+      `${profile.name?.givenName} ${profile.name?.familyName}`;
+
+    if (!email || !googleId) {
+      throw new UnauthorizedException('Invalid Google profile data');
+    }
+
+    return this.authRepository.findOrCreateGoogleUser({
+      email,
+      fullName,
+      googleId,
+      accessToken,
+      refreshToken,
+      avatarUrl: profile.photos?.[0]?.value,
+    });
+  }
+
+  /**
+   * Optional helper - can be used later for Google login controller
+   */
+  async googleLogin(payload: JwtPayload): Promise<AuthResponseDto> {
+    // reuse the same flow as local login (token generation + cookie)
+    const user = await this.authRepository.findUserById(payload.sub);
     return this.generateAuthResponse(user);
+  }
+
+  async logout(refreshToken: string): Promise<{ message: string }> {
+    // Try to revoke the token (it may already be expired/revoked — we don't throw)
+    const record =
+      await this.authRepository.findRefreshTokenByToken(refreshToken);
+    if (record) {
+      await this.authRepository.revokeToken(record.id);
+    }
+
+    return { message: 'Logged out successfully' };
+  }
+  async logoutAll(userId: string): Promise<{ message: string }> {
+    await this.authRepository.revokeAllUserRefreshTokens(userId);
+    return { message: 'Logged out from all devices successfully' };
   }
 }

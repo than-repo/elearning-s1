@@ -32,7 +32,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Invalid JWT payload structure');
     }
 
-    // Attach request context (very useful for logging, rate limiting, or future features)
     return {
       ...payload,
       ip: req.ip || req.ips?.[0],

@@ -120,8 +120,8 @@ model UserIdentity {
   userId       String
   provider     AuthProviderEnum
   providerId   String
-  accessToken  String?
-  refreshToken String?
+  accessToken  String?          @db.LongText //GGtoken is too long
+  refreshToken String?          @db.LongText
   createdAt    DateTime         @default(now())
   lastUsedAt   DateTime?
 

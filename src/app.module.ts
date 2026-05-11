@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from './core/database/prisma.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseFormattingInterceptor } from './common/interceptors/response-formatting.interceptor';
 import { AuthModule } from './features/auth/auth.module';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -29,6 +29,11 @@ import { ThrottlerModule } from '@nestjs/throttler';
   controllers: [],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: ResponseFormattingInterceptor },
+
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

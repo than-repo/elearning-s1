@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import * as crypto from 'node:crypto';
 import { CreateLocalUserData } from '../interfaces/create-local-user.interface';
 import { CreateRefreshToken } from '../interfaces/create-refresh-token.interface';
+import { CreateGoogleUserData } from '../interfaces/create-google-user.interface';
 
 @Injectable()
 export class AuthRepository {
@@ -140,6 +141,98 @@ export class AuthRepository {
       data: {
         isRevoked: true,
       },
+    });
+  }
+
+  /**
+   *Find user by ID (used by Google login flow)
+   */
+  async findUserById(userId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: userId, isActive: true },
+      include: {
+        identities: true,
+      },
+    });
+  }
+
+  async findOrCreateGoogleUser(data: CreateGoogleUserData) {
+    const emailLower = data.email.toLowerCase();
+
+    return this.prisma.$transaction(async (tx) => {
+      // 1. Check if user already exists by email
+      let user = await tx.user.findUnique({
+        where: { email: emailLower },
+        include: { identities: true },
+      });
+
+      if (user) {
+        // User exists -> check if Google identity is already linked
+        const googleIdentity = user.identities.find(
+          (id) =>
+            id.provider === AuthProviderEnum.GOOGLE &&
+            id.providerId === data.googleId,
+        );
+
+        if (!googleIdentity) {
+          // Link Google account to existing user
+          await tx.userIdentity.create({
+            data: {
+              userId: user.id,
+              provider: AuthProviderEnum.GOOGLE,
+              providerId: data.googleId,
+              accessToken: data.accessToken,
+              refreshToken: data.refreshToken || null,
+            },
+          });
+        } else {
+          // Update existing Google identity tokens
+          await tx.userIdentity.update({
+            where: { id: googleIdentity.id },
+            data: {
+              accessToken: data.accessToken,
+              refreshToken: data.refreshToken || null,
+              lastUsedAt: new Date(),
+            },
+          });
+        }
+
+        // Update user avatar if not set
+        if (!user.avatarUrl && data.avatarUrl) {
+          user = await tx.user.update({
+            where: { id: user.id },
+            data: { avatarUrl: data.avatarUrl },
+            include: { identities: true },
+          });
+        }
+
+        return user;
+      }
+
+      // 2. No user exists => create brand new user + Google identity
+      user = await tx.user.create({
+        data: {
+          fullName: data.fullName.trim(),
+          email: emailLower,
+          avatarUrl: data.avatarUrl || null,
+          role: UserRole.LEARNER,
+          isActive: true,
+          emailVerified: true, // Google accounts are considered verified
+        },
+        include: { identities: true },
+      });
+
+      await tx.userIdentity.create({
+        data: {
+          userId: user.id,
+          provider: AuthProviderEnum.GOOGLE,
+          providerId: data.googleId,
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken || null,
+        },
+      });
+
+      return user;
     });
   }
 }

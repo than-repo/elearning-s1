@@ -1,5 +1,5 @@
 // src/features/auth/dto/auth-response.dto.ts
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 
 export class AuthResponseDto {
   @ApiProperty({ description: 'Basic user information' })
@@ -13,7 +13,7 @@ export class AuthResponseDto {
   @ApiProperty({ description: 'JWT access token' })
   accessToken!: string;
 
-  @ApiProperty({ description: 'Refresh token (to be used for token refresh)' })
+  @ApiHideProperty()
   refreshToken!: string;
 
   @ApiProperty({

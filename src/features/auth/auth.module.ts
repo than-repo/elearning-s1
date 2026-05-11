@@ -11,6 +11,8 @@ import { AuthRepository } from './repositories/auth.repository';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { GoogleStrategy } from './strategies/google.strategy';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 
 @Module({
   imports: [
@@ -22,7 +24,7 @@ import { RolesGuard } from './guards/roles.guard';
         secret: configService.getOrThrow<string>('JWT_SECRET'),
         signOptions: {
           expiresIn: configService.getOrThrow<string>(
-            'JWT_EXPIRES_IN',
+            'JWT_ACCESS_EXPIRES_IN',
           ) as `${number}${'s' | 'm' | 'h' | 'd'}`,
         },
       }),
@@ -37,6 +39,8 @@ import { RolesGuard } from './guards/roles.guard';
     JwtStrategy,
     JwtAuthGuard,
     RolesGuard,
+    GoogleStrategy,
+    GoogleAuthGuard,
     // LocalStrategy, GoogleStrategy, etc. will be added later
   ],
 

@@ -1,4 +1,4 @@
-// src/features/auth/auth.controller.ts
+import { ConfigService } from '@nestjs/config';
 import {
   Body,
   Controller,
@@ -7,8 +7,13 @@ import {
   HttpStatus,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import type { Response } from 'express';
+import { Throttle } from '@nestjs/throttler';
+import { UnauthorizedException } from '@nestjs/common';
+
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -22,21 +27,36 @@ import {
 
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-
 import { AuthService } from './auth.service';
-import { AuthResponseDto } from './dto/login-response.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
-import { Roles } from './decorators/roles.decorator';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { Roles } from './decorators/roles.decorator';
 import { UserRole } from 'generated/prisma/enums';
-import { Throttle } from '@nestjs/throttler';
+import { AuthResponseDto } from './dto/login-response.dto';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  private setRefreshTokenCookie(res: Response, refreshToken: string): void {
+    const maxAge =
+      this.configService.getOrThrow<number>('REFRESH_TOKEN_MAX_AGE_MS') ||
+      7 * 24 * 60 * 60 * 1000;
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge,
+      path: '/',
+    });
+  }
 
   @Post('register')
   @Throttle({ default: { ttl: 60000, limit: 5 } })
@@ -49,8 +69,15 @@ export class AuthController {
   @ApiBadRequestResponse({
     description: 'Validation error or email already taken',
   })
-  async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
-    return this.authService.register(registerDto);
+  async register(
+    @Body() registerDto: RegisterDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.register(registerDto);
+    this.setRefreshTokenCookie(res, result.refreshToken);
+
+    const { refreshToken, ...response } = result;
+    return response;
   }
 
   @Post('login')
@@ -62,59 +89,118 @@ export class AuthController {
     type: AuthResponseDto,
   })
   @ApiBadRequestResponse({ description: 'Invalid credentials' })
-  async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
-    return this.authService.login(loginDto);
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.login(loginDto);
+    this.setRefreshTokenCookie(res, result.refreshToken);
+
+    const { refreshToken, ...response } = result;
+    return response;
   }
 
   @Post('refresh')
   @Throttle({ default: { ttl: 30000, limit: 5 } })
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Refresh access token using refresh token' })
+  @ApiOperation({ summary: 'Refresh access token using httpOnly cookie' })
   @ApiOkResponse({
-    description: 'New access and refresh tokens returned',
+    description: 'New access token returned',
     type: AuthResponseDto,
   })
   @ApiUnauthorizedResponse({ description: 'Invalid or expired refresh token' })
-  async refresh(
-    @Body() refreshTokenDto: RefreshTokenDto,
-  ): Promise<AuthResponseDto> {
-    return this.authService.refreshToken(refreshTokenDto);
+  async refresh(@Req() req: any, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token is missing from cookies');
+    }
+
+    const result = await this.authService.refreshToken(refreshToken);
+
+    this.setRefreshTokenCookie(res, result.refreshToken);
+
+    const { refreshToken: _, ...response } = result;
+    return response;
   }
 
-  //TestAccessToken + JwtAuthGuard
+  // GOOGLE OAUTH
+  @Get('google')
+  @UseGuards(GoogleAuthGuard)
+  @ApiOperation({ summary: 'Start Google OAuth2 login flow' })
+  async googleAuth() {
+    // Passport will automatically redirect to Google
+  }
+
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard)
+  @ApiOperation({ summary: 'Google OAuth2 callback' })
+  async googleAuthCallback(
+    @Req() req: any,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    // req.user contains the JwtPayload from GoogleStrategy
+    const result = await this.authService.googleLogin(req.user);
+
+    this.setRefreshTokenCookie(res, result.refreshToken);
+
+    const { refreshToken, ...response } = result;
+
+    // Note: has not redirect to frontend dashboard yet
+    // For now returning Json instead
+    return response;
+  }
+
+  @Post('logout')
+  @Throttle({ default: { ttl: 60000, limit: 10 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Logout user - revokes refresh token and clears httpOnly cookie',
+  })
+  @ApiOkResponse({ description: 'User logged out successfully' })
+  async logout(@Req() req: any, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies?.refreshToken;
+
+    // Revoke token if it exists
+    if (refreshToken) {
+      await this.authService.logout(refreshToken);
+    }
+
+    // Clear the httpOnly cookie securely
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+    });
+
+    return { message: 'Logged out successfully' };
+  }
+
+  @Post('logout-all')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Logout from all devices' })
+  async logoutAll(@Req() req: Request & { user: any }) {
+    await this.authService.logoutAll(req.user.sub);
+    return { message: 'Logged out from all devices successfully' };
+  }
+
+  // Test endpoints
   @Get('TestAccessToken')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Test endpoint - returns current user if JWT is valid',
-  })
-  @ApiOkResponse({ description: 'JWT Guard is working' })
   async TestAccessToken(@Req() req: Request & { user: any }) {
-    return {
-      success: true,
-      message: 'JWT authentication successful',
-      user: req.user as any,
-    };
+    return { success: true, message: 'JWT OK', user: req.user };
   }
 
   @Get('TestRBAC')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.LEARNER)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get current authenticated user (RBAC protected)' })
-  @ApiOkResponse({ description: 'Returns current user from JWT' })
-  @ApiForbiddenResponse({ description: 'Role not allowed' })
   async getMe(@Req() req: Request & { user: any }) {
-    return {
-      success: true,
-      message: 'JWT + RBAC authentication successful',
-      user: {
-        id: req.user.sub,
-        email: req.user.email,
-        role: req.user.role,
-        ip: req.user.ip,
-        userAgent: req.user.userAgent,
-      },
-    };
+    return { success: true, message: 'RBAC OK', user: req.user };
   }
 }
