@@ -35,6 +35,8 @@ import { Roles } from './decorators/roles.decorator';
 import { UserRole } from 'generated/prisma/enums';
 import { AuthResponseDto } from './dto/login-response.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
+import type { RequestWithCookies } from './interfaces/request-with-cookies';
+import type { RequestWithUser } from './interfaces/request-with-user';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -45,9 +47,9 @@ export class AuthController {
   ) {}
 
   private setRefreshTokenCookie(res: Response, refreshToken: string): void {
-    const maxAge =
-      this.configService.getOrThrow<number>('REFRESH_TOKEN_MAX_AGE_MS') ||
-      7 * 24 * 60 * 60 * 1000;
+    const maxAge = this.configService.getOrThrow<number>(
+      'REFRESH_TOKEN_MAX_AGE_MS',
+    );
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -109,7 +111,10 @@ export class AuthController {
     type: AuthResponseDto,
   })
   @ApiUnauthorizedResponse({ description: 'Invalid or expired refresh token' })
-  async refresh(@Req() req: any, @Res({ passthrough: true }) res: Response) {
+  async refresh(
+    @Req() req: RequestWithCookies,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const refreshToken = req.cookies?.refreshToken;
 
     if (!refreshToken) {
@@ -136,7 +141,7 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   @ApiOperation({ summary: 'Google OAuth2 callback' })
   async googleAuthCallback(
-    @Req() req: any,
+    @Req() req: RequestWithUser,
     @Res({ passthrough: true }) res: Response,
   ) {
     // req.user contains the JwtPayload from GoogleStrategy
@@ -147,6 +152,7 @@ export class AuthController {
     const { refreshToken, ...response } = result;
 
     // Note: has not redirect to frontend dashboard yet
+    // res.redirect(${frontendUrl}/auth/success?token=...')`
     // For now returning Json instead
     return response;
   }
@@ -158,7 +164,10 @@ export class AuthController {
     summary: 'Logout user - revokes refresh token and clears httpOnly cookie',
   })
   @ApiOkResponse({ description: 'User logged out successfully' })
-  async logout(@Req() req: any, @Res({ passthrough: true }) res: Response) {
+  async logout(
+    @Req() req: RequestWithCookies,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const refreshToken = req.cookies?.refreshToken;
 
     // Revoke token if it exists

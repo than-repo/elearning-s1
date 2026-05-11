@@ -17,9 +17,9 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Swagger Example')
-    .setDescription('The cats API description')
+    .setDescription('The Elearning API description')
     .setVersion('1.0')
-    .addTag('cats')
+    .addTag('E-l')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);

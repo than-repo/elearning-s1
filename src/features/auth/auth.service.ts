@@ -15,11 +15,10 @@ import { AuthRepository } from './repositories/auth.repository';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
 import { AuthResponseDto } from './dto/login-response.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
-  private readonly PASSWORD_SALT_ROUNDS = 12; // consistent with repository
+  private readonly PASSWORD_SALT_ROUNDS = 12; // note
 
   constructor(
     private readonly authRepository: AuthRepository,

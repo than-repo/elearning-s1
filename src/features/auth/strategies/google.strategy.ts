@@ -28,7 +28,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   async validate(
     accessToken: string,
     refreshToken: string,
-    profile: any,
+    profile: any, //gg sent, so it can be reliable
   ): Promise<JwtPayload> {
     try {
       const user = await this.authService.validateGoogleUser(
