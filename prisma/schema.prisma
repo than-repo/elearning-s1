@@ -134,7 +134,7 @@ model UserIdentity {
 model RefreshToken {
   id         String   @id @default(uuid())
   userId     String
-  tokenHash  String   @unique
+  tokenHash  String   @unique @db.VarChar(64) // explicit length for SHA-256
   expiresAt  DateTime
   deviceInfo String?
   ipAddress  String?
@@ -143,6 +143,9 @@ model RefreshToken {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
+  // Production indexes
+  @@index([userId, isRevoked, expiresAt]) // modify it for revokeAll + find
+  @@index([tokenHash])
   @@map("refresh_tokens")
 }
 

@@ -1,25 +1,18 @@
 // src/core/database/prisma.service.ts
-import {
-  Injectable,
-  OnModuleInit,
-  OnModuleDestroy,
-  Logger,
-} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaClient } from '../../../generated/prisma/client';
+import { PrismaClient } from 'generated/prisma/client';
+import { Global, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 
-@Injectable()
+@Global()
 export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
   private readonly logger = new Logger(PrismaService.name);
 
-  constructor(private readonly configService: ConfigService) {
-    // Use configService (without 'this.') BEFORE super()
-    const databaseUrl = configService.get<string>('DATABASE_URL');
-
+  constructor(private readonly ConfigService: ConfigService) {
+    const databaseUrl = ConfigService.get<string>('DATABASE_URL');
     if (!databaseUrl) {
       throw new Error('DATABASE_URL is missing in .development.env');
     }
@@ -36,19 +29,17 @@ export class PrismaService
       allowPublicKeyRetrieval: true, // fixes RSA error
     });
 
-    super({ adapter }); //  super() called here
+    super({ adapter });
   }
-
   async onModuleInit() {
-    await this.$connect();
-    this.logger.log('Prisma connected to MySQL database successfully');
+    await this.$connect;
+    this.logger.log('Prisma connected to MySql successfully');
 
-    const userCount = await this.user.count();
-    this.logger.log(`Prisma test OK - Total users: ${userCount}`);
+    const user = await this.user.count();
+    this.logger.log(`Prisma test OK - User: ${user}`);
   }
-
   async onModuleDestroy() {
-    await this.$disconnect();
+    await this.$disconnect;
     this.logger.log('Prisma disconnected');
   }
 }

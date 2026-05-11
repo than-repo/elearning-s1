@@ -96,3 +96,87 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+```
+elearning-system
+├─ .prettierrc
+├─ common
+├─ docker-compose.yml
+├─ eslint.config.mjs
+├─ generated
+│  └─ prisma
+│     ├─ browser.ts
+│     ├─ client.ts
+│     ├─ commonInputTypes.ts
+│     ├─ enums.ts
+│     ├─ internal
+│     │  ├─ class.ts
+│     │  ├─ prismaNamespace.ts
+│     │  └─ prismaNamespaceBrowser.ts
+│     ├─ models
+│     │  ├─ Course.ts
+│     │  ├─ CourseInstructor.ts
+│     │  ├─ CourseSection.ts
+│     │  ├─ Enrollment.ts
+│     │  ├─ FileMedia.ts
+│     │  ├─ Lesson.ts
+│     │  ├─ Payment.ts
+│     │  ├─ RefreshToken.ts
+│     │  ├─ User.ts
+│     │  └─ UserIdentity.ts
+│     └─ models.ts
+├─ nest-cli.json
+├─ npx
+├─ package-lock.json
+├─ package.json
+├─ prisma
+│  ├─ schema.prisma
+│  └─ test.prisma
+├─ prisma.config.ts
+├─ README.md
+├─ sample-data.txt
+├─ src
+│  ├─ app.module.ts
+│  ├─ common
+│  │  ├─ interceptors
+│  │  │  └─ response-formatting.interceptor.ts
+│  │  ├─ interfaces
+│  │  │  └─ api-response.interfaces.ts
+│  │  └─ pipes
+│  ├─ config
+│  ├─ core
+│  │  ├─ database
+│  │  │  ├─ prisma.module.ts
+│  │  │  └─ prisma.service.ts
+│  │  ├─ mailer
+│  │  └─ storage
+│  ├─ features
+│  │  ├─ auth
+│  │  │  ├─ auth.controller.ts
+│  │  │  ├─ auth.module.ts
+│  │  │  ├─ auth.service.ts
+│  │  │  ├─ decorators
+│  │  │  │  └─ roles.decorator.ts
+│  │  │  ├─ dto
+│  │  │  │  ├─ login.dto.ts
+│  │  │  │  └─ register.dto.ts
+│  │  │  ├─ guards
+│  │  │  │  ├─ jwt-auth.guard.ts
+│  │  │  │  └─ roles.guard.ts
+│  │  │  ├─ interfaces
+│  │  │  │  └─ jwt-payload.interface.ts
+│  │  │  ├─ repositories
+│  │  │  │  └─ auth.repository.ts
+│  │  │  └─ strategies
+│  │  │     └─ jwt.strategy.ts
+│  │  └─ users
+│  └─ main.ts
+├─ structure.txt
+├─ test
+│  ├─ app.e2e-spec.ts
+│  └─ jest-e2e.json
+├─ test.ts
+├─ tsconfig.build.json
+└─ tsconfig.json
+
+```
