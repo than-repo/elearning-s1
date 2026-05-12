@@ -1,5 +1,4 @@
 //src\features\auth\repositories\auth.repository.ts
-import { ConfigService } from '@nestjs/config';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/core/database/prisma.service';
 import { AuthProviderEnum, UserRole } from 'generated/prisma/enums';
@@ -12,7 +11,6 @@ import { CreateGoogleUserData } from '../interfaces/create-google-user.interface
 
 @Injectable()
 export class AuthRepository {
-  private readonly SALT_ROUNDS = 12;
   constructor(private readonly prisma: PrismaService) {}
 
   /**

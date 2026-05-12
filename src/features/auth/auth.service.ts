@@ -18,13 +18,17 @@ import { AuthResponseDto } from './dto/login-response.dto';
 
 @Injectable()
 export class AuthService {
-  private readonly PASSWORD_SALT_ROUNDS = 12; // note
-
+  private readonly saltRounds: number;
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {}
+  ) {
+    this.saltRounds = parseInt(
+      this.configService.getOrThrow('PASSWORD_SALT_ROUNDS'),
+      10,
+    );
+  }
 
   async register(dto: RegisterDto): Promise<AuthResponseDto> {
     const existingUser =
@@ -33,10 +37,7 @@ export class AuthService {
       throw new ConflictException('Email already registered');
     }
 
-    const passwordHash = await bcrypt.hash(
-      dto.password,
-      this.PASSWORD_SALT_ROUNDS,
-    );
+    const passwordHash = await bcrypt.hash(dto.password, this.saltRounds);
 
     const newUser = await this.authRepository.createLocalUser({
       fullName: dto.fullName,

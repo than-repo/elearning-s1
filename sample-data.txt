@@ -8,3 +8,11 @@
   "email": "johndoe@example.com",
   "password": "John@12345"
 }
+
+//Admin
+{
+  "fullName": "Admin 1",
+  "email": "Admin1@example.com",
+  "password": "Admin1@12345",
+    "gender": "MALE"
+}

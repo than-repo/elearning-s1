@@ -5,6 +5,7 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseFormattingInterceptor } from './common/interceptors/response-formatting.interceptor';
 import { AuthModule } from './features/auth/auth.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { UsersModule } from './features/users/users.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
       envFilePath: '.development.env',
       isGlobal: true,
     }),
+    UsersModule,
     PrismaModule,
     AuthModule,
   ],
