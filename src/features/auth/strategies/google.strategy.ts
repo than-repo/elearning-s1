@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
 
-import { AuthService } from '../auth.service';
+import { AuthService } from '../services/auth.service';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 
 @Injectable()

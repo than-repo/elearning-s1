@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 import { AuthRepository } from './repositories/auth.repository';
 
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -13,6 +13,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { TokenCleanupService } from './services/token-cleanup.service';
 
 @Module({
   imports: [
@@ -41,7 +42,7 @@ import { GoogleAuthGuard } from './guards/google-auth.guard';
     RolesGuard,
     GoogleStrategy,
     GoogleAuthGuard,
-    // LocalStrategy, GoogleStrategy, etc. will be added later
+    TokenCleanupService,
   ],
 
   exports: [AuthService, JwtStrategy, JwtAuthGuard, RolesGuard],

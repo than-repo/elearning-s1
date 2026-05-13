@@ -6,6 +6,7 @@ import { ResponseFormattingInterceptor } from './common/interceptors/response-fo
 import { AuthModule } from './features/auth/auth.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { UsersModule } from './features/users/users.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { UsersModule } from './features/users/users.module';
     UsersModule,
     PrismaModule,
     AuthModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [],
   providers: [

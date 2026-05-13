@@ -27,7 +27,7 @@ import {
 
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';

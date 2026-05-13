@@ -1,5 +1,9 @@
 //src\features\users\services\admin-user.service.ts
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 
 import { UsersRepository } from '../repositories/users.repository';
@@ -39,13 +43,32 @@ export class AdminUserService {
     return plainToInstance(UserResponseDto, user);
   }
 
-  async updateUser(id: string, dto: UpdateUserDto): Promise<UserResponseDto> {
+  async updateUser(
+    id: string,
+    dto: UpdateUserDto,
+    currentAdminId: string,
+  ): Promise<UserResponseDto> {
+    if (id === currentAdminId) {
+      // Prevent changing critical fields on self
+      if (dto.role || dto.isActive !== undefined) {
+        throw new ForbiddenException(
+          'You cannot change your own role or active status',
+        );
+      }
+    }
     const user = await this.usersRepository.updateUser(id, dto);
     return plainToInstance(UserResponseDto, user);
   }
 
-  async deactivateUser(id: string): Promise<UserResponseDto> {
+  async deactivateUser(id: string, currentAdminId: string): Promise<void> {
+    if (id === currentAdminId) {
+      throw new ForbiddenException('You cannot deactivate your own account');
+    }
+
     const user = await this.usersRepository.deactivateUser(id);
-    return plainToInstance(UserResponseDto, user);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
   }
 }

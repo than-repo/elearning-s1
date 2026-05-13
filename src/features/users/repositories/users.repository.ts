@@ -197,7 +197,7 @@ export class UsersRepository {
 
   // ==================== PUBLIC OPERATIONS ====================
 
-  async findCurrentUser(id: string) {
+  async findActiveById(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id, isActive: true },
       select: this.userSelect,
@@ -210,7 +210,7 @@ export class UsersRepository {
     return user;
   }
 
-  async updateCurrentUser(id: string, dto: UpdateUserDto) {
+  async updateProfile(id: string, dto: UpdateUserDto) {
     // Public users are not allowed to change role, isActive, or emailVerified
     const { role, isActive, emailVerified, password, ...safeData } = dto;
 
@@ -240,5 +240,25 @@ export class UsersRepository {
       },
       select: this.userSelect,
     });
+  }
+
+  async findPublicById(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id, isActive: true },
+      select: {
+        id: true,
+        fullName: true,
+        avatarUrl: true,
+        gender: true,
+        role: true,
+        createdAt: true,
+        // Only expose safe public fields
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 }

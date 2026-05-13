@@ -1,6 +1,5 @@
 //src\features\auth\auth.service.ts
 
-import { RefreshToken } from './../../../generated/prisma/client';
 import {
   ConflictException,
   Injectable,
@@ -9,12 +8,12 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { AuthRepository } from './repositories/auth.repository';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { RegisterDto } from '../dto/register.dto';
+import { LoginDto } from '../dto/login.dto';
+import { AuthRepository } from '../repositories/auth.repository';
+import { JwtPayload } from '../interfaces/jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
-import { AuthResponseDto } from './dto/login-response.dto';
+import { AuthResponseDto } from '../dto/login-response.dto';
 
 @Injectable()
 export class AuthService {
