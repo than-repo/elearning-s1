@@ -126,7 +126,6 @@ elearning-system
 │     │  └─ UserIdentity.ts
 │     └─ models.ts
 ├─ nest-cli.json
-├─ npx
 ├─ package-lock.json
 ├─ package.json
 ├─ prisma
@@ -138,11 +137,17 @@ elearning-system
 ├─ src
 │  ├─ app.module.ts
 │  ├─ common
+│  │  ├─ cloudinary
+│  │  │  ├─ cloudinary.module.ts
+│  │  │  └─ cloudinary.service.ts
 │  │  ├─ interceptors
 │  │  │  └─ response-formatting.interceptor.ts
 │  │  ├─ interfaces
 │  │  │  └─ api-response.interfaces.ts
-│  │  └─ pipes
+│  │  ├─ pipes
+│  │  └─ utils
+│  │     ├─ clean-data-util.ts
+│  │     └─ prisma-error.util.ts
 │  ├─ config
 │  ├─ core
 │  │  ├─ database
@@ -154,22 +159,61 @@ elearning-system
 │  │  ├─ auth
 │  │  │  ├─ auth.controller.ts
 │  │  │  ├─ auth.module.ts
-│  │  │  ├─ auth.service.ts
 │  │  │  ├─ decorators
+│  │  │  │  ├─ public.decorator.ts
 │  │  │  │  └─ roles.decorator.ts
 │  │  │  ├─ dto
+│  │  │  │  ├─ login-response.dto.ts
 │  │  │  │  ├─ login.dto.ts
+│  │  │  │  ├─ refresh-token.dto.ts
 │  │  │  │  └─ register.dto.ts
 │  │  │  ├─ guards
+│  │  │  │  ├─ google-auth.guard.ts
 │  │  │  │  ├─ jwt-auth.guard.ts
 │  │  │  │  └─ roles.guard.ts
 │  │  │  ├─ interfaces
-│  │  │  │  └─ jwt-payload.interface.ts
+│  │  │  │  ├─ create-google-user.interface.ts
+│  │  │  │  ├─ create-local-user.interface.ts
+│  │  │  │  ├─ create-refresh-token.interface.ts
+│  │  │  │  ├─ jwt-payload.interface.ts
+│  │  │  │  ├─ request-with-cookies.ts
+│  │  │  │  └─ request-with-user.ts
 │  │  │  ├─ repositories
 │  │  │  │  └─ auth.repository.ts
+│  │  │  ├─ services
+│  │  │  │  ├─ auth.service.ts
+│  │  │  │  └─ token-cleanup.service.ts
 │  │  │  └─ strategies
+│  │  │     ├─ google.strategy.ts
 │  │  │     └─ jwt.strategy.ts
+│  │  ├─ upload
+│  │  │  ├─ dto
+│  │  │  ├─ upload.controller.ts
+│  │  │  ├─ upload.module.ts
+│  │  │  ├─ upload.service.ts
+│  │  │  └─ webhook.controller.ts
 │  │  └─ users
+│  │     ├─ controllers
+│  │     │  ├─ admin-users.controller.ts
+│  │     │  └─ users.controller.ts
+│  │     ├─ dto
+│  │     │  ├─ create-user.dto.ts
+│  │     │  ├─ find-all-users-query.dto.ts
+│  │     │  ├─ paginated-users-response.dto.ts
+│  │     │  ├─ public-user-response.dto.ts
+│  │     │  ├─ update-user.dto.ts
+│  │     │  └─ user-response.dto.ts
+│  │     ├─ interfaces
+│  │     │  ├─ create-user-payload.interface.ts
+│  │     │  ├─ get-users-payload.interface.ts
+│  │     │  ├─ update-user-payload.interface.ts
+│  │     │  └─ user-select-result.interface.ts
+│  │     ├─ repositories
+│  │     │  └─ users.repository.ts
+│  │     ├─ services
+│  │     │  ├─ admin-user.service.ts
+│  │     │  └─ users.service.ts
+│  │     └─ users.module.ts
 │  └─ main.ts
 ├─ structure.txt
 ├─ test

@@ -38,7 +38,7 @@ import { FindAllUsersQuery } from '../dto/find-all-users-query.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { RolesGuard } from 'src/features/auth/guards/roles.guard';
 import { UserRole } from 'generated/prisma/enums';
-import type { RequestWithUser } from 'src/features/auth/interfaces/request-with-user';
+import type { RequestWithUser } from 'src/common/interfaces/request-with-user';
 import { Throttle } from '@nestjs/throttler';
 import { PaginatedUsersResponseDto } from '../dto/paginated-users-response.dto';
 

@@ -36,7 +36,7 @@ import { UserRole } from 'generated/prisma/enums';
 import { AuthResponseDto } from './dto/login-response.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import type { RequestWithCookies } from './interfaces/request-with-cookies';
-import type { RequestWithUser } from './interfaces/request-with-user';
+import type { RequestWithUser } from '../../common/interfaces/request-with-user';
 
 @ApiTags('Auth')
 @Controller('auth')

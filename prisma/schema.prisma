@@ -234,13 +234,14 @@ model Lesson {
 }
 
 model FileMedia {
-  id          String        @id @default(uuid())
-  lessonId    String
-  url         String
-  type        MediaTypeEnum
-  filename    String?
-  mimeType    String?
-  sizeInBytes Int?
+  id                 String        @id @default(uuid())
+  lessonId           String
+  cloudinaryPublicId String?       @unique
+  url                String
+  type               MediaTypeEnum
+  filename           String?
+  mimeType           String?
+  sizeInBytes        Int?
 
   lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 

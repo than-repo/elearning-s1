@@ -37,6 +37,7 @@ export type FileMediaSumAggregateOutputType = {
 export type FileMediaMinAggregateOutputType = {
   id: string | null
   lessonId: string | null
+  cloudinaryPublicId: string | null
   url: string | null
   type: $Enums.MediaTypeEnum | null
   filename: string | null
@@ -47,6 +48,7 @@ export type FileMediaMinAggregateOutputType = {
 export type FileMediaMaxAggregateOutputType = {
   id: string | null
   lessonId: string | null
+  cloudinaryPublicId: string | null
   url: string | null
   type: $Enums.MediaTypeEnum | null
   filename: string | null
@@ -57,6 +59,7 @@ export type FileMediaMaxAggregateOutputType = {
 export type FileMediaCountAggregateOutputType = {
   id: number
   lessonId: number
+  cloudinaryPublicId: number
   url: number
   type: number
   filename: number
@@ -77,6 +80,7 @@ export type FileMediaSumAggregateInputType = {
 export type FileMediaMinAggregateInputType = {
   id?: true
   lessonId?: true
+  cloudinaryPublicId?: true
   url?: true
   type?: true
   filename?: true
@@ -87,6 +91,7 @@ export type FileMediaMinAggregateInputType = {
 export type FileMediaMaxAggregateInputType = {
   id?: true
   lessonId?: true
+  cloudinaryPublicId?: true
   url?: true
   type?: true
   filename?: true
@@ -97,6 +102,7 @@ export type FileMediaMaxAggregateInputType = {
 export type FileMediaCountAggregateInputType = {
   id?: true
   lessonId?: true
+  cloudinaryPublicId?: true
   url?: true
   type?: true
   filename?: true
@@ -194,6 +200,7 @@ export type FileMediaGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
 export type FileMediaGroupByOutputType = {
   id: string
   lessonId: string
+  cloudinaryPublicId: string | null
   url: string
   type: $Enums.MediaTypeEnum
   filename: string | null
@@ -227,6 +234,7 @@ export type FileMediaWhereInput = {
   NOT?: Prisma.FileMediaWhereInput | Prisma.FileMediaWhereInput[]
   id?: Prisma.StringFilter<"FileMedia"> | string
   lessonId?: Prisma.StringFilter<"FileMedia"> | string
+  cloudinaryPublicId?: Prisma.StringNullableFilter<"FileMedia"> | string | null
   url?: Prisma.StringFilter<"FileMedia"> | string
   type?: Prisma.EnumMediaTypeEnumFilter<"FileMedia"> | $Enums.MediaTypeEnum
   filename?: Prisma.StringNullableFilter<"FileMedia"> | string | null
@@ -238,6 +246,7 @@ export type FileMediaWhereInput = {
 export type FileMediaOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   lessonId?: Prisma.SortOrder
+  cloudinaryPublicId?: Prisma.SortOrderInput | Prisma.SortOrder
   url?: Prisma.SortOrder
   type?: Prisma.SortOrder
   filename?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -249,6 +258,7 @@ export type FileMediaOrderByWithRelationInput = {
 
 export type FileMediaWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  cloudinaryPublicId?: string
   AND?: Prisma.FileMediaWhereInput | Prisma.FileMediaWhereInput[]
   OR?: Prisma.FileMediaWhereInput[]
   NOT?: Prisma.FileMediaWhereInput | Prisma.FileMediaWhereInput[]
@@ -259,11 +269,12 @@ export type FileMediaWhereUniqueInput = Prisma.AtLeast<{
   mimeType?: Prisma.StringNullableFilter<"FileMedia"> | string | null
   sizeInBytes?: Prisma.IntNullableFilter<"FileMedia"> | number | null
   lesson?: Prisma.XOR<Prisma.LessonScalarRelationFilter, Prisma.LessonWhereInput>
-}, "id">
+}, "id" | "cloudinaryPublicId">
 
 export type FileMediaOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   lessonId?: Prisma.SortOrder
+  cloudinaryPublicId?: Prisma.SortOrderInput | Prisma.SortOrder
   url?: Prisma.SortOrder
   type?: Prisma.SortOrder
   filename?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -282,6 +293,7 @@ export type FileMediaScalarWhereWithAggregatesInput = {
   NOT?: Prisma.FileMediaScalarWhereWithAggregatesInput | Prisma.FileMediaScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"FileMedia"> | string
   lessonId?: Prisma.StringWithAggregatesFilter<"FileMedia"> | string
+  cloudinaryPublicId?: Prisma.StringNullableWithAggregatesFilter<"FileMedia"> | string | null
   url?: Prisma.StringWithAggregatesFilter<"FileMedia"> | string
   type?: Prisma.EnumMediaTypeEnumWithAggregatesFilter<"FileMedia"> | $Enums.MediaTypeEnum
   filename?: Prisma.StringNullableWithAggregatesFilter<"FileMedia"> | string | null
@@ -291,6 +303,7 @@ export type FileMediaScalarWhereWithAggregatesInput = {
 
 export type FileMediaCreateInput = {
   id?: string
+  cloudinaryPublicId?: string | null
   url: string
   type: $Enums.MediaTypeEnum
   filename?: string | null
@@ -302,6 +315,7 @@ export type FileMediaCreateInput = {
 export type FileMediaUncheckedCreateInput = {
   id?: string
   lessonId: string
+  cloudinaryPublicId?: string | null
   url: string
   type: $Enums.MediaTypeEnum
   filename?: string | null
@@ -311,6 +325,7 @@ export type FileMediaUncheckedCreateInput = {
 
 export type FileMediaUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  cloudinaryPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeEnumFieldUpdateOperationsInput | $Enums.MediaTypeEnum
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -322,6 +337,7 @@ export type FileMediaUpdateInput = {
 export type FileMediaUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   lessonId?: Prisma.StringFieldUpdateOperationsInput | string
+  cloudinaryPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeEnumFieldUpdateOperationsInput | $Enums.MediaTypeEnum
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -332,6 +348,7 @@ export type FileMediaUncheckedUpdateInput = {
 export type FileMediaCreateManyInput = {
   id?: string
   lessonId: string
+  cloudinaryPublicId?: string | null
   url: string
   type: $Enums.MediaTypeEnum
   filename?: string | null
@@ -341,6 +358,7 @@ export type FileMediaCreateManyInput = {
 
 export type FileMediaUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  cloudinaryPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeEnumFieldUpdateOperationsInput | $Enums.MediaTypeEnum
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -351,6 +369,7 @@ export type FileMediaUpdateManyMutationInput = {
 export type FileMediaUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   lessonId?: Prisma.StringFieldUpdateOperationsInput | string
+  cloudinaryPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeEnumFieldUpdateOperationsInput | $Enums.MediaTypeEnum
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -377,6 +396,7 @@ export type FileMediaOrderByRelevanceInput = {
 export type FileMediaCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   lessonId?: Prisma.SortOrder
+  cloudinaryPublicId?: Prisma.SortOrder
   url?: Prisma.SortOrder
   type?: Prisma.SortOrder
   filename?: Prisma.SortOrder
@@ -391,6 +411,7 @@ export type FileMediaAvgOrderByAggregateInput = {
 export type FileMediaMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   lessonId?: Prisma.SortOrder
+  cloudinaryPublicId?: Prisma.SortOrder
   url?: Prisma.SortOrder
   type?: Prisma.SortOrder
   filename?: Prisma.SortOrder
@@ -401,6 +422,7 @@ export type FileMediaMaxOrderByAggregateInput = {
 export type FileMediaMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   lessonId?: Prisma.SortOrder
+  cloudinaryPublicId?: Prisma.SortOrder
   url?: Prisma.SortOrder
   type?: Prisma.SortOrder
   filename?: Prisma.SortOrder
@@ -460,6 +482,7 @@ export type EnumMediaTypeEnumFieldUpdateOperationsInput = {
 
 export type FileMediaCreateWithoutLessonInput = {
   id?: string
+  cloudinaryPublicId?: string | null
   url: string
   type: $Enums.MediaTypeEnum
   filename?: string | null
@@ -469,6 +492,7 @@ export type FileMediaCreateWithoutLessonInput = {
 
 export type FileMediaUncheckedCreateWithoutLessonInput = {
   id?: string
+  cloudinaryPublicId?: string | null
   url: string
   type: $Enums.MediaTypeEnum
   filename?: string | null
@@ -508,6 +532,7 @@ export type FileMediaScalarWhereInput = {
   NOT?: Prisma.FileMediaScalarWhereInput | Prisma.FileMediaScalarWhereInput[]
   id?: Prisma.StringFilter<"FileMedia"> | string
   lessonId?: Prisma.StringFilter<"FileMedia"> | string
+  cloudinaryPublicId?: Prisma.StringNullableFilter<"FileMedia"> | string | null
   url?: Prisma.StringFilter<"FileMedia"> | string
   type?: Prisma.EnumMediaTypeEnumFilter<"FileMedia"> | $Enums.MediaTypeEnum
   filename?: Prisma.StringNullableFilter<"FileMedia"> | string | null
@@ -517,6 +542,7 @@ export type FileMediaScalarWhereInput = {
 
 export type FileMediaCreateManyLessonInput = {
   id?: string
+  cloudinaryPublicId?: string | null
   url: string
   type: $Enums.MediaTypeEnum
   filename?: string | null
@@ -526,6 +552,7 @@ export type FileMediaCreateManyLessonInput = {
 
 export type FileMediaUpdateWithoutLessonInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  cloudinaryPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeEnumFieldUpdateOperationsInput | $Enums.MediaTypeEnum
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -535,6 +562,7 @@ export type FileMediaUpdateWithoutLessonInput = {
 
 export type FileMediaUncheckedUpdateWithoutLessonInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  cloudinaryPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeEnumFieldUpdateOperationsInput | $Enums.MediaTypeEnum
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -544,6 +572,7 @@ export type FileMediaUncheckedUpdateWithoutLessonInput = {
 
 export type FileMediaUncheckedUpdateManyWithoutLessonInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  cloudinaryPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMediaTypeEnumFieldUpdateOperationsInput | $Enums.MediaTypeEnum
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -556,6 +585,7 @@ export type FileMediaUncheckedUpdateManyWithoutLessonInput = {
 export type FileMediaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   lessonId?: boolean
+  cloudinaryPublicId?: boolean
   url?: boolean
   type?: boolean
   filename?: boolean
@@ -569,6 +599,7 @@ export type FileMediaSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type FileMediaSelectScalar = {
   id?: boolean
   lessonId?: boolean
+  cloudinaryPublicId?: boolean
   url?: boolean
   type?: boolean
   filename?: boolean
@@ -576,7 +607,7 @@ export type FileMediaSelectScalar = {
   sizeInBytes?: boolean
 }
 
-export type FileMediaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "lessonId" | "url" | "type" | "filename" | "mimeType" | "sizeInBytes", ExtArgs["result"]["fileMedia"]>
+export type FileMediaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "lessonId" | "cloudinaryPublicId" | "url" | "type" | "filename" | "mimeType" | "sizeInBytes", ExtArgs["result"]["fileMedia"]>
 export type FileMediaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   lesson?: boolean | Prisma.LessonDefaultArgs<ExtArgs>
 }
@@ -589,6 +620,7 @@ export type $FileMediaPayload<ExtArgs extends runtime.Types.Extensions.InternalA
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     lessonId: string
+    cloudinaryPublicId: string | null
     url: string
     type: $Enums.MediaTypeEnum
     filename: string | null
@@ -966,6 +998,7 @@ export interface Prisma__FileMediaClient<T, Null = never, ExtArgs extends runtim
 export interface FileMediaFieldRefs {
   readonly id: Prisma.FieldRef<"FileMedia", 'String'>
   readonly lessonId: Prisma.FieldRef<"FileMedia", 'String'>
+  readonly cloudinaryPublicId: Prisma.FieldRef<"FileMedia", 'String'>
   readonly url: Prisma.FieldRef<"FileMedia", 'String'>
   readonly type: Prisma.FieldRef<"FileMedia", 'MediaTypeEnum'>
   readonly filename: Prisma.FieldRef<"FileMedia", 'String'>

@@ -1233,6 +1233,7 @@ export type LessonScalarFieldEnum = (typeof LessonScalarFieldEnum)[keyof typeof 
 export const FileMediaScalarFieldEnum = {
   id: 'id',
   lessonId: 'lessonId',
+  cloudinaryPublicId: 'cloudinaryPublicId',
   url: 'url',
   type: 'type',
   filename: 'filename',
@@ -1401,6 +1402,7 @@ export type LessonOrderByRelevanceFieldEnum = (typeof LessonOrderByRelevanceFiel
 export const FileMediaOrderByRelevanceFieldEnum = {
   id: 'id',
   lessonId: 'lessonId',
+  cloudinaryPublicId: 'cloudinaryPublicId',
   url: 'url',
   filename: 'filename',
   mimeType: 'mimeType'

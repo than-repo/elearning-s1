@@ -23,7 +23,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { JwtAuthGuard } from 'src/features/auth/guards/jwt-auth.guard';
-import type { RequestWithUser } from 'src/features/auth/interfaces/request-with-user';
+import type { RequestWithUser } from 'src/common/interfaces/request-with-user';
 import { PublicUserResponseDto } from '../dto/public-user-response.dto';
 import { Public } from 'src/features/auth/decorators/public.decorator';
 import { Throttle } from '@nestjs/throttler';

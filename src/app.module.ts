@@ -7,6 +7,7 @@ import { AuthModule } from './features/auth/auth.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { UsersModule } from './features/users/users.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { UploadModule } from './features/upload/upload.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     PrismaModule,
     AuthModule,
     ScheduleModule.forRoot(),
+    UploadModule,
   ],
   controllers: [],
   providers: [
