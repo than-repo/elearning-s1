@@ -1,16 +1,17 @@
 //src\features\users\repositories\users.repository.ts
 import { ConfigService } from '@nestjs/config';
-import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../../core/database/prisma.service';
 
-import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { FindAllUsersQuery } from '../dto/find-all-users-query.dto';
+import { UserSelectResult } from '../interfaces/user-select-result.interface';
+import { UpdateUserPayload } from '../interfaces/update-user-payload.interface';
+import { UserRole } from 'generated/prisma/enums';
+import { CreateUserPayload } from '../interfaces/create-user-payload.interface';
+import { GetUsersPayload } from '../interfaces/get-users-payload.interface';
+import { UserCreateInput, UserUpdateInput } from 'generated/prisma/models';
 
 @Injectable()
 export class UsersRepository {
@@ -44,155 +45,61 @@ export class UsersRepository {
 
   // ==================== ADMIN OPERATIONS ====================
 
-  async createUser(dto: CreateUserDto) {
-    const email = dto.email.toLowerCase().trim();
-    const existing = await this.prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existing) {
-      throw new ConflictException('Email already registered');
-    }
-
-    const passwordHash = await bcrypt.hash(dto.password, this.saltRounds);
-
+  async createUser(data: CreateUserPayload) {
     return this.prisma.user.create({
-      data: {
-        fullName: dto.fullName.trim(),
-        email,
-        passwordHash,
-        phoneNumber: dto.phoneNumber?.trim() || null,
-        dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : null,
-        gender: dto.gender || null,
-        avatarUrl: dto.avatarUrl?.trim() || null,
-        role: dto.role,
-        isActive: true,
-        emailVerified: false,
-      },
-
+      data,
       select: this.userSelect,
     });
   }
 
-  async findAll(query: FindAllUsersQuery) {
-    const {
-      page = 1,
-      limit = 20,
-      search,
-      role,
-      isActive,
-      emailVerified,
-      createdAfter,
-      createdBefore,
-      sortBy = 'createdAt',
-      sortOrder = 'desc',
-    } = query;
-
-    const skip = (page - 1) * limit;
-    const take = limit;
-    const where: any = {};
-    if (search) {
-      where.OR = [
-        { fullName: { contains: search } },
-        { email: { contains: search } },
-        { phoneNumber: { contains: search } },
-        //mode:"insentitive"
-      ];
-    }
-    if (role) where.role = role;
-    if (isActive !== undefined) where.isActive = isActive;
-    if (emailVerified !== undefined) where.emailVerified = emailVerified;
-    if (createdAfter || createdBefore) {
-      where.createdAt = {};
-      if (createdAfter) where.createdAt.gte = new Date(createdAfter);
-      if (createdBefore) where.createdAt.lte = new Date(createdBefore);
-    }
-
+  async findAll(getUserPayload: GetUsersPayload) {
+    const { skip, take, where, orderBy } = getUserPayload;
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
         skip,
         take,
         where,
-        orderBy: { [sortBy]: sortOrder },
+        orderBy,
         select: this.userSelect,
       }),
       this.prisma.user.count({ where }),
     ]);
-    return { users, total, page, limit };
+    return { users, total };
   }
 
-  async updateUser(id: string, dto: UpdateUserDto) {
-    const userExists = await this.prisma.user.findUnique({
-      where: { id },
-      select: { id: true, email: true },
-    });
-
-    if (!userExists) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (dto.email) {
-      const newEmail = dto.email.toLowerCase().trim();
-      if (newEmail !== userExists.email) // Needs to update email
-      {
-        const emailTaken = await this.prisma.user.findUnique({
-          where: { email: newEmail },
-        });
-        if (emailTaken) {
-          throw new ConflictException('Email already taken by another user');
-        }
-      }
-    }
-    let passwordHash: string | undefined;
-    if (dto.password) {
-      passwordHash = await bcrypt.hash(dto.password, this.saltRounds);
-    }
-
+  async updateUser(id: string, data: UpdateUserPayload) {
     return this.prisma.user.update({
       where: { id },
-      data: {
-        fullName: dto.fullName?.trim(),
-        email: dto.email?.toLowerCase().trim(),
-        passwordHash,
-        phoneNumber: dto.phoneNumber?.trim() || null,
-        dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
-        gender: dto.gender,
-        avatarUrl: dto.avatarUrl?.trim() || null,
-        role: dto.role,
-        isActive: dto.isActive,
-        emailVerified: dto.emailVerified,
-      },
+      data,
       select: this.userSelect,
     });
   }
 
-  async deactivateUser(id: string) {
-    const existing = await this.prisma.user.findUnique({
-      where: { id },
-      select: { id: true }, // only need to check existence
+  async countActiveAdmins(): Promise<number> {
+    return this.prisma.user.count({
+      where: { role: UserRole.ADMIN, isActive: true },
     });
+  }
 
-    if (!existing) {
-      throw new NotFoundException('User not found');
-    }
-
+  async deactivateUser(id: string) {
     return this.prisma.user.update({
       where: { id },
       data: { isActive: false },
       select: this.userSelect,
     });
   }
-  async findById(id: string) {
-    const user = await this.prisma.user.findUnique({
+  async findById(id: string): Promise<UserSelectResult | null> {
+    return this.prisma.user.findUnique({
       where: { id },
       select: this.userSelect,
     });
+  }
 
-    if (!user) {
-      throw new NotFoundException(`User not found`);
-    }
-
-    return user;
+  async findByEmail(email: string): Promise<UserSelectResult | null> {
+    return this.prisma.user.findUnique({
+      where: { email },
+      select: this.userSelect,
+    });
   }
 
   // ==================== PUBLIC OPERATIONS ====================
@@ -210,34 +117,10 @@ export class UsersRepository {
     return user;
   }
 
-  async updateProfile(id: string, dto: UpdateUserDto) {
-    // Public users are not allowed to change role, isActive, or emailVerified
-    const { role, isActive, emailVerified, password, ...safeData } = dto;
-
-    let passwordHash: string | undefined;
-    if (password) {
-      passwordHash = await bcrypt.hash(password, this.saltRounds);
-    }
-    const userExists = await this.prisma.user.findUnique({
-      where: { id },
-      select: { id: true },
-    });
-    if (!userExists) {
-      throw new NotFoundException('User not found');
-    }
+  async updateProfile(id: string, data: UserUpdateInput) {
     return this.prisma.user.update({
       where: { id },
-      data: {
-        ...safeData,
-        fullName: safeData.fullName?.trim(),
-        email: safeData.email?.toLowerCase().trim(),
-        phoneNumber: safeData.phoneNumber?.trim() || null,
-        dateOfBirth: safeData.dateOfBirth
-          ? new Date(safeData.dateOfBirth)
-          : undefined,
-        avatarUrl: safeData.avatarUrl?.trim() || null,
-        passwordHash,
-      },
+      data,
       select: this.userSelect,
     });
   }

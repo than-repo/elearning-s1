@@ -23,10 +23,16 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {
-    this.saltRounds = parseInt(
+    const rounds = parseInt(
       this.configService.getOrThrow('PASSWORD_SALT_ROUNDS'),
       10,
     );
+
+    if (isNaN(rounds) || rounds < 10) {
+      throw new Error('PASSWORD_SALT_ROUNDS must be a number >= 10');
+    }
+
+    this.saltRounds = rounds;
   }
 
   async register(dto: RegisterDto): Promise<AuthResponseDto> {

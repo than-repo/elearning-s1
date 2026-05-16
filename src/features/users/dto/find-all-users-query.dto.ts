@@ -20,7 +20,7 @@ export class FindAllUsersQuery {
 
   @IsOptional()
   @IsString()
-  search?: string; // Full-text search on name/email/phone
+  search?: string;
 
   @IsOptional()
   @IsEnum(UserRole)
