@@ -1,5 +1,5 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { CreateUserDto } from '../../users/dto/create-user.dto';
+import { CreateUserDto } from '../../users/dtos/create-user.dto';
 import { UserRole } from 'generated/prisma/enums';
 import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 

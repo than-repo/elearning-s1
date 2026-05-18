@@ -8,12 +8,12 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { RegisterDto } from '../dto/register.dto';
-import { LoginDto } from '../dto/login.dto';
+import { RegisterDto } from '../dtos/register.dto';
+import { LoginDto } from '../dtos/login.dto';
 import { AuthRepository } from '../repositories/auth.repository';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
-import { AuthResponseDto } from '../dto/login-response.dto';
+import { AuthResponseDto } from '../dtos/login-response.dto';
 
 @Injectable()
 export class AuthService {

@@ -5,7 +5,7 @@ import { UploadService } from './upload.service';
 import {
   GetUploadSignatureDto,
   SignatureResponseDto,
-} from './dto/get-upload-signature.dto';
+} from './dtos/get-upload-signature.dto';
 import {
   ApiAcceptedResponse,
   ApiBadRequestResponse,

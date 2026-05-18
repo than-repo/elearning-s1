@@ -143,7 +143,8 @@ elearning-system
 │  │  ├─ interceptors
 │  │  │  └─ response-formatting.interceptor.ts
 │  │  ├─ interfaces
-│  │  │  └─ api-response.interfaces.ts
+│  │  │  ├─ api-response.interfaces.ts
+│  │  │  └─ request-with-user.ts
 │  │  ├─ pipes
 │  │  └─ utils
 │  │     ├─ clean-data-util.ts
@@ -162,7 +163,7 @@ elearning-system
 │  │  │  ├─ decorators
 │  │  │  │  ├─ public.decorator.ts
 │  │  │  │  └─ roles.decorator.ts
-│  │  │  ├─ dto
+│  │  │  ├─ dtos
 │  │  │  │  ├─ login-response.dto.ts
 │  │  │  │  ├─ login.dto.ts
 │  │  │  │  ├─ refresh-token.dto.ts
@@ -176,8 +177,7 @@ elearning-system
 │  │  │  │  ├─ create-local-user.interface.ts
 │  │  │  │  ├─ create-refresh-token.interface.ts
 │  │  │  │  ├─ jwt-payload.interface.ts
-│  │  │  │  ├─ request-with-cookies.ts
-│  │  │  │  └─ request-with-user.ts
+│  │  │  │  └─ request-with-cookies.ts
 │  │  │  ├─ repositories
 │  │  │  │  └─ auth.repository.ts
 │  │  │  ├─ services
@@ -186,17 +186,25 @@ elearning-system
 │  │  │  └─ strategies
 │  │  │     ├─ google.strategy.ts
 │  │  │     └─ jwt.strategy.ts
+│  │  ├─ courses
+│  │  │  ├─ controllers
+│  │  │  ├─ course.module.ts
+│  │  │  ├─ dtos
+│  │  │  ├─ interfaces
+│  │  │  ├─ repositories
+│  │  │  └─ services
 │  │  ├─ upload
-│  │  │  ├─ dto
+│  │  │  ├─ dtos
+│  │  │  │  └─ get-upload-signature.dto.ts
+│  │  │  ├─ interfaces
 │  │  │  ├─ upload.controller.ts
 │  │  │  ├─ upload.module.ts
-│  │  │  ├─ upload.service.ts
-│  │  │  └─ webhook.controller.ts
+│  │  │  └─ upload.service.ts
 │  │  └─ users
 │  │     ├─ controllers
 │  │     │  ├─ admin-users.controller.ts
 │  │     │  └─ users.controller.ts
-│  │     ├─ dto
+│  │     ├─ dtos
 │  │     │  ├─ create-user.dto.ts
 │  │     │  ├─ find-all-users-query.dto.ts
 │  │     │  ├─ paginated-users-response.dto.ts

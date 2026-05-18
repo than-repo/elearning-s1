@@ -25,15 +25,15 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dtos/register.dto';
+import { LoginDto } from './dtos/login.dto';
 import { AuthService } from './services/auth.service';
 
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { Roles } from './decorators/roles.decorator';
 import { UserRole } from 'generated/prisma/enums';
-import { AuthResponseDto } from './dto/login-response.dto';
+import { AuthResponseDto } from './dtos/login-response.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import type { RequestWithCookies } from './interfaces/request-with-cookies';
 import type { RequestWithUser } from '../../common/interfaces/request-with-user';

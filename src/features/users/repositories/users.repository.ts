@@ -4,8 +4,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../../core/database/prisma.service';
 
-import { UpdateUserDto } from '../dto/update-user.dto';
-import { FindAllUsersQuery } from '../dto/find-all-users-query.dto';
+import { UpdateUserDto } from '../dtos/update-user.dto';
+import { FindAllUsersQuery } from '../dtos/find-all-users-query.dto';
 import { UserSelectResult } from '../interfaces/user-select-result.interface';
 import { UpdateUserPayload } from '../interfaces/update-user-payload.interface';
 import { UserRole } from 'generated/prisma/enums';

@@ -11,10 +11,10 @@ import {
 import { plainToInstance } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
 import { UsersRepository } from '../repositories/users.repository';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
-import { FindAllUsersQuery } from '../dto/find-all-users-query.dto';
-import { UserResponseDto } from '../dto/user-response.dto';
+import { CreateUserDto } from '../dtos/create-user.dto';
+import { UpdateUserDto } from '../dtos/update-user.dto';
+import { FindAllUsersQuery } from '../dtos/find-all-users-query.dto';
+import { UserResponseDto } from '../dtos/user-response.dto';
 import { UpdateUserPayload } from '../interfaces/update-user-payload.interface';
 import { cleanData } from 'src/common/utils/clean-data-util';
 import { UserRole } from 'generated/prisma/enums';
@@ -26,7 +26,7 @@ import { GetUsersPayload } from '../interfaces/get-users-payload.interface';
 import { Prisma } from 'generated/prisma/client';
 
 @Injectable()
-export class AdminUserService {
+export class AdminUsersService {
   private readonly saltRounds: number;
   constructor(
     private readonly usersRepository: UsersRepository,
@@ -115,7 +115,7 @@ export class AdminUserService {
     // Safe date handling
     if (createdAfter) {
       where.createdAt = where.createdAt || {};
-      (where.createdAt as any).gte = new Date(createdAfter); // better: use date-fns later
+      (where.createdAt as any).gte = new Date(createdAfter);
     }
     if (createdBefore) {
       where.createdAt = where.createdAt || {};

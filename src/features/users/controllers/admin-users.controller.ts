@@ -31,16 +31,16 @@ import {
 
 import { Roles } from 'src/features/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/features/auth/guards/jwt-auth.guard';
-import { AdminUserService } from '../services/admin-user.service';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { UserResponseDto } from '../dto/user-response.dto';
-import { FindAllUsersQuery } from '../dto/find-all-users-query.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
+import { AdminUsersService } from '../services/admin-user.service';
+import { CreateUserDto } from '../dtos/create-user.dto';
+import { UserResponseDto } from '../dtos/user-response.dto';
+import { FindAllUsersQuery } from '../dtos/find-all-users-query.dto';
+import { UpdateUserDto } from '../dtos/update-user.dto';
 import { RolesGuard } from 'src/features/auth/guards/roles.guard';
 import { UserRole } from 'generated/prisma/enums';
 import type { RequestWithUser } from 'src/common/interfaces/request-with-user';
 import { Throttle } from '@nestjs/throttler';
-import { PaginatedUsersResponseDto } from '../dto/paginated-users-response.dto';
+import { PaginatedUsersResponseDto } from '../dtos/paginated-users-response.dto';
 
 @ApiTags('Admin-Users')
 @Controller('admin/users')
@@ -48,7 +48,7 @@ import { PaginatedUsersResponseDto } from '../dto/paginated-users-response.dto';
 @Roles(UserRole.ADMIN)
 @ApiBearerAuth()
 export class AdminUsersController {
-  constructor(private readonly adminUserService: AdminUserService) {}
+  constructor(private readonly adminUserService: AdminUsersService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

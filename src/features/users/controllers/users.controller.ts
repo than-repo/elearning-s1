@@ -1,5 +1,5 @@
 //src\features\users\controllers\users.controller.ts
-import { UpdateUserDto } from './../dto/update-user.dto';
+import { UpdateUserDto } from './../dtos/update-user.dto';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -10,7 +10,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { UserResponseDto } from '../dto/user-response.dto';
+import { UserResponseDto } from '../dtos/user-response.dto';
 import {
   Body,
   Controller,
@@ -24,7 +24,7 @@ import {
 import { UsersService } from '../services/users.service';
 import { JwtAuthGuard } from 'src/features/auth/guards/jwt-auth.guard';
 import type { RequestWithUser } from 'src/common/interfaces/request-with-user';
-import { PublicUserResponseDto } from '../dto/public-user-response.dto';
+import { PublicUserResponseDto } from '../dtos/public-user-response.dto';
 import { Public } from 'src/features/auth/decorators/public.decorator';
 import { Throttle } from '@nestjs/throttler';
 
@@ -32,7 +32,7 @@ import { Throttle } from '@nestjs/throttler';
 @Controller('/users')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-export class UserController {
+export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('me')

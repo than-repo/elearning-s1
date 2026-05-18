@@ -1,4 +1,4 @@
-// src/features/auth/dto/auth-response.dto.ts
+// src/features/auth/dtos/auth-response.dto.ts
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 
 export class AuthResponseDto {

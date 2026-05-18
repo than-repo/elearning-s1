@@ -5,7 +5,7 @@ import { CloudinaryService } from '../../common/cloudinary/cloudinary.service';
 import {
   GetUploadSignatureDto,
   SignatureResponseDto,
-} from './dto/get-upload-signature.dto';
+} from './dtos/get-upload-signature.dto';
 
 @Injectable()
 export class UploadService {
@@ -21,27 +21,30 @@ export class UploadService {
     return this.configService.getOrThrow<string>('CLOUDINARY_API_KEY');
   }
 
+  private readonly uploadPresets: Record<string, string> = {
+    image: 'elearning_images',
+    video: 'elearning_videos',
+    raw: 'elearning_documents',
+  };
+
   async getUploadSignature(
     dto: GetUploadSignatureDto,
   ): Promise<SignatureResponseDto> {
-    // Map resourceType to the correct Cloudinary Upload Preset
-    let uploadPreset: string;
-    switch (dto.resourceType) {
-      case 'image':
-        uploadPreset = 'elearning_images';
-        break;
-      case 'video':
-        uploadPreset = 'elearning_videos';
-        break;
-      case 'raw':
-        uploadPreset = 'elearning_documents'; //PDF, DOCX, PPTX, etc.
-        break;
-      default:
-        throw new BadRequestException('Invalid resourceType');
+    const uploadPreset = this.uploadPresets[dto.resourceType];
+    if (!uploadPreset) {
+      throw new BadRequestException(
+        `Invalid resourceType: ${dto.resourceType}`,
+      );
+    }
+
+    // Build the folder safely
+    let folder = `elearning/${dto.entityType}s/${dto.entityId}`;
+    if (dto.subFolder) {
+      folder = `${folder}/${dto.subFolder}`;
     }
 
     const paramsToSign: Record<string, any> = {
-      folder: dto.folder,
+      folder,
       upload_preset: uploadPreset,
     };
 
@@ -58,8 +61,8 @@ export class UploadService {
       cloudName: this.cloudName,
       apiKey: this.apiKey,
       uploadPreset,
-      folder: dto.folder,
+      folder,
       resourceType: dto.resourceType,
-    } as SignatureResponseDto;
+    };
   }
 }

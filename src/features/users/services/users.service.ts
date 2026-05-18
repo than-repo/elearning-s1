@@ -2,9 +2,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { UsersRepository } from '../repositories/users.repository';
-import { UserResponseDto } from '../dto/user-response.dto';
-import { PublicUserResponseDto } from '../dto/public-user-response.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
+import { UserResponseDto } from '../dtos/user-response.dto';
+import { PublicUserResponseDto } from '../dtos/public-user-response.dto';
+import { UpdateUserDto } from '../dtos/update-user.dto';
 
 import bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
