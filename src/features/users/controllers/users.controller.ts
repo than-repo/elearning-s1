@@ -29,7 +29,7 @@ import { Public } from 'src/features/auth/decorators/public.decorator';
 import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Users')
-@Controller('/users')
+@Controller({ path: 'users', version: '1' })
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class UsersController {

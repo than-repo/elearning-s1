@@ -114,7 +114,9 @@ elearning-system
 │     │  ├─ prismaNamespace.ts
 │     │  └─ prismaNamespaceBrowser.ts
 │     ├─ models
+│     │  ├─ Category.ts
 │     │  ├─ Course.ts
+│     │  ├─ CourseCategory.ts
 │     │  ├─ CourseInstructor.ts
 │     │  ├─ CourseSection.ts
 │     │  ├─ Enrollment.ts
@@ -140,6 +142,9 @@ elearning-system
 │  │  ├─ cloudinary
 │  │  │  ├─ cloudinary.module.ts
 │  │  │  └─ cloudinary.service.ts
+│  │  ├─ filters
+│  │  │  ├─ prisma-client-exception.filter.spec.ts
+│  │  │  └─ prisma-client-exception.filter.ts
 │  │  ├─ interceptors
 │  │  │  └─ response-formatting.interceptor.ts
 │  │  ├─ interfaces
@@ -148,7 +153,8 @@ elearning-system
 │  │  ├─ pipes
 │  │  └─ utils
 │  │     ├─ clean-data-util.ts
-│  │     └─ prisma-error.util.ts
+│  │     ├─ prisma-error.util.ts
+│  │     └─ slugify.util.ts
 │  ├─ config
 │  ├─ core
 │  │  ├─ database
@@ -188,11 +194,23 @@ elearning-system
 │  │  │     └─ jwt.strategy.ts
 │  │  ├─ courses
 │  │  │  ├─ controllers
-│  │  │  ├─ course.module.ts
+│  │  │  │  ├─ courses.controller.ts
+│  │  │  │  ├─ instructors-courses.controller.ts
+│  │  │  │  └─ reviewer-courses.controller.ts
+│  │  │  ├─ courses.module.ts
 │  │  │  ├─ dtos
+│  │  │  │  ├─ category-response.dto.ts
+│  │  │  │  ├─ course-response.dto.ts
+│  │  │  │  ├─ create-category.dto.ts
+│  │  │  │  ├─ create-course.dto.ts
+│  │  │  │  └─ update-category.dto.ts
 │  │  │  ├─ interfaces
+│  │  │  │  └─ category.repository.interface.ts
 │  │  │  ├─ repositories
+│  │  │  │  ├─ category.repository.ts
+│  │  │  │  └─ courses.repository.ts
 │  │  │  └─ services
+│  │  │     └─ courses.service.ts
 │  │  ├─ upload
 │  │  │  ├─ dtos
 │  │  │  │  └─ get-upload-signature.dto.ts
@@ -222,7 +240,10 @@ elearning-system
 │  │     │  ├─ admin-user.service.ts
 │  │     │  └─ users.service.ts
 │  │     └─ users.module.ts
-│  └─ main.ts
+│  ├─ main.ts
+│  └─ __mocks__
+│     └─ @prisma
+│        └─ client.ts
 ├─ structure.txt
 ├─ test
 │  ├─ app.e2e-spec.ts

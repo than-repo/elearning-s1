@@ -43,7 +43,7 @@ import { Throttle } from '@nestjs/throttler';
 import { PaginatedUsersResponseDto } from '../dtos/paginated-users-response.dto';
 
 @ApiTags('Admin-Users')
-@Controller('admin/users')
+@Controller({ path: 'admin/users', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
 @ApiBearerAuth()

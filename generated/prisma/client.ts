@@ -65,6 +65,16 @@ export type CourseInstructor = Prisma.CourseInstructorModel
  */
 export type Course = Prisma.CourseModel
 /**
+ * Model Category
+ * 
+ */
+export type Category = Prisma.CategoryModel
+/**
+ * Model CourseCategory
+ * 
+ */
+export type CourseCategory = Prisma.CourseCategoryModel
+/**
  * Model CourseSection
  * 
  */

@@ -389,6 +389,8 @@ export const ModelName = {
   RefreshToken: 'RefreshToken',
   CourseInstructor: 'CourseInstructor',
   Course: 'Course',
+  Category: 'Category',
+  CourseCategory: 'CourseCategory',
   CourseSection: 'CourseSection',
   Lesson: 'Lesson',
   FileMedia: 'FileMedia',
@@ -409,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "userIdentity" | "refreshToken" | "courseInstructor" | "course" | "courseSection" | "lesson" | "fileMedia" | "enrollment" | "payment"
+    modelProps: "user" | "userIdentity" | "refreshToken" | "courseInstructor" | "course" | "category" | "courseCategory" | "courseSection" | "lesson" | "fileMedia" | "enrollment" | "payment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -740,6 +742,138 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CourseCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CourseCountAggregateOutputType> | number
+        }
+      }
+    }
+    Category: {
+      payload: Prisma.$CategoryPayload<ExtArgs>
+      fields: Prisma.CategoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CategoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CategoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
+        }
+        findFirst: {
+          args: Prisma.CategoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CategoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
+        }
+        findMany: {
+          args: Prisma.CategoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>[]
+        }
+        create: {
+          args: Prisma.CategoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
+        }
+        createMany: {
+          args: Prisma.CategoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.CategoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
+        }
+        update: {
+          args: Prisma.CategoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.CategoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CategoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.CategoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
+        }
+        aggregate: {
+          args: Prisma.CategoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCategory>
+        }
+        groupBy: {
+          args: Prisma.CategoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CategoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CategoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CategoryCountAggregateOutputType> | number
+        }
+      }
+    }
+    CourseCategory: {
+      payload: Prisma.$CourseCategoryPayload<ExtArgs>
+      fields: Prisma.CourseCategoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CourseCategoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseCategoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CourseCategoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseCategoryPayload>
+        }
+        findFirst: {
+          args: Prisma.CourseCategoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseCategoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CourseCategoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseCategoryPayload>
+        }
+        findMany: {
+          args: Prisma.CourseCategoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseCategoryPayload>[]
+        }
+        create: {
+          args: Prisma.CourseCategoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseCategoryPayload>
+        }
+        createMany: {
+          args: Prisma.CourseCategoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.CourseCategoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseCategoryPayload>
+        }
+        update: {
+          args: Prisma.CourseCategoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseCategoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.CourseCategoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CourseCategoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.CourseCategoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseCategoryPayload>
+        }
+        aggregate: {
+          args: Prisma.CourseCategoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCourseCategory>
+        }
+        groupBy: {
+          args: Prisma.CourseCategoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CourseCategoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CourseCategoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CourseCategoryCountAggregateOutputType> | number
         }
       }
     }
@@ -1182,22 +1316,48 @@ export const CourseScalarFieldEnum = {
   shortDescription: 'shortDescription',
   description: 'description',
   whatYouWillLearn: 'whatYouWillLearn',
+  requirements: 'requirements',
   thumbnailUrl: 'thumbnailUrl',
+  cloudinaryPublicId: 'cloudinaryPublicId',
   level: 'level',
   status: 'status',
   price: 'price',
   language: 'language',
-  estimatedDurationMinutes: 'estimatedDurationMinutes',
-  startDate: 'startDate',
-  endDate: 'endDate',
-  schedule: 'schedule',
+  durationInMinutes: 'durationInMinutes',
   isActive: 'isActive',
+  certificateEnabled: 'certificateEnabled',
+  publishedAt: 'publishedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'
 } as const
 
 export type CourseScalarFieldEnum = (typeof CourseScalarFieldEnum)[keyof typeof CourseScalarFieldEnum]
+
+
+export const CategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  parentId: 'parentId',
+  order: 'order',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
+
+
+export const CourseCategoryScalarFieldEnum = {
+  courseId: 'courseId',
+  categoryId: 'categoryId',
+  createdAt: 'createdAt'
+} as const
+
+export type CourseCategoryScalarFieldEnum = (typeof CourseCategoryScalarFieldEnum)[keyof typeof CourseCategoryScalarFieldEnum]
 
 
 export const CourseSectionScalarFieldEnum = {
@@ -1373,10 +1533,30 @@ export const CourseOrderByRelevanceFieldEnum = {
   shortDescription: 'shortDescription',
   description: 'description',
   thumbnailUrl: 'thumbnailUrl',
+  cloudinaryPublicId: 'cloudinaryPublicId',
   language: 'language'
 } as const
 
 export type CourseOrderByRelevanceFieldEnum = (typeof CourseOrderByRelevanceFieldEnum)[keyof typeof CourseOrderByRelevanceFieldEnum]
+
+
+export const CategoryOrderByRelevanceFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  parentId: 'parentId'
+} as const
+
+export type CategoryOrderByRelevanceFieldEnum = (typeof CategoryOrderByRelevanceFieldEnum)[keyof typeof CategoryOrderByRelevanceFieldEnum]
+
+
+export const CourseCategoryOrderByRelevanceFieldEnum = {
+  courseId: 'courseId',
+  categoryId: 'categoryId'
+} as const
+
+export type CourseCategoryOrderByRelevanceFieldEnum = (typeof CourseCategoryOrderByRelevanceFieldEnum)[keyof typeof CourseCategoryOrderByRelevanceFieldEnum]
 
 
 export const CourseSectionOrderByRelevanceFieldEnum = {
@@ -1665,6 +1845,8 @@ export type GlobalOmitConfig = {
   refreshToken?: Prisma.RefreshTokenOmit
   courseInstructor?: Prisma.CourseInstructorOmit
   course?: Prisma.CourseOmit
+  category?: Prisma.CategoryOmit
+  courseCategory?: Prisma.CourseCategoryOmit
   courseSection?: Prisma.CourseSectionOmit
   lesson?: Prisma.LessonOmit
   fileMedia?: Prisma.FileMediaOmit

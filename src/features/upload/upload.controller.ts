@@ -14,9 +14,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from 'generated/prisma/enums';
+import { RolesGuard } from '../auth/guards/roles.guard';
 
 @ApiTags('Upload')
-@Controller('upload')
+@Controller({ path: 'upload', version: '1' })
 @UseGuards(JwtAuthGuard)
 @Throttle({ default: { ttl: 60, limit: 20 } })
 export class UploadController {
@@ -26,6 +29,8 @@ export class UploadController {
   @ApiAcceptedResponse({ type: SignatureResponseDto })
   @ApiBadRequestResponse()
   @ApiBody({ type: GetUploadSignatureDto })
+  @Roles(UserRole.INSTRUCTOR)
+  @UseGuards(RolesGuard)
   @Post('signature')
   async getUploadSignature(
     @Body() dto: GetUploadSignatureDto,

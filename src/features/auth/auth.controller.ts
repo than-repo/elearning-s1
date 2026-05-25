@@ -39,7 +39,7 @@ import type { RequestWithCookies } from './interfaces/request-with-cookies';
 import type { RequestWithUser } from '../../common/interfaces/request-with-user';
 
 @ApiTags('Auth')
-@Controller('auth')
+@Controller({ path: 'auth', version: '1' })
 export class AuthController {
   constructor(
     private readonly authService: AuthService,

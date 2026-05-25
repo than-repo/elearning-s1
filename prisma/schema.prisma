@@ -170,33 +170,72 @@ model CourseInstructor {
 }
 
 model Course {
-  id                       String       @id @default(uuid())
-  title                    String
-  slug                     String       @unique
-  shortDescription         String
-  description              String?
-  whatYouWillLearn         Json? // string[] - Json (MySQL compatible)
-  thumbnailUrl             String?
-  level                    CourseLevel
-  status                   CourseStatus @default(DRAFT)
-  price                    Float?
-  language                 String?
-  estimatedDurationMinutes Int?
-  startDate                DateTime?
-  endDate                  DateTime?
-  schedule                 Json?
-  isActive                 Boolean      @default(true)
-  createdAt                DateTime     @default(now())
-  updatedAt                DateTime     @updatedAt
-  deletedAt                DateTime?
+  id                 String       @id @default(uuid())
+  title              String
+  slug               String       @unique
+  shortDescription   String
+  description        String?      @db.LongText
+  whatYouWillLearn   Json? // string[]
+  requirements       Json? // string[]
+  thumbnailUrl       String?
+  cloudinaryPublicId String?      @unique
+  level              CourseLevel
+  status             CourseStatus @default(DRAFT)
+  price              Float?
+  language           String?
+  durationInMinutes  Int? // Total duration
+  isActive           Boolean      @default(true)
+  certificateEnabled Boolean      @default(false)
+  publishedAt        DateTime? // When it was published
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  deletedAt          DateTime?
 
   // Relations
-  sections    CourseSection[]
-  enrollments Enrollment[]
+  sections         CourseSection[]
+  enrollments      Enrollment[]
+  instructors      CourseInstructor[]
+  courseCategories CourseCategory[]
 
-  instructors CourseInstructor[]
-
+  @@index([slug])
+  @@index([status])
+  @@index([isActive])
   @@map("courses")
+}
+
+model Category {
+  id          String  @id @default(uuid())
+  name        String
+  slug        String  @unique
+  description String?
+
+  parent   Category?  @relation("CategoryToParent", fields: [parentId], references: [id])
+  parentId String?
+  children Category[] @relation("CategoryToParent")
+
+  order     Int       @default(0)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  courseCategories CourseCategory[]
+
+  @@index([parentId])
+  @@map("categories")
+}
+
+model CourseCategory {
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@id([courseId, categoryId])
+  @@map("course_categories")
 }
 
 model CourseSection {

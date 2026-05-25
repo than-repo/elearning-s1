@@ -56,6 +56,8 @@ export const ModelName = {
   RefreshToken: 'RefreshToken',
   CourseInstructor: 'CourseInstructor',
   Course: 'Course',
+  Category: 'Category',
+  CourseCategory: 'CourseCategory',
   CourseSection: 'CourseSection',
   Lesson: 'Lesson',
   FileMedia: 'FileMedia',
@@ -149,22 +151,48 @@ export const CourseScalarFieldEnum = {
   shortDescription: 'shortDescription',
   description: 'description',
   whatYouWillLearn: 'whatYouWillLearn',
+  requirements: 'requirements',
   thumbnailUrl: 'thumbnailUrl',
+  cloudinaryPublicId: 'cloudinaryPublicId',
   level: 'level',
   status: 'status',
   price: 'price',
   language: 'language',
-  estimatedDurationMinutes: 'estimatedDurationMinutes',
-  startDate: 'startDate',
-  endDate: 'endDate',
-  schedule: 'schedule',
+  durationInMinutes: 'durationInMinutes',
   isActive: 'isActive',
+  certificateEnabled: 'certificateEnabled',
+  publishedAt: 'publishedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'
 } as const
 
 export type CourseScalarFieldEnum = (typeof CourseScalarFieldEnum)[keyof typeof CourseScalarFieldEnum]
+
+
+export const CategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  parentId: 'parentId',
+  order: 'order',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
+
+
+export const CourseCategoryScalarFieldEnum = {
+  courseId: 'courseId',
+  categoryId: 'categoryId',
+  createdAt: 'createdAt'
+} as const
+
+export type CourseCategoryScalarFieldEnum = (typeof CourseCategoryScalarFieldEnum)[keyof typeof CourseCategoryScalarFieldEnum]
 
 
 export const CourseSectionScalarFieldEnum = {
@@ -340,10 +368,30 @@ export const CourseOrderByRelevanceFieldEnum = {
   shortDescription: 'shortDescription',
   description: 'description',
   thumbnailUrl: 'thumbnailUrl',
+  cloudinaryPublicId: 'cloudinaryPublicId',
   language: 'language'
 } as const
 
 export type CourseOrderByRelevanceFieldEnum = (typeof CourseOrderByRelevanceFieldEnum)[keyof typeof CourseOrderByRelevanceFieldEnum]
+
+
+export const CategoryOrderByRelevanceFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  parentId: 'parentId'
+} as const
+
+export type CategoryOrderByRelevanceFieldEnum = (typeof CategoryOrderByRelevanceFieldEnum)[keyof typeof CategoryOrderByRelevanceFieldEnum]
+
+
+export const CourseCategoryOrderByRelevanceFieldEnum = {
+  courseId: 'courseId',
+  categoryId: 'categoryId'
+} as const
+
+export type CourseCategoryOrderByRelevanceFieldEnum = (typeof CourseCategoryOrderByRelevanceFieldEnum)[keyof typeof CourseCategoryOrderByRelevanceFieldEnum]
 
 
 export const CourseSectionOrderByRelevanceFieldEnum = {
