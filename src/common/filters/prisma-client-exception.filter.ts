@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
 import { Response, Request } from 'express';
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'generated/prisma/client';
 
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class PrismaClientExceptionFilter extends BaseExceptionFilter {
@@ -27,7 +27,13 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
 
     switch (code) {
       case 'P2025': {
-        const id = meta?.where?.id ?? meta?.where?.[0]?.id ?? '';
+        const where = meta?.where as
+          | { id?: string | number }
+          | Array<{ id?: string | number }>
+          | undefined;
+
+        const id = Array.isArray(where) ? where[0]?.id : where?.id;
+
         const message = id
           ? `${entity} with id "${id}" not found`
           : `${entity} not found`;

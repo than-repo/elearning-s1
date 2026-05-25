@@ -4,6 +4,8 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { PrismaClientExceptionFilter } from './common/filters/prisma-client-exception.filter';
+import helmet from 'helmet';
+import { urlencoded } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
@@ -35,6 +37,10 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
   });
+
+  app.use(helmet());
+
+  app.use(urlencoded({ extended: true, limit: '2mb' }));
 
   await app.listen(process.env.PORT ?? 3000);
 }
