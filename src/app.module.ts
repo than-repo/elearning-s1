@@ -8,6 +8,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { UsersModule } from './features/users/users.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UploadModule } from './features/upload/upload.module';
+import { CoursesModule } from './features/courses/courses.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { UploadModule } from './features/upload/upload.module';
     AuthModule,
     ScheduleModule.forRoot(),
     UploadModule,
+    CoursesModule,
   ],
   controllers: [],
   providers: [

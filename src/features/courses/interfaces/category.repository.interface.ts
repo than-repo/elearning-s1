@@ -31,6 +31,7 @@ export interface UpdateCategoryInput {
   parentId?: string | null;
   order?: number;
   isActive?: boolean;
+  deletedAt?: Date | null;
 }
 
 /** Flexible where conditions for querying categories */
@@ -39,16 +40,17 @@ export interface CategoryWhereInput {
   slug?: string;
   parentId?: string | null;
   isActive?: boolean;
-  nameContains?: string; // for search
+  includeDeleted?: boolean;
+  nameContains?: string;
 }
 
 /** Ordering options */
-export type CategoryOrderByInput =
-  | 'name_asc'
-  | 'name_desc'
-  | 'order_asc'
-  | 'order_desc'
-  | 'createdAt_desc';
+export type CategorySortField = 'name' | 'order' | 'createdAt' | 'updatedAt';
+export type SortDirection = 'asc' | 'desc';
+export interface CategoryOrderByInput {
+  field: CategorySortField;
+  direction: SortDirection;
+}
 
 /** Parameters for findMany / pagination */
 export interface FindManyCategoryParams {
@@ -56,7 +58,6 @@ export interface FindManyCategoryParams {
   orderBy?: CategoryOrderByInput;
   limit?: number;
   offset?: number;
-  includeChildren?: boolean; // for tree structure
 }
 
 /** Result when returning a category with its children (tree) */
@@ -77,29 +78,14 @@ export interface ICategoryRepository {
 
   existsBySlug(slug: string): Promise<boolean>;
 
-  /**
-   * Creates a new category.
-   * - Auto-generates slug from name
-   * - Auto-calculates order if not provided
-   * - Validates parentId exists (if provided)
-   */
   create(input: CreateCategoryInput): Promise<Category>;
 
-  /**
-   * Finds a single category by ID.
-   * Returns null if not found or soft-deleted.
-   */
   findById(id: string): Promise<Category | null>;
 
-  /**
-   * Finds a single category by slug.
-   * Returns null if not found or soft-deleted.
-   */
+  findByIdIncludingDeleted(id: string): Promise<Category | null>;
+
   findBySlug(slug: string): Promise<Category | null>;
 
-  /**
-   * Returns all categories as a flat list (for admin tables).
-   */
   findMany(params?: FindManyCategoryParams): Promise<Category[]>;
 
   /**
@@ -119,17 +105,12 @@ export interface ICategoryRepository {
    * Also cascades soft delete to all children (optional business rule).
    * Returns true if successful.
    */
-  softDelete(id: string): Promise<boolean>;
-
-  /**
-   * Checks if a slug already exists (used for slug generation uniqueness).
-   */
-  existsBySlug(slug: string): Promise<boolean>;
+  softDelete(id: string): Promise<Category>;
 
   /**
    * Checks if a category has any courses attached (used before delete).
    */
   hasAssociatedCourses(id: string): Promise<boolean>;
-}
 
-// This follows strict clean architecture — zero Prisma leakage.
+  count(params?: { where?: CategoryWhereInput }): Promise<number>;
+}

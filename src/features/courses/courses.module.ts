@@ -1,16 +1,17 @@
 import { Module } from '@nestjs/common';
 import { CoursesRepository } from './repositories/courses.repository';
-import { CoursesService } from './services/courses.service';
-import { CoursesController } from './controllers/courses.controller';
+
 import { PrismaService } from 'src/core/database/prisma.service';
 import { PrismaModule } from 'src/core/database/prisma.module';
 import { CategoryRepository } from './repositories/category.repository';
 import { CATEGORY_REPOSITORY } from './repositories/category-repository.token';
+import { CategoriesService } from './services/categories.service';
+import { CategoriesController } from './controllers/categories.controller';
 
 @Module({
   providers: [
     CoursesRepository,
-    CoursesService,
+    CategoriesService,
     PrismaService,
     {
       provide: CATEGORY_REPOSITORY,
@@ -19,6 +20,6 @@ import { CATEGORY_REPOSITORY } from './repositories/category-repository.token';
   ],
   exports: [],
   imports: [PrismaModule],
-  controllers: [CoursesController],
+  controllers: [CategoriesController],
 })
 export class CoursesModule {}

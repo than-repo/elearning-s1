@@ -43,14 +43,4 @@ export class CreateCategoryDto {
   @IsOptional()
   @IsUUID('4', { message: 'parentId must be a valid UUID' })
   parentId?: string;
-
-  @ApiProperty({
-    example: 0,
-    description: 'Display order (lower number = higher in list)',
-    required: false,
-  })
-  @IsOptional()
-  @IsInt()
-  @Min(0, { message: 'Order cannot be negative' })
-  order?: number;
 }
