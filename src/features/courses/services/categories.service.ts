@@ -37,7 +37,7 @@ export class CategoriesService {
   }
   async createCategory(dto: CreateCategoryDto): Promise<CategoryResponseDto> {
     // 1. Slug generation
-    let slug = this.generateSlug(dto.name);
+    let slug: string = await this.generateSlug(dto.name);
 
     // 2. Parent validation
     if (dto.parentId) {
