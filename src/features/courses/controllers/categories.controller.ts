@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -97,14 +98,14 @@ export class CategoriesController {
     return this.categoriesService.restoreCategory(id);
   }
 
-  @ApiOperation({ summary: 'Find Categories - Admin api' })
+  @ApiOperation({ summary: 'Get Categories - Admin api' })
   @ApiOkResponse({ type: CategoryResponseDto })
   @ApiBadRequestResponse()
   @ApiForbiddenResponse()
-  @Get('')
+  @Get()
   async getCategories(
-    @Body() dto: CategoryQueryDto,
+    @Query() query: CategoryQueryDto,
   ): Promise<PaginatedResponse<CategoryResponseDto>> {
-    return this.categoriesService.getCategories(dto);
+    return this.categoriesService.getCategories(query);
   }
 }

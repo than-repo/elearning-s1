@@ -13,6 +13,7 @@ import { Prisma } from 'generated/prisma/client';
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class PrismaClientExceptionFilter extends BaseExceptionFilter {
   private readonly logger = new Logger(PrismaClientExceptionFilter.name);
+
   catch(
     exception: Prisma.PrismaClientKnownRequestError,
     host: ArgumentsHost,
@@ -22,58 +23,52 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     const { code, meta } = exception;
-
     const entity = (meta?.modelName as string) ?? 'Record';
 
     switch (code) {
       case 'P2025': {
-        const where = meta?.where as
-          | { id?: string | number }
-          | Array<{ id?: string | number }>
-          | undefined;
+        const message = `${entity} not found`;
 
-        const id = Array.isArray(where) ? where[0]?.id : where?.id;
-
-        const message = id
-          ? `${entity} with id "${id}" not found`
-          : `${entity} not found`;
-
-        response.status(HttpStatus.NOT_FOUND).json({
-          statusCode: HttpStatus.NOT_FOUND,
+        return this.sendError(
+          response,
+          request,
+          HttpStatus.NOT_FOUND,
           message,
-          error: 'Not Found',
-        });
-        break;
+          'Not Found',
+        );
       }
 
       case 'P2002': {
         const target = meta?.target as string[] | undefined;
         const fields = Array.isArray(target) ? target.join(', ') : 'field';
 
-        response.status(HttpStatus.CONFLICT).json({
-          statusCode: HttpStatus.CONFLICT,
-          message: `${entity} with this ${fields} already exists`,
-          error: 'Conflict',
-        });
-        break;
+        return this.sendError(
+          response,
+          request,
+          HttpStatus.CONFLICT,
+          `${entity} with this ${fields} already exists`,
+          'Conflict',
+        );
       }
 
       case 'P2003':
-        response.status(HttpStatus.BAD_REQUEST).json({
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: `Invalid reference in ${entity}`,
-          error: 'Bad Request',
-        });
-        break;
+        return this.sendError(
+          response,
+          request,
+          HttpStatus.BAD_REQUEST,
+          `Invalid reference in ${entity}`,
+          'Bad Request',
+        );
 
       case 'P2014':
       case 'P2016':
-        response.status(HttpStatus.BAD_REQUEST).json({
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: `Invalid data for ${entity}`,
-          error: 'Bad Request',
-        });
-        break;
+        return this.sendError(
+          response,
+          request,
+          HttpStatus.BAD_REQUEST,
+          `Invalid data for ${entity}`,
+          'Bad Request',
+        );
 
       default:
         this.logger.error(
@@ -81,12 +76,30 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
           exception.stack,
         );
 
-        response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: `Database error occurred while processing ${entity}`,
-          error: 'Bad Request',
-        });
-        break;
+        return this.sendError(
+          response,
+          request,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          `Database error occurred while processing ${entity}`,
+          'Internal Server Error',
+        );
     }
+  }
+
+  private sendError(
+    response: Response,
+    request: Request,
+    statusCode: number,
+    message: string,
+    error: string,
+  ): void {
+    response.status(statusCode).json({
+      success: false,
+      statusCode,
+      timestamp: new Date().toISOString(),
+      path: request.originalUrl || request.url,
+      message,
+      error,
+    });
   }
 }

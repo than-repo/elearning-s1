@@ -27,13 +27,17 @@ export class CategoriesService {
     private readonly iCategoryRepository: ICategoryRepository,
   ) {}
 
-  async createCategory(dto: CreateCategoryDto): Promise<CategoryResponseDto> {
-    // 1. Slug generation
-    let slug = slugify(dto.name);
+  private async generateSlug(name: string): Promise<string> {
+    let slug: string = slugify(name);
     let counter = 1;
     while (await this.iCategoryRepository.existsBySlug(slug)) {
-      slug = `${slugify(dto.name)}-${counter++}`;
+      slug = `${slugify(name)}-${counter++}`;
     }
+    return slug;
+  }
+  async createCategory(dto: CreateCategoryDto): Promise<CategoryResponseDto> {
+    // 1. Slug generation
+    let slug = this.generateSlug(dto.name);
 
     // 2. Parent validation
     if (dto.parentId) {
@@ -68,13 +72,28 @@ export class CategoriesService {
     id: string,
     dto: UpdateCategoryDto,
   ): Promise<CategoryResponseDto> {
+    const currentCategory = await this.iCategoryRepository.findById(id);
+
+    if (!currentCategory) {
+      throw new NotFoundException('Not found category');
+    }
+
     const input: UpdateCategoryInput = {
       name: dto.name,
       description: dto.description,
       parentId: dto.parentId,
-      order: dto.order,
       isActive: dto.isActive,
     };
+    if (dto.name && dto.name !== currentCategory.name) {
+      input.slug = await this.generateSlug(dto.name);
+    }
+
+    if (
+      dto.parentId !== undefined &&
+      dto.parentId !== currentCategory.parentId
+    ) {
+      input.order = await this.iCategoryRepository.getNextOrder(dto.parentId);
+    }
 
     const cleanedInput = cleanData(input);
     try {
@@ -116,7 +135,8 @@ export class CategoriesService {
   }
 
   async restoreCategory(id: string): Promise<CategoryResponseDto> {
-    const category = await this.iCategoryRepository.findById(id);
+    const category =
+      await this.iCategoryRepository.findByIdIncludingDeleted(id);
     if (!category) {
       throw new NotFoundException(`Category with id ${id} not found`);
     }
@@ -129,7 +149,7 @@ export class CategoriesService {
 
   async getCategories(
     query: CategoryQueryDto,
-  ): Promise<PaginatedResponse<Category>> {
+  ): Promise<PaginatedResponse<CategoryResponseDto>> {
     const {
       search,
       parentId,

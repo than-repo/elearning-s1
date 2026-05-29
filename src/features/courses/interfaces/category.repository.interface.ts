@@ -27,6 +27,7 @@ export interface CreateCategoryInput {
 /** Input for updating an existing category */
 export interface UpdateCategoryInput {
   name?: string;
+  slug?: string;
   description?: string | null;
   parentId?: string | null;
   order?: number;
