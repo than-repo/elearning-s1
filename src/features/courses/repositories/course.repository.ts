@@ -3,13 +3,18 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/core/database/prisma.service';
 import {
   CourseModel,
+  CourseOrderByInput,
   CourseWhereInput,
   CreateCourseInput,
   FindManyCourseParams,
   ICourseRepository,
   UpdateCourseInput,
 } from '../interfaces/course.repository.interface';
-import { Course as PrismaCourse, Prisma } from 'generated/prisma/client';
+import {
+  Course as PrismaCourse,
+  Prisma,
+  CourseStatus,
+} from 'generated/prisma/client';
 
 @Injectable()
 export class CourseRepository implements ICourseRepository {
@@ -48,8 +53,141 @@ export class CourseRepository implements ICourseRepository {
     return value.filter((item): item is string => typeof item === 'string');
   }
 
-  create(input: CreateCourseInput): Promise<CourseModel> {
-    throw new Error('Method not implemented.');
+  private buildWhere(
+    courseWhereInput?: CourseWhereInput,
+  ): Prisma.CourseWhereInput {
+    const prismaWhere: Prisma.CourseWhereInput = {
+      deletedAt: null,
+    };
+    if (courseWhereInput === undefined) {
+      return prismaWhere;
+    }
+    const {
+      search,
+      level,
+      status,
+      isActive,
+      certificateEnabled,
+      categoryId,
+      instructorId,
+      minPrice,
+      maxPrice,
+      language,
+      publishedFrom,
+      publishedTo,
+    } = courseWhereInput;
+
+    if (search) {
+      prismaWhere.OR = [
+        {
+          title: {
+            contains: search,
+          },
+        },
+        {
+          shortDescription: {
+            contains: search,
+          },
+        },
+      ];
+    }
+
+    if (level) {
+      prismaWhere.level = Array.isArray(level) ? { in: level } : level;
+    }
+    //Multiple status
+    if (status) {
+      prismaWhere.status = Array.isArray(status) ? { in: status } : status;
+    }
+    if (isActive !== undefined) {
+      prismaWhere.isActive = isActive;
+    }
+    if (certificateEnabled !== undefined) {
+      prismaWhere.certificateEnabled = certificateEnabled;
+    }
+
+    if (categoryId) {
+      prismaWhere.courseCategories = {
+        some: {
+          categoryId,
+        },
+      };
+    }
+    if (instructorId) {
+      prismaWhere.instructors = { some: { instructorId } };
+    }
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      prismaWhere.price = {};
+      if (minPrice !== undefined) {
+        prismaWhere.price.gte = minPrice;
+      }
+      if (maxPrice !== undefined) {
+        prismaWhere.price.lt = maxPrice;
+      }
+    }
+    if (language) {
+      prismaWhere.language = language;
+    }
+    if (publishedFrom || publishedTo) {
+      prismaWhere.publishedAt = {};
+
+      if (publishedFrom) {
+        prismaWhere.publishedAt.gte = publishedFrom;
+      }
+
+      if (publishedTo) {
+        prismaWhere.publishedAt.lt = publishedTo;
+      }
+    }
+
+    return prismaWhere;
+  }
+
+  private buildOrderBy(
+    orderBy?: CourseOrderByInput,
+  ): Prisma.CourseOrderByWithRelationInput {
+    if (orderBy === undefined) {
+      return {
+        createdAt: 'desc',
+      };
+    }
+
+    return {
+      [orderBy.field]: orderBy.direction,
+    };
+  }
+
+  private toPrismaJsonArray(
+    value?: string[] | null,
+  ): Prisma.InputJsonValue | typeof Prisma.JsonNull | undefined {
+    if (value === undefined) return undefined;
+
+    if (value === null) return Prisma.JsonNull;
+
+    return value;
+  }
+  async findMany(param?: FindManyCourseParams): Promise<CourseModel[]> {
+    const courses = await this.prisma.course.findMany({
+      where: this.buildWhere(param?.where),
+      orderBy: this.buildOrderBy(param?.orderBy),
+      take: param?.limit,
+      skip: param?.offset,
+    });
+
+    return courses.map((course) => {
+      return this.toCourseModel(course);
+    });
+  }
+  async create(input: CreateCourseInput): Promise<CourseModel> {
+    const course = await this.prisma.course.create({
+      data: {
+        ...input,
+        whatYouWillLearn: this.toPrismaJsonArray(input.whatYouWillLearn),
+        requirements: this.toPrismaJsonArray(input.requirements),
+      },
+    });
+
+    return this.toCourseModel(course);
   }
   async findById(id: string): Promise<CourseModel | null> {
     const course = await this.prisma.course.findFirst({
@@ -79,26 +217,64 @@ export class CourseRepository implements ICourseRepository {
 
     return course ? this.toCourseModel(course) : null;
   }
-  findMany(params?: FindManyCourseParams): Promise<CourseModel[]> {
-    throw new Error('Method not implemented.');
+
+  async count(where?: CourseWhereInput): Promise<number> {
+    return this.prisma.course.count({
+      where: this.buildWhere(where),
+    });
   }
-  count(where?: CourseWhereInput): Promise<number> {
-    throw new Error('Method not implemented.');
+  async update(id: string, input: UpdateCourseInput): Promise<CourseModel> {
+    const course = await this.prisma.course.update({
+      where: { id },
+      data: {
+        ...input,
+        whatYouWillLearn: this.toPrismaJsonArray(input.whatYouWillLearn),
+        requirements: this.toPrismaJsonArray(input.requirements),
+      },
+    });
+
+    return this.toCourseModel(course);
   }
-  update(id: string, input: UpdateCourseInput): Promise<CourseModel> {
-    throw new Error('Method not implemented.');
+  async softDelete(id: string): Promise<CourseModel> {
+    const course = await this.prisma.course.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+        isActive: false,
+      },
+    });
+    return this.toCourseModel(course);
   }
-  softDelete(id: string): Promise<CourseModel> {
-    throw new Error('Method not implemented.');
+  async restore(id: string): Promise<CourseModel> {
+    const course = await this.prisma.course.update({
+      where: { id },
+      data: {
+        deletedAt: null,
+      },
+    });
+    return this.toCourseModel(course);
   }
-  restore(id: string): Promise<CourseModel> {
-    throw new Error('Method not implemented.');
+  async publish(id: string): Promise<CourseModel> {
+    const course = await this.prisma.course.update({
+      where: { id },
+      data: {
+        publishedAt: new Date(),
+        status: CourseStatus.PUBLISHED,
+        isActive: true,
+      },
+    });
+    return this.toCourseModel(course);
   }
-  publish(id: string): Promise<CourseModel> {
-    throw new Error('Method not implemented.');
-  }
-  unpublish(id: string): Promise<CourseModel> {
-    throw new Error('Method not implemented.');
+  async unpublish(id: string): Promise<CourseModel> {
+    const course = await this.prisma.course.update({
+      where: { id },
+      data: {
+        status: CourseStatus.DRAFT,
+        publishedAt: null,
+      },
+    });
+
+    return this.toCourseModel(course);
   }
   async existsBySlug(slug: string, excludeId?: string): Promise<boolean> {
     const count = await this.prisma.course.count({

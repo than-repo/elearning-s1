@@ -67,7 +67,7 @@ export interface UpdateCourseInput {
   cloudinaryPublicId?: string | null;
   level?: CourseLevel;
   status?: CourseStatus;
-  // price?: number | null;
+  price?: number | null;
   language?: string | null;
   durationInMinutes?: number | null;
   isActive?: boolean;
