@@ -58,6 +58,8 @@ enum CourseStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
+  IN_REVIEW
+  CHANGES_REQUESTED
 }
 
 enum DayOfWeek {
@@ -112,6 +114,9 @@ model User {
   payments          Payment[]
   courseInstructors CourseInstructor[] // as instructor
 
+  assignedReviewCategories CourseReviewerCategory[] @relation("ReviewerCategories")
+  courseReviews            CourseReview[]           @relation("CourseReviewReviewer")
+
   @@map("users")
 }
 
@@ -150,7 +155,56 @@ model RefreshToken {
 }
 
 // ====================== 4. COURSE MODELS ======================
+//======================4.1 REVIEWER =====================
+enum CourseReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CHANGES_REQUESTED
+}
 
+model CourseReview {
+  id String @id @default(uuid())
+
+  status      CourseReviewStatus @default(PENDING)
+  reviewNote  String?            @db.LongText
+  submittedAt DateTime           @default(now())
+  reviewedAt  DateTime?
+
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId String
+
+  reviewer   User   @relation("CourseReviewReviewer", fields: [reviewerId], references: [id], onDelete: Restrict)
+  reviewerId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+  @@index([reviewerId])
+  @@index([status])
+  @@map("course_reviews")
+}
+
+model CourseReviewerCategory {
+  isActive Boolean @default(true)
+
+  reviewer   User   @relation("ReviewerCategories", fields: [reviewerId], references: [id], onDelete: Cascade)
+  reviewerId String
+
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([reviewerId, categoryId])
+  @@index([reviewerId])
+  @@index([categoryId])
+  @@map("course_reviewer_categories")
+}
+
+//========================================================
 model CourseInstructor {
   id           String    @id @default(uuid())
   courseId     String
@@ -197,6 +251,9 @@ model Course {
   instructors      CourseInstructor[]
   courseCategories CourseCategory[]
 
+  //reviewer
+  reviews CourseReview[]
+
   @@index([slug])
   @@index([status])
   @@index([isActive])
@@ -219,7 +276,9 @@ model Category {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  courseCategories CourseCategory[]
+  courseCategories   CourseCategory[]
+  //reviewer
+  reviewerCategories CourseReviewerCategory[]
 
   @@index([parentId])
   @@map("categories")

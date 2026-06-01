@@ -16,7 +16,7 @@ import { CourseSlugParamDto } from '../dtos/course/param-course.dto';
 
 @ApiTags('Course - Public API')
 @Controller({ path: 'courses', version: '1' })
-@Throttle({ default: { ttl: 60, limit: 5 } })
+@Throttle({ default: { ttl: 60, limit: 60 } })
 export class PublicCoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
