@@ -212,6 +212,8 @@ export class CourseRepository implements ICourseRepository {
       where: {
         slug,
         deletedAt: null,
+        isActive: true,
+        status: CourseStatus.PUBLISHED,
       },
     });
 

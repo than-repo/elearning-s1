@@ -28,7 +28,7 @@ import { CategoryResponseDto } from '../dtos/category/category-response.dto';
 import { SetCategoryActiveStatusDto } from '../dtos/category/set-category-active-status.dto';
 import { CategoriesService } from '../services/categories.service';
 import { CategoryQueryDto } from '../dtos/category/category-query.dto';
-import { PaginatedResponse } from '../dtos/category/paginated-response.dto';
+import { PaginatedResponse } from '../dtos/paginated-response.dto';
 
 @ApiTags('categories')
 @UseGuards(JwtAuthGuard, RolesGuard)

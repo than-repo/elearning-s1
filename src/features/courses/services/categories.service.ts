@@ -18,7 +18,7 @@ import { UpdateCategoryDto } from '../dtos/category/update-category.dto';
 import { cleanData } from 'src/common/utils/clean-data-util';
 import { CATEGORY_REPOSITORY } from '../repositories/category-repository.token';
 import { CategoryQueryDto } from '../dtos/category/category-query.dto';
-import { PaginatedResponse } from '../dtos/category/paginated-response.dto';
+import { PaginatedResponse } from '../dtos/paginated-response.dto';
 
 @Injectable()
 export class CategoriesService {

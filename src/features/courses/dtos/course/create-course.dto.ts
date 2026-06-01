@@ -1,6 +1,3 @@
-//src\features\courses\dtos\create-course.dto.ts
-import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -9,99 +6,81 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
-  IsUrl,
   MaxLength,
   Min,
+  MinLength,
 } from 'class-validator';
-import { CourseLevel } from 'generated/prisma/enums';
+import { Type } from 'class-transformer';
+import { CourseLevel, CourseStatus } from 'generated/prisma/enums';
 
 export class CreateCourseDto {
-  @ApiProperty({ example: 'Complete NestJS Masterclass 2026' })
-  @IsNotEmpty({ message: 'Title is required' })
   @IsString()
-  @MaxLength(160, {
-    message: 'Title must be shorter than 160 characters',
-  })
+  @IsNotEmpty()
+  @MinLength(3)
+  @MaxLength(255)
   title!: string;
 
-  @ApiProperty({
-    example:
-      'Master NestJS, Prisma, Cloudinary, and build production-ready apps',
-  })
-  @IsNotEmpty({ message: 'Short description is required' })
   @IsString()
+  @IsOptional()
+  @MaxLength(255)
+  slug?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(10)
+  @MaxLength(500)
   shortDescription!: string;
 
-  @ApiProperty({
-    example: '<p>Full detailed description with rich content...</p>',
-  })
-  @IsOptional()
   @IsString()
-  @MaxLength(20000, {
-    message: 'Description must be shorter than 20,000 characters',
-  })
+  @IsOptional()
+  @MaxLength(500)
   description?: string;
 
-  @ApiProperty({ example: ['Learn NestJS from zero', 'Build real projects'] })
   @IsArray()
-  @IsOptional()
   @IsString({ each: true })
-  @Transform(({ value }) => (Array.isArray(value) ? value : []))
+  @IsOptional()
   whatYouWillLearn?: string[];
 
-  @ApiProperty({ example: ['Basic TypeScript', 'Node.js basics'] })
   @IsArray()
-  @IsOptional()
   @IsString({ each: true })
-  @Transform(({ value }) => (Array.isArray(value) ? value : []))
+  @IsOptional()
   requirements?: string[];
 
-  @ApiProperty({ enum: CourseLevel, example: 'INTERMEDIATE' })
-  @IsNotEmpty()
-  @IsEnum(CourseLevel, {
-    message:
-      'Level must be one of: BEGINNER, INTERMEDIATE, ADVANCE, ALL_LEVELS',
-  })
-  level!: CourseLevel;
-
-  @ApiProperty({ example: 500000 })
-  @IsOptional()
-  @IsNumber()
-  @Min(0, { message: 'Price cannot be negative' })
-  price?: number;
-
-  @ApiProperty({ example: 'en' })
-  @IsOptional()
   @IsString()
-  @MaxLength(50)
-  language?: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsInt()
-  @Min(0)
-  durationInMinutes?: number;
-
-  @ApiProperty({ example: 'https://res.cloudinary.com/.../thumbnail.jpg' })
-  @IsUrl()
   @IsOptional()
   thumbnailUrl?: string;
 
-  @ApiProperty({ example: 'elearning/courses/abc123/thumbnail_v1234567890' })
   @IsString()
   @IsOptional()
   cloudinaryPublicId?: string;
 
-  @ApiProperty()
-  @IsOptional()
-  @IsBoolean()
-  certificateEnabled?: boolean;
+  @IsEnum(CourseLevel)
+  level!: CourseLevel;
 
-  @ApiProperty({ example: ['cat-uuid-1', 'cat-uuid-2'] })
+  @IsEnum(CourseStatus)
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  @Transform(({ value }) => (Array.isArray(value) ? value : []))
-  categoryIds?: string[];
+  status?: CourseStatus;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  @Min(0)
+  price?: number;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(50)
+  language?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Type(() => Number)
+  @IsPositive()
+  durationInMinutes?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  certificateEnabled?: boolean;
 }

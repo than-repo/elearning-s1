@@ -4,4 +4,6 @@ import { Controller } from '@nestjs/common';
   path: 'course',
   version: '1',
 })
-export class CoursesController {}
+export class CoursesController {
+  //
+}
