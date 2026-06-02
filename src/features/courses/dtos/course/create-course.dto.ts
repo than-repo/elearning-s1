@@ -2,30 +2,22 @@ import {
   IsArray,
   IsBoolean,
   IsEnum,
-  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
-  IsPositive,
   IsString,
   MaxLength,
   Min,
   MinLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CourseLevel, CourseStatus } from 'generated/prisma/enums';
-
+import { CourseLevel } from 'generated/prisma/enums';
 export class CreateCourseDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
   @MaxLength(255)
   title!: string;
-
-  @IsString()
-  @IsOptional()
-  @MaxLength(255)
-  slug?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -35,7 +27,7 @@ export class CreateCourseDto {
 
   @IsString()
   @IsOptional()
-  @MaxLength(500)
+  @MaxLength(10000)
   description?: string;
 
   @IsArray()
@@ -48,20 +40,8 @@ export class CreateCourseDto {
   @IsOptional()
   requirements?: string[];
 
-  @IsString()
-  @IsOptional()
-  thumbnailUrl?: string;
-
-  @IsString()
-  @IsOptional()
-  cloudinaryPublicId?: string;
-
   @IsEnum(CourseLevel)
   level!: CourseLevel;
-
-  @IsEnum(CourseStatus)
-  @IsOptional()
-  status?: CourseStatus;
 
   @IsOptional()
   @IsNumber()
@@ -73,12 +53,6 @@ export class CreateCourseDto {
   @IsOptional()
   @MaxLength(50)
   language?: string;
-
-  @IsOptional()
-  @IsInt()
-  @Type(() => Number)
-  @IsPositive()
-  durationInMinutes?: number;
 
   @IsBoolean()
   @IsOptional()
