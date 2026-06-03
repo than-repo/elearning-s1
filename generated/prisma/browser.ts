@@ -33,6 +33,16 @@ export type UserIdentity = Prisma.UserIdentityModel
  */
 export type RefreshToken = Prisma.RefreshTokenModel
 /**
+ * Model CourseReview
+ * 
+ */
+export type CourseReview = Prisma.CourseReviewModel
+/**
+ * Model CourseReviewerCategory
+ * 
+ */
+export type CourseReviewerCategory = Prisma.CourseReviewerCategoryModel
+/**
  * Model CourseInstructor
  * 
  */

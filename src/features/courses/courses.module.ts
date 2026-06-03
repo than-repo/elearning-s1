@@ -18,6 +18,8 @@ import { LessonRepository } from './repositories/lesson.repository';
 import { LessonsService } from './services/lessons.service';
 import { FileMediaService } from './services/file-media.service';
 import { CourseSectionsService } from './services/course-sections.service';
+import { PublicCoursesController } from './controllers/public-courses.controller';
+import { InstructorCoursesController } from './controllers/instructor-course.controller';
 
 @Module({
   providers: [
@@ -60,6 +62,10 @@ import { CourseSectionsService } from './services/course-sections.service';
   ],
   exports: [],
   imports: [PrismaModule],
-  controllers: [CategoriesController],
+  controllers: [
+    CategoriesController,
+    PublicCoursesController,
+    InstructorCoursesController,
+  ],
 })
 export class CoursesModule {}

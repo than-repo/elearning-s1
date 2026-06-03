@@ -1,18 +1,14 @@
+import type { ICategoryRepository } from './../interfaces/category.repository.interface';
 //src\features\courses\services\courses.service.ts
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { COURSE_REPOSITORY } from '../repositories/course-repository.token';
 import type {
-  CourseModel,
   CourseOrderByInput,
   CourseWhereInput,
-  CreateCourseInput,
   FindManyCourseParams,
   ICourseRepository,
 } from '../interfaces/course.repository.interface';
-import {
-  BaseCourseQueryDto,
-  LearnerCourseQueryDto,
-} from '../dtos/course/course-query.dto';
+import { LearnerCourseQueryDto } from '../dtos/course/course-query.dto';
 import {
   COURSE_VIEW_GROUPS,
   CourseResponseDto,
@@ -21,14 +17,30 @@ import { cleanData } from 'src/common/utils/clean-data-util';
 import { plainToInstance } from 'class-transformer';
 import { PaginatedResponse } from '../dtos/paginated-response.dto';
 import { CourseStatus } from 'generated/prisma/enums';
-import { NOTFOUND } from 'dns';
+import { CreateCourseDto } from '../dtos/course/create-course.dto';
+import { slugify } from 'src/common/utils/slugify.util';
+import { CATEGORY_REPOSITORY } from '../repositories/category-repository.token';
 
 @Injectable()
 export class CoursesService {
   constructor(
     @Inject(COURSE_REPOSITORY)
-    private readonly ICourseRepository: ICourseRepository,
+    private readonly iCourseRepository: ICourseRepository,
+
+    @Inject(CATEGORY_REPOSITORY)
+    private readonly iCategoryRepository: ICategoryRepository,
   ) {}
+  private async generateUniqueSlug(title: string): Promise<string> {
+    const baseSlug = slugify(title);
+    let slug = baseSlug;
+    let count = 1;
+
+    while (await this.iCourseRepository.existsBySlug(slug)) {
+      slug = `${baseSlug}-${count++}`;
+    }
+
+    return slug;
+  }
 
   async findAllPublic(
     dto: LearnerCourseQueryDto,
@@ -68,8 +80,8 @@ export class CoursesService {
     };
 
     const [courses, total] = await Promise.all([
-      this.ICourseRepository.findMany(param),
-      this.ICourseRepository.count(cleanedWhere),
+      this.iCourseRepository.findMany(param),
+      this.iCourseRepository.count(cleanedWhere),
     ]);
 
     const totalPages: number = Math.ceil(total / limit);
@@ -92,7 +104,7 @@ export class CoursesService {
   }
 
   async findCourseBySlug(slug: string): Promise<CourseResponseDto> {
-    const course = await this.ICourseRepository.findBySlug(slug);
+    const course = await this.iCourseRepository.findBySlug(slug);
 
     if (!course) {
       throw new NotFoundException('COURSE NOT FOUND');
@@ -101,6 +113,54 @@ export class CoursesService {
     return plainToInstance(CourseResponseDto, course, {
       excludeExtraneousValues: true,
       groups: [COURSE_VIEW_GROUPS.PUBLIC],
+    });
+  }
+
+  async createDraftCourse(
+    instructorId: string,
+    dto: CreateCourseDto,
+  ): Promise<CourseResponseDto> {
+    const {
+      categoryIds,
+      title,
+      shortDescription,
+      description,
+      whatYouWillLearn,
+      requirements,
+      level,
+      price,
+      language,
+      certificateEnabled,
+    } = dto;
+
+    const categories =
+      await this.iCategoryRepository.findManyByIds(categoryIds);
+
+    if (categories.length !== categoryIds.length) {
+      throw new NotFoundException('One or more categories not found');
+    }
+
+    const slug = await this.generateUniqueSlug(title);
+
+    const course = await this.iCourseRepository.createDraftCourse({
+      title,
+      slug,
+      shortDescription,
+      description,
+      whatYouWillLearn,
+      requirements,
+      level,
+      price,
+      language,
+      certificateEnabled,
+      status: CourseStatus.DRAFT,
+      instructorId,
+      categoryIds,
+    });
+
+    return plainToInstance(CourseResponseDto, course, {
+      excludeExtraneousValues: true,
+      groups: [COURSE_VIEW_GROUPS.INSTRUCTOR],
     });
   }
 }

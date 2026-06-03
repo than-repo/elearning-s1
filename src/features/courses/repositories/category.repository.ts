@@ -10,11 +10,25 @@ import {
   UpdateCategoryInput,
 } from '../interfaces/category.repository.interface';
 import { Injectable } from '@nestjs/common';
+import { Prisma } from 'generated/prisma/client';
 
 @Injectable()
 export class CategoryRepository implements ICategoryRepository {
   constructor(private readonly prisma: PrismaService) {}
-
+  private toCategoryModel(category: Prisma.CategoryModel): Category {
+    return {
+      id: category.id,
+      name: category.name,
+      slug: category.slug,
+      description: category.description,
+      parentId: category.parentId,
+      order: category.order,
+      isActive: category.isActive,
+      createdAt: category.createdAt,
+      updatedAt: category.updatedAt,
+      deletedAt: category.deletedAt,
+    };
+  }
   private buildWhere(where: CategoryWhereInput = {}): Record<string, unknown> {
     const prismaWhere: Record<string, unknown> = {};
 
@@ -75,14 +89,33 @@ export class CategoryRepository implements ICategoryRepository {
       skip: params?.offset,
     });
   }
+  async findManyByIds(ids: string[]): Promise<Category[]> {
+    const categories = await this.prisma.category.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        deletedAt: null,
+      },
+    });
+    return categories;
+  }
 
   async count(params?: { where?: CategoryWhereInput }): Promise<number> {
     return this.prisma.category.count({
       where: this.buildWhere(params?.where),
     });
   }
-  async findAllAsTree(): Promise<CategoryWithChildren[]> {
-    throw new Error('Method not implemented.');
+  async findAllActive(): Promise<Category[]> {
+    const categories = await this.prisma.category.findMany({
+      where: {
+        deletedAt: null,
+        isActive: true,
+      },
+      orderBy: [{ order: 'asc' }, { name: 'asc' }],
+    });
+
+    return categories.map((category) => this.toCategoryModel(category));
   }
   async update(id: string, input: UpdateCategoryInput): Promise<Category> {
     return this.prisma.category.update({

@@ -89,12 +89,12 @@ export interface ICategoryRepository {
 
   findMany(params?: FindManyCategoryParams): Promise<Category[]>;
 
+  findManyByIds(ids: string[]): Promise<Category[]>;
   /**
    * Returns categories as a hierarchical tree (top-level + children).
    * Used heavily in "Create Course" form.
    */
-  findAllAsTree(): Promise<CategoryWithChildren[]>;
-
+  findAllActive(): Promise<Category[]>;
   /**
    * Updates an existing category.
    * Throws if category does not exist.

@@ -259,6 +259,7 @@ export type CategoryWhereInput = {
   parent?: Prisma.XOR<Prisma.CategoryNullableScalarRelationFilter, Prisma.CategoryWhereInput> | null
   children?: Prisma.CategoryListRelationFilter
   courseCategories?: Prisma.CourseCategoryListRelationFilter
+  reviewerCategories?: Prisma.CourseReviewerCategoryListRelationFilter
 }
 
 export type CategoryOrderByWithRelationInput = {
@@ -275,6 +276,7 @@ export type CategoryOrderByWithRelationInput = {
   parent?: Prisma.CategoryOrderByWithRelationInput
   children?: Prisma.CategoryOrderByRelationAggregateInput
   courseCategories?: Prisma.CourseCategoryOrderByRelationAggregateInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryOrderByRelationAggregateInput
   _relevance?: Prisma.CategoryOrderByRelevanceInput
 }
 
@@ -295,6 +297,7 @@ export type CategoryWhereUniqueInput = Prisma.AtLeast<{
   parent?: Prisma.XOR<Prisma.CategoryNullableScalarRelationFilter, Prisma.CategoryWhereInput> | null
   children?: Prisma.CategoryListRelationFilter
   courseCategories?: Prisma.CourseCategoryListRelationFilter
+  reviewerCategories?: Prisma.CourseReviewerCategoryListRelationFilter
 }, "id" | "slug">
 
 export type CategoryOrderByWithAggregationInput = {
@@ -344,6 +347,7 @@ export type CategoryCreateInput = {
   parent?: Prisma.CategoryCreateNestedOneWithoutChildrenInput
   children?: Prisma.CategoryCreateNestedManyWithoutParentInput
   courseCategories?: Prisma.CourseCategoryCreateNestedManyWithoutCategoryInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryUncheckedCreateInput = {
@@ -359,6 +363,7 @@ export type CategoryUncheckedCreateInput = {
   deletedAt?: Date | string | null
   children?: Prisma.CategoryUncheckedCreateNestedManyWithoutParentInput
   courseCategories?: Prisma.CourseCategoryUncheckedCreateNestedManyWithoutCategoryInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryUncheckedCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryUpdateInput = {
@@ -374,6 +379,7 @@ export type CategoryUpdateInput = {
   parent?: Prisma.CategoryUpdateOneWithoutChildrenNestedInput
   children?: Prisma.CategoryUpdateManyWithoutParentNestedInput
   courseCategories?: Prisma.CourseCategoryUpdateManyWithoutCategoryNestedInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryUncheckedUpdateInput = {
@@ -389,6 +395,7 @@ export type CategoryUncheckedUpdateInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   children?: Prisma.CategoryUncheckedUpdateManyWithoutParentNestedInput
   courseCategories?: Prisma.CourseCategoryUncheckedUpdateManyWithoutCategoryNestedInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryCreateManyInput = {
@@ -427,6 +434,11 @@ export type CategoryUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type CategoryScalarRelationFilter = {
+  is?: Prisma.CategoryWhereInput
+  isNot?: Prisma.CategoryWhereInput
 }
 
 export type CategoryNullableScalarRelationFilter = {
@@ -497,9 +509,18 @@ export type CategorySumOrderByAggregateInput = {
   order?: Prisma.SortOrder
 }
 
-export type CategoryScalarRelationFilter = {
-  is?: Prisma.CategoryWhereInput
-  isNot?: Prisma.CategoryWhereInput
+export type CategoryCreateNestedOneWithoutReviewerCategoriesInput = {
+  create?: Prisma.XOR<Prisma.CategoryCreateWithoutReviewerCategoriesInput, Prisma.CategoryUncheckedCreateWithoutReviewerCategoriesInput>
+  connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutReviewerCategoriesInput
+  connect?: Prisma.CategoryWhereUniqueInput
+}
+
+export type CategoryUpdateOneRequiredWithoutReviewerCategoriesNestedInput = {
+  create?: Prisma.XOR<Prisma.CategoryCreateWithoutReviewerCategoriesInput, Prisma.CategoryUncheckedCreateWithoutReviewerCategoriesInput>
+  connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutReviewerCategoriesInput
+  upsert?: Prisma.CategoryUpsertWithoutReviewerCategoriesInput
+  connect?: Prisma.CategoryWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CategoryUpdateToOneWithWhereWithoutReviewerCategoriesInput, Prisma.CategoryUpdateWithoutReviewerCategoriesInput>, Prisma.CategoryUncheckedUpdateWithoutReviewerCategoriesInput>
 }
 
 export type CategoryCreateNestedOneWithoutChildrenInput = {
@@ -574,6 +595,82 @@ export type CategoryUpdateOneRequiredWithoutCourseCategoriesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CategoryUpdateToOneWithWhereWithoutCourseCategoriesInput, Prisma.CategoryUpdateWithoutCourseCategoriesInput>, Prisma.CategoryUncheckedUpdateWithoutCourseCategoriesInput>
 }
 
+export type CategoryCreateWithoutReviewerCategoriesInput = {
+  id?: string
+  name: string
+  slug: string
+  description?: string | null
+  order?: number
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  parent?: Prisma.CategoryCreateNestedOneWithoutChildrenInput
+  children?: Prisma.CategoryCreateNestedManyWithoutParentInput
+  courseCategories?: Prisma.CourseCategoryCreateNestedManyWithoutCategoryInput
+}
+
+export type CategoryUncheckedCreateWithoutReviewerCategoriesInput = {
+  id?: string
+  name: string
+  slug: string
+  description?: string | null
+  parentId?: string | null
+  order?: number
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  children?: Prisma.CategoryUncheckedCreateNestedManyWithoutParentInput
+  courseCategories?: Prisma.CourseCategoryUncheckedCreateNestedManyWithoutCategoryInput
+}
+
+export type CategoryCreateOrConnectWithoutReviewerCategoriesInput = {
+  where: Prisma.CategoryWhereUniqueInput
+  create: Prisma.XOR<Prisma.CategoryCreateWithoutReviewerCategoriesInput, Prisma.CategoryUncheckedCreateWithoutReviewerCategoriesInput>
+}
+
+export type CategoryUpsertWithoutReviewerCategoriesInput = {
+  update: Prisma.XOR<Prisma.CategoryUpdateWithoutReviewerCategoriesInput, Prisma.CategoryUncheckedUpdateWithoutReviewerCategoriesInput>
+  create: Prisma.XOR<Prisma.CategoryCreateWithoutReviewerCategoriesInput, Prisma.CategoryUncheckedCreateWithoutReviewerCategoriesInput>
+  where?: Prisma.CategoryWhereInput
+}
+
+export type CategoryUpdateToOneWithWhereWithoutReviewerCategoriesInput = {
+  where?: Prisma.CategoryWhereInput
+  data: Prisma.XOR<Prisma.CategoryUpdateWithoutReviewerCategoriesInput, Prisma.CategoryUncheckedUpdateWithoutReviewerCategoriesInput>
+}
+
+export type CategoryUpdateWithoutReviewerCategoriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  parent?: Prisma.CategoryUpdateOneWithoutChildrenNestedInput
+  children?: Prisma.CategoryUpdateManyWithoutParentNestedInput
+  courseCategories?: Prisma.CourseCategoryUpdateManyWithoutCategoryNestedInput
+}
+
+export type CategoryUncheckedUpdateWithoutReviewerCategoriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  children?: Prisma.CategoryUncheckedUpdateManyWithoutParentNestedInput
+  courseCategories?: Prisma.CourseCategoryUncheckedUpdateManyWithoutCategoryNestedInput
+}
+
 export type CategoryCreateWithoutChildrenInput = {
   id?: string
   name: string
@@ -586,6 +683,7 @@ export type CategoryCreateWithoutChildrenInput = {
   deletedAt?: Date | string | null
   parent?: Prisma.CategoryCreateNestedOneWithoutChildrenInput
   courseCategories?: Prisma.CourseCategoryCreateNestedManyWithoutCategoryInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryUncheckedCreateWithoutChildrenInput = {
@@ -600,6 +698,7 @@ export type CategoryUncheckedCreateWithoutChildrenInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   courseCategories?: Prisma.CourseCategoryUncheckedCreateNestedManyWithoutCategoryInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryUncheckedCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryCreateOrConnectWithoutChildrenInput = {
@@ -619,6 +718,7 @@ export type CategoryCreateWithoutParentInput = {
   deletedAt?: Date | string | null
   children?: Prisma.CategoryCreateNestedManyWithoutParentInput
   courseCategories?: Prisma.CourseCategoryCreateNestedManyWithoutCategoryInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryUncheckedCreateWithoutParentInput = {
@@ -633,6 +733,7 @@ export type CategoryUncheckedCreateWithoutParentInput = {
   deletedAt?: Date | string | null
   children?: Prisma.CategoryUncheckedCreateNestedManyWithoutParentInput
   courseCategories?: Prisma.CourseCategoryUncheckedCreateNestedManyWithoutCategoryInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryUncheckedCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryCreateOrConnectWithoutParentInput = {
@@ -668,6 +769,7 @@ export type CategoryUpdateWithoutChildrenInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   parent?: Prisma.CategoryUpdateOneWithoutChildrenNestedInput
   courseCategories?: Prisma.CourseCategoryUpdateManyWithoutCategoryNestedInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryUncheckedUpdateWithoutChildrenInput = {
@@ -682,6 +784,7 @@ export type CategoryUncheckedUpdateWithoutChildrenInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   courseCategories?: Prisma.CourseCategoryUncheckedUpdateManyWithoutCategoryNestedInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryUpsertWithWhereUniqueWithoutParentInput = {
@@ -728,6 +831,7 @@ export type CategoryCreateWithoutCourseCategoriesInput = {
   deletedAt?: Date | string | null
   parent?: Prisma.CategoryCreateNestedOneWithoutChildrenInput
   children?: Prisma.CategoryCreateNestedManyWithoutParentInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryUncheckedCreateWithoutCourseCategoriesInput = {
@@ -742,6 +846,7 @@ export type CategoryUncheckedCreateWithoutCourseCategoriesInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   children?: Prisma.CategoryUncheckedCreateNestedManyWithoutParentInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryUncheckedCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryCreateOrConnectWithoutCourseCategoriesInput = {
@@ -772,6 +877,7 @@ export type CategoryUpdateWithoutCourseCategoriesInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   parent?: Prisma.CategoryUpdateOneWithoutChildrenNestedInput
   children?: Prisma.CategoryUpdateManyWithoutParentNestedInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryUncheckedUpdateWithoutCourseCategoriesInput = {
@@ -786,6 +892,7 @@ export type CategoryUncheckedUpdateWithoutCourseCategoriesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   children?: Prisma.CategoryUncheckedUpdateManyWithoutParentNestedInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryCreateManyParentInput = {
@@ -812,6 +919,7 @@ export type CategoryUpdateWithoutParentInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   children?: Prisma.CategoryUpdateManyWithoutParentNestedInput
   courseCategories?: Prisma.CourseCategoryUpdateManyWithoutCategoryNestedInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryUncheckedUpdateWithoutParentInput = {
@@ -826,6 +934,7 @@ export type CategoryUncheckedUpdateWithoutParentInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   children?: Prisma.CategoryUncheckedUpdateManyWithoutParentNestedInput
   courseCategories?: Prisma.CourseCategoryUncheckedUpdateManyWithoutCategoryNestedInput
+  reviewerCategories?: Prisma.CourseReviewerCategoryUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryUncheckedUpdateManyWithoutParentInput = {
@@ -848,11 +957,13 @@ export type CategoryUncheckedUpdateManyWithoutParentInput = {
 export type CategoryCountOutputType = {
   children: number
   courseCategories: number
+  reviewerCategories: number
 }
 
 export type CategoryCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   children?: boolean | CategoryCountOutputTypeCountChildrenArgs
   courseCategories?: boolean | CategoryCountOutputTypeCountCourseCategoriesArgs
+  reviewerCategories?: boolean | CategoryCountOutputTypeCountReviewerCategoriesArgs
 }
 
 /**
@@ -879,6 +990,13 @@ export type CategoryCountOutputTypeCountCourseCategoriesArgs<ExtArgs extends run
   where?: Prisma.CourseCategoryWhereInput
 }
 
+/**
+ * CategoryCountOutputType without action
+ */
+export type CategoryCountOutputTypeCountReviewerCategoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CourseReviewerCategoryWhereInput
+}
+
 
 export type CategorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -894,6 +1012,7 @@ export type CategorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   parent?: boolean | Prisma.Category$parentArgs<ExtArgs>
   children?: boolean | Prisma.Category$childrenArgs<ExtArgs>
   courseCategories?: boolean | Prisma.Category$courseCategoriesArgs<ExtArgs>
+  reviewerCategories?: boolean | Prisma.Category$reviewerCategoriesArgs<ExtArgs>
   _count?: boolean | Prisma.CategoryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["category"]>
 
@@ -917,6 +1036,7 @@ export type CategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   parent?: boolean | Prisma.Category$parentArgs<ExtArgs>
   children?: boolean | Prisma.Category$childrenArgs<ExtArgs>
   courseCategories?: boolean | Prisma.Category$courseCategoriesArgs<ExtArgs>
+  reviewerCategories?: boolean | Prisma.Category$reviewerCategoriesArgs<ExtArgs>
   _count?: boolean | Prisma.CategoryCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -926,6 +1046,7 @@ export type $CategoryPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     parent: Prisma.$CategoryPayload<ExtArgs> | null
     children: Prisma.$CategoryPayload<ExtArgs>[]
     courseCategories: Prisma.$CourseCategoryPayload<ExtArgs>[]
+    reviewerCategories: Prisma.$CourseReviewerCategoryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1281,6 +1402,7 @@ export interface Prisma__CategoryClient<T, Null = never, ExtArgs extends runtime
   parent<T extends Prisma.Category$parentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Category$parentArgs<ExtArgs>>): Prisma.Prisma__CategoryClient<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   children<T extends Prisma.Category$childrenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Category$childrenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   courseCategories<T extends Prisma.Category$courseCategoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Category$courseCategoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CourseCategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  reviewerCategories<T extends Prisma.Category$reviewerCategoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Category$reviewerCategoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CourseReviewerCategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1732,6 +1854,30 @@ export type Category$courseCategoriesArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.CourseCategoryScalarFieldEnum | Prisma.CourseCategoryScalarFieldEnum[]
+}
+
+/**
+ * Category.reviewerCategories
+ */
+export type Category$reviewerCategoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CourseReviewerCategory
+   */
+  select?: Prisma.CourseReviewerCategorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CourseReviewerCategory
+   */
+  omit?: Prisma.CourseReviewerCategoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CourseReviewerCategoryInclude<ExtArgs> | null
+  where?: Prisma.CourseReviewerCategoryWhereInput
+  orderBy?: Prisma.CourseReviewerCategoryOrderByWithRelationInput | Prisma.CourseReviewerCategoryOrderByWithRelationInput[]
+  cursor?: Prisma.CourseReviewerCategoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CourseReviewerCategoryScalarFieldEnum | Prisma.CourseReviewerCategoryScalarFieldEnum[]
 }
 
 /**

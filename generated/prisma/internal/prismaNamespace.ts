@@ -387,6 +387,8 @@ export const ModelName = {
   User: 'User',
   UserIdentity: 'UserIdentity',
   RefreshToken: 'RefreshToken',
+  CourseReview: 'CourseReview',
+  CourseReviewerCategory: 'CourseReviewerCategory',
   CourseInstructor: 'CourseInstructor',
   Course: 'Course',
   Category: 'Category',
@@ -411,7 +413,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "userIdentity" | "refreshToken" | "courseInstructor" | "course" | "category" | "courseCategory" | "courseSection" | "lesson" | "fileMedia" | "enrollment" | "payment"
+    modelProps: "user" | "userIdentity" | "refreshToken" | "courseReview" | "courseReviewerCategory" | "courseInstructor" | "course" | "category" | "courseCategory" | "courseSection" | "lesson" | "fileMedia" | "enrollment" | "payment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -610,6 +612,138 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.RefreshTokenCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.RefreshTokenCountAggregateOutputType> | number
+        }
+      }
+    }
+    CourseReview: {
+      payload: Prisma.$CourseReviewPayload<ExtArgs>
+      fields: Prisma.CourseReviewFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CourseReviewFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CourseReviewFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewPayload>
+        }
+        findFirst: {
+          args: Prisma.CourseReviewFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CourseReviewFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewPayload>
+        }
+        findMany: {
+          args: Prisma.CourseReviewFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewPayload>[]
+        }
+        create: {
+          args: Prisma.CourseReviewCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewPayload>
+        }
+        createMany: {
+          args: Prisma.CourseReviewCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.CourseReviewDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewPayload>
+        }
+        update: {
+          args: Prisma.CourseReviewUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewPayload>
+        }
+        deleteMany: {
+          args: Prisma.CourseReviewDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CourseReviewUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.CourseReviewUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewPayload>
+        }
+        aggregate: {
+          args: Prisma.CourseReviewAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCourseReview>
+        }
+        groupBy: {
+          args: Prisma.CourseReviewGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CourseReviewGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CourseReviewCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CourseReviewCountAggregateOutputType> | number
+        }
+      }
+    }
+    CourseReviewerCategory: {
+      payload: Prisma.$CourseReviewerCategoryPayload<ExtArgs>
+      fields: Prisma.CourseReviewerCategoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CourseReviewerCategoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewerCategoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CourseReviewerCategoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewerCategoryPayload>
+        }
+        findFirst: {
+          args: Prisma.CourseReviewerCategoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewerCategoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CourseReviewerCategoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewerCategoryPayload>
+        }
+        findMany: {
+          args: Prisma.CourseReviewerCategoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewerCategoryPayload>[]
+        }
+        create: {
+          args: Prisma.CourseReviewerCategoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewerCategoryPayload>
+        }
+        createMany: {
+          args: Prisma.CourseReviewerCategoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.CourseReviewerCategoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewerCategoryPayload>
+        }
+        update: {
+          args: Prisma.CourseReviewerCategoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewerCategoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.CourseReviewerCategoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CourseReviewerCategoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.CourseReviewerCategoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseReviewerCategoryPayload>
+        }
+        aggregate: {
+          args: Prisma.CourseReviewerCategoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCourseReviewerCategory>
+        }
+        groupBy: {
+          args: Prisma.CourseReviewerCategoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CourseReviewerCategoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CourseReviewerCategoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CourseReviewerCategoryCountAggregateOutputType> | number
         }
       }
     }
@@ -1294,6 +1428,32 @@ export const RefreshTokenScalarFieldEnum = {
 export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum]
 
 
+export const CourseReviewScalarFieldEnum = {
+  id: 'id',
+  status: 'status',
+  reviewNote: 'reviewNote',
+  submittedAt: 'submittedAt',
+  reviewedAt: 'reviewedAt',
+  courseId: 'courseId',
+  reviewerId: 'reviewerId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CourseReviewScalarFieldEnum = (typeof CourseReviewScalarFieldEnum)[keyof typeof CourseReviewScalarFieldEnum]
+
+
+export const CourseReviewerCategoryScalarFieldEnum = {
+  isActive: 'isActive',
+  reviewerId: 'reviewerId',
+  categoryId: 'categoryId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CourseReviewerCategoryScalarFieldEnum = (typeof CourseReviewerCategoryScalarFieldEnum)[keyof typeof CourseReviewerCategoryScalarFieldEnum]
+
+
 export const CourseInstructorScalarFieldEnum = {
   id: 'id',
   courseId: 'courseId',
@@ -1500,6 +1660,24 @@ export const RefreshTokenOrderByRelevanceFieldEnum = {
 export type RefreshTokenOrderByRelevanceFieldEnum = (typeof RefreshTokenOrderByRelevanceFieldEnum)[keyof typeof RefreshTokenOrderByRelevanceFieldEnum]
 
 
+export const CourseReviewOrderByRelevanceFieldEnum = {
+  id: 'id',
+  reviewNote: 'reviewNote',
+  courseId: 'courseId',
+  reviewerId: 'reviewerId'
+} as const
+
+export type CourseReviewOrderByRelevanceFieldEnum = (typeof CourseReviewOrderByRelevanceFieldEnum)[keyof typeof CourseReviewOrderByRelevanceFieldEnum]
+
+
+export const CourseReviewerCategoryOrderByRelevanceFieldEnum = {
+  reviewerId: 'reviewerId',
+  categoryId: 'categoryId'
+} as const
+
+export type CourseReviewerCategoryOrderByRelevanceFieldEnum = (typeof CourseReviewerCategoryOrderByRelevanceFieldEnum)[keyof typeof CourseReviewerCategoryOrderByRelevanceFieldEnum]
+
+
 export const CourseInstructorOrderByRelevanceFieldEnum = {
   id: 'id',
   courseId: 'courseId',
@@ -1662,6 +1840,13 @@ export type EnumAuthProviderEnumFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
+ * Reference to a field of type 'CourseReviewStatus'
+ */
+export type EnumCourseReviewStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CourseReviewStatus'>
+    
+
+
+/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -1697,9 +1882,9 @@ export type EnumCourseStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
 
 
 /**
- * Reference to a field of type 'Float'
+ * Reference to a field of type 'Decimal'
  */
-export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
     
 
 
@@ -1714,6 +1899,13 @@ export type EnumMediaTypeEnumFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'EnrollmentStatus'
  */
 export type EnumEnrollmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EnrollmentStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
     
 
 
@@ -1843,6 +2035,8 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   userIdentity?: Prisma.UserIdentityOmit
   refreshToken?: Prisma.RefreshTokenOmit
+  courseReview?: Prisma.CourseReviewOmit
+  courseReviewerCategory?: Prisma.CourseReviewerCategoryOmit
   courseInstructor?: Prisma.CourseInstructorOmit
   course?: Prisma.CourseOmit
   category?: Prisma.CategoryOmit

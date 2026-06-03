@@ -235,7 +235,7 @@ model Course {
   cloudinaryPublicId String?      @unique
   level              CourseLevel
   status             CourseStatus @default(DRAFT)
-  price              Float?
+  price              Decimal?     @db.Decimal(10, 2)
   language           String?
   durationInMinutes  Int? // Total duration
   isActive           Boolean      @default(true)

@@ -6,13 +6,17 @@ import type {
   Category,
   CategoryOrderByInput,
   CategoryWhereInput,
+  CategoryWithChildren,
   CreateCategoryInput,
   FindManyCategoryParams,
   ICategoryRepository,
   UpdateCategoryInput,
 } from '../interfaces/category.repository.interface';
 import { plainToInstance } from 'class-transformer';
-import { CategoryResponseDto } from '../dtos/category/category-response.dto';
+import {
+  CategoryResponseDto,
+  CategoryTreeResponseDto,
+} from '../dtos/category/category-response.dto';
 import { slugify } from 'src/common/utils/slugify.util';
 import { UpdateCategoryDto } from '../dtos/category/update-category.dto';
 import { cleanData } from 'src/common/utils/clean-data-util';
@@ -27,6 +31,38 @@ export class CategoriesService {
     private readonly iCategoryRepository: ICategoryRepository,
   ) {}
 
+  private buildCategoryTree(categories: Category[]): CategoryWithChildren[] {
+    const categoryModels: CategoryWithChildren[] = categories.map(
+      (category) => ({
+        ...category,
+        children: [],
+      }),
+    );
+
+    const categoryMap = new Map<string, CategoryWithChildren>();
+
+    for (const category of categoryModels) {
+      categoryMap.set(category.id, category);
+    }
+
+    const tree: CategoryWithChildren[] = [];
+
+    for (const category of categoryModels) {
+      if (category.parentId) {
+        const parent = categoryMap.get(category.parentId);
+
+        if (parent) {
+          parent.children.push(category);
+        }
+
+        continue;
+      }
+
+      tree.push(category);
+    }
+
+    return tree;
+  }
   private async generateSlug(name: string): Promise<string> {
     let slug: string = slugify(name);
     let counter = 1;
@@ -201,5 +237,15 @@ export class CategoriesService {
         hasPreviousPage: page > 1,
       },
     };
+  }
+
+  async findAllAsTree(): Promise<CategoryTreeResponseDto[]> {
+    const categories = await this.iCategoryRepository.findAllActive();
+
+    const tree = this.buildCategoryTree(categories);
+
+    return plainToInstance(CategoryTreeResponseDto, tree, {
+      excludeExtraneousValues: true,
+    });
   }
 }

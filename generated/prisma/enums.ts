@@ -72,7 +72,9 @@ export type CourseLevel = (typeof CourseLevel)[keyof typeof CourseLevel]
 export const CourseStatus = {
   DRAFT: 'DRAFT',
   PUBLISHED: 'PUBLISHED',
-  ARCHIVED: 'ARCHIVED'
+  ARCHIVED: 'ARCHIVED',
+  IN_REVIEW: 'IN_REVIEW',
+  CHANGES_REQUESTED: 'CHANGES_REQUESTED'
 } as const
 
 export type CourseStatus = (typeof CourseStatus)[keyof typeof CourseStatus]
@@ -111,3 +113,13 @@ export const MediaTypeEnum = {
 } as const
 
 export type MediaTypeEnum = (typeof MediaTypeEnum)[keyof typeof MediaTypeEnum]
+
+
+export const CourseReviewStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  CHANGES_REQUESTED: 'CHANGES_REQUESTED'
+} as const
+
+export type CourseReviewStatus = (typeof CourseReviewStatus)[keyof typeof CourseReviewStatus]

@@ -54,8 +54,24 @@ export interface CreateCourseInput {
   isActive?: boolean;
   certificateEnabled?: boolean;
   publishedAt?: Date | null;
-}
 
+  categoryIds: string[];
+}
+export interface CreateDraftCourseInput {
+  title: string;
+  slug: string;
+  shortDescription: string;
+  description?: string;
+  whatYouWillLearn?: string[];
+  requirements?: string[];
+  level: CourseLevel;
+  price?: number;
+  language?: string;
+  certificateEnabled?: boolean;
+  status: CourseStatus;
+  instructorId: string;
+  categoryIds: string[];
+}
 export interface UpdateCourseInput {
   title?: string;
   slug?: string;
@@ -105,6 +121,7 @@ export interface FindManyCourseParams {
 export interface ICourseRepository {
   create(input: CreateCourseInput): Promise<CourseModel>;
 
+  createDraftCourse(input: CreateDraftCourseInput): Promise<CourseModel>;
   /**
    * deletedAt: null
    */

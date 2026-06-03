@@ -1,5 +1,6 @@
 // src/features/courses/dtos/course-response.dto.ts
 
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { CourseLevel, CourseStatus } from 'generated/prisma/enums';
 
@@ -13,164 +14,92 @@ export const COURSE_VIEW_GROUPS = {
 export type CourseViewGroup =
   (typeof COURSE_VIEW_GROUPS)[keyof typeof COURSE_VIEW_GROUPS];
 
+const ALL_COURSE_GROUPS = [
+  COURSE_VIEW_GROUPS.PUBLIC,
+  COURSE_VIEW_GROUPS.STUDENT,
+  COURSE_VIEW_GROUPS.INSTRUCTOR,
+  COURSE_VIEW_GROUPS.ADMIN,
+];
+
+const MANAGEMENT_COURSE_GROUPS = [
+  COURSE_VIEW_GROUPS.INSTRUCTOR,
+  COURSE_VIEW_GROUPS.ADMIN,
+];
+
 export class CourseResponseDto {
-  @Expose({
-    groups: [
-      COURSE_VIEW_GROUPS.PUBLIC,
-      COURSE_VIEW_GROUPS.STUDENT,
-      COURSE_VIEW_GROUPS.INSTRUCTOR,
-      COURSE_VIEW_GROUPS.ADMIN,
-    ],
-  })
+  @ApiProperty()
+  @Expose({ groups: ALL_COURSE_GROUPS })
   id!: string;
 
-  @Expose({
-    groups: [
-      COURSE_VIEW_GROUPS.PUBLIC,
-      COURSE_VIEW_GROUPS.STUDENT,
-      COURSE_VIEW_GROUPS.INSTRUCTOR,
-      COURSE_VIEW_GROUPS.ADMIN,
-    ],
-  })
+  @ApiProperty()
+  @Expose({ groups: ALL_COURSE_GROUPS })
   title!: string;
 
-  @Expose({
-    groups: [
-      COURSE_VIEW_GROUPS.PUBLIC,
-      COURSE_VIEW_GROUPS.STUDENT,
-      COURSE_VIEW_GROUPS.INSTRUCTOR,
-      COURSE_VIEW_GROUPS.ADMIN,
-    ],
-  })
+  @ApiProperty()
+  @Expose({ groups: ALL_COURSE_GROUPS })
   slug!: string;
 
-  @Expose({
-    groups: [
-      COURSE_VIEW_GROUPS.PUBLIC,
-      COURSE_VIEW_GROUPS.STUDENT,
-      COURSE_VIEW_GROUPS.INSTRUCTOR,
-      COURSE_VIEW_GROUPS.ADMIN,
-    ],
-  })
+  @ApiProperty()
+  @Expose({ groups: ALL_COURSE_GROUPS })
   shortDescription!: string;
 
-  @Expose({
-    groups: [
-      COURSE_VIEW_GROUPS.PUBLIC,
-      COURSE_VIEW_GROUPS.STUDENT,
-      COURSE_VIEW_GROUPS.INSTRUCTOR,
-      COURSE_VIEW_GROUPS.ADMIN,
-    ],
-  })
+  @ApiPropertyOptional({ nullable: true })
+  @Expose({ groups: ALL_COURSE_GROUPS })
   description?: string | null;
 
-  @Expose({
-    groups: [
-      COURSE_VIEW_GROUPS.PUBLIC,
-      COURSE_VIEW_GROUPS.STUDENT,
-      COURSE_VIEW_GROUPS.INSTRUCTOR,
-      COURSE_VIEW_GROUPS.ADMIN,
-    ],
-  })
+  @ApiPropertyOptional({ type: [String], nullable: true })
+  @Expose({ groups: ALL_COURSE_GROUPS })
   whatYouWillLearn?: string[] | null;
 
-  @Expose({
-    groups: [
-      COURSE_VIEW_GROUPS.PUBLIC,
-      COURSE_VIEW_GROUPS.STUDENT,
-      COURSE_VIEW_GROUPS.INSTRUCTOR,
-      COURSE_VIEW_GROUPS.ADMIN,
-    ],
-  })
+  @ApiPropertyOptional({ type: [String], nullable: true })
+  @Expose({ groups: ALL_COURSE_GROUPS })
   requirements?: string[] | null;
 
-  @Expose({
-    groups: [
-      COURSE_VIEW_GROUPS.PUBLIC,
-      COURSE_VIEW_GROUPS.STUDENT,
-      COURSE_VIEW_GROUPS.INSTRUCTOR,
-      COURSE_VIEW_GROUPS.ADMIN,
-    ],
-  })
+  @ApiPropertyOptional({ nullable: true })
+  @Expose({ groups: ALL_COURSE_GROUPS })
   thumbnailUrl?: string | null;
 
-  @Expose({
-    groups: [
-      COURSE_VIEW_GROUPS.PUBLIC,
-      COURSE_VIEW_GROUPS.STUDENT,
-      COURSE_VIEW_GROUPS.INSTRUCTOR,
-      COURSE_VIEW_GROUPS.ADMIN,
-    ],
-  })
+  @ApiProperty({ enum: CourseLevel })
+  @Expose({ groups: ALL_COURSE_GROUPS })
   level!: CourseLevel;
 
-  @Expose({
-    groups: [
-      COURSE_VIEW_GROUPS.PUBLIC,
-      COURSE_VIEW_GROUPS.STUDENT,
-      COURSE_VIEW_GROUPS.INSTRUCTOR,
-      COURSE_VIEW_GROUPS.ADMIN,
-    ],
-  })
+  @ApiPropertyOptional({ nullable: true })
+  @Expose({ groups: ALL_COURSE_GROUPS })
   price?: number | null;
 
-  @Expose({
-    groups: [
-      COURSE_VIEW_GROUPS.PUBLIC,
-      COURSE_VIEW_GROUPS.STUDENT,
-      COURSE_VIEW_GROUPS.INSTRUCTOR,
-      COURSE_VIEW_GROUPS.ADMIN,
-    ],
-  })
+  @ApiPropertyOptional({ nullable: true })
+  @Expose({ groups: ALL_COURSE_GROUPS })
   language?: string | null;
 
-  @Expose({
-    groups: [
-      COURSE_VIEW_GROUPS.PUBLIC,
-      COURSE_VIEW_GROUPS.STUDENT,
-      COURSE_VIEW_GROUPS.INSTRUCTOR,
-      COURSE_VIEW_GROUPS.ADMIN,
-    ],
-  })
+  @ApiPropertyOptional({ nullable: true })
+  @Expose({ groups: ALL_COURSE_GROUPS })
   durationInMinutes?: number | null;
 
-  @Expose({
-    groups: [
-      COURSE_VIEW_GROUPS.PUBLIC,
-      COURSE_VIEW_GROUPS.STUDENT,
-      COURSE_VIEW_GROUPS.INSTRUCTOR,
-      COURSE_VIEW_GROUPS.ADMIN,
-    ],
-  })
+  @ApiProperty()
+  @Expose({ groups: ALL_COURSE_GROUPS })
   certificateEnabled!: boolean;
 
-  @Expose({
-    groups: [COURSE_VIEW_GROUPS.INSTRUCTOR, COURSE_VIEW_GROUPS.ADMIN],
-  })
+  @ApiProperty({ enum: CourseStatus })
+  @Expose({ groups: MANAGEMENT_COURSE_GROUPS })
   status!: CourseStatus;
 
-  @Expose({
-    groups: [COURSE_VIEW_GROUPS.INSTRUCTOR, COURSE_VIEW_GROUPS.ADMIN],
-  })
+  @ApiProperty()
+  @Expose({ groups: MANAGEMENT_COURSE_GROUPS })
   isActive!: boolean;
 
-  @Expose({
-    groups: [COURSE_VIEW_GROUPS.INSTRUCTOR, COURSE_VIEW_GROUPS.ADMIN],
-  })
+  @ApiPropertyOptional({ nullable: true })
+  @Expose({ groups: MANAGEMENT_COURSE_GROUPS })
   publishedAt?: Date | null;
 
-  @Expose({
-    groups: [COURSE_VIEW_GROUPS.ADMIN],
-  })
+  @ApiProperty()
+  @Expose({ groups: MANAGEMENT_COURSE_GROUPS })
   createdAt!: Date;
 
-  @Expose({
-    groups: [COURSE_VIEW_GROUPS.ADMIN],
-  })
+  @ApiProperty()
+  @Expose({ groups: MANAGEMENT_COURSE_GROUPS })
   updatedAt!: Date;
 
-  @Expose({
-    groups: [COURSE_VIEW_GROUPS.ADMIN],
-  })
+  @ApiPropertyOptional({ nullable: true })
+  @Expose({ groups: [COURSE_VIEW_GROUPS.ADMIN] })
   deletedAt?: Date | null;
 }

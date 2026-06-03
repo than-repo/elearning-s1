@@ -54,6 +54,8 @@ export const ModelName = {
   User: 'User',
   UserIdentity: 'UserIdentity',
   RefreshToken: 'RefreshToken',
+  CourseReview: 'CourseReview',
+  CourseReviewerCategory: 'CourseReviewerCategory',
   CourseInstructor: 'CourseInstructor',
   Course: 'Course',
   Category: 'Category',
@@ -127,6 +129,32 @@ export const RefreshTokenScalarFieldEnum = {
 } as const
 
 export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum]
+
+
+export const CourseReviewScalarFieldEnum = {
+  id: 'id',
+  status: 'status',
+  reviewNote: 'reviewNote',
+  submittedAt: 'submittedAt',
+  reviewedAt: 'reviewedAt',
+  courseId: 'courseId',
+  reviewerId: 'reviewerId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CourseReviewScalarFieldEnum = (typeof CourseReviewScalarFieldEnum)[keyof typeof CourseReviewScalarFieldEnum]
+
+
+export const CourseReviewerCategoryScalarFieldEnum = {
+  isActive: 'isActive',
+  reviewerId: 'reviewerId',
+  categoryId: 'categoryId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CourseReviewerCategoryScalarFieldEnum = (typeof CourseReviewerCategoryScalarFieldEnum)[keyof typeof CourseReviewerCategoryScalarFieldEnum]
 
 
 export const CourseInstructorScalarFieldEnum = {
@@ -333,6 +361,24 @@ export const RefreshTokenOrderByRelevanceFieldEnum = {
 } as const
 
 export type RefreshTokenOrderByRelevanceFieldEnum = (typeof RefreshTokenOrderByRelevanceFieldEnum)[keyof typeof RefreshTokenOrderByRelevanceFieldEnum]
+
+
+export const CourseReviewOrderByRelevanceFieldEnum = {
+  id: 'id',
+  reviewNote: 'reviewNote',
+  courseId: 'courseId',
+  reviewerId: 'reviewerId'
+} as const
+
+export type CourseReviewOrderByRelevanceFieldEnum = (typeof CourseReviewOrderByRelevanceFieldEnum)[keyof typeof CourseReviewOrderByRelevanceFieldEnum]
+
+
+export const CourseReviewerCategoryOrderByRelevanceFieldEnum = {
+  reviewerId: 'reviewerId',
+  categoryId: 'categoryId'
+} as const
+
+export type CourseReviewerCategoryOrderByRelevanceFieldEnum = (typeof CourseReviewerCategoryOrderByRelevanceFieldEnum)[keyof typeof CourseReviewerCategoryOrderByRelevanceFieldEnum]
 
 
 export const CourseInstructorOrderByRelevanceFieldEnum = {

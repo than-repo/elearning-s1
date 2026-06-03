@@ -72,15 +72,37 @@ export class CategoryResponseDto {
  * - Category selector in "Create Course" form
  * - Drag-and-drop reordering UI
  */
-export class CategoryTreeResponseDto extends CategoryResponseDto {
+
+export class CategoryTreeResponseDto {
+  @ApiProperty()
+  @Expose()
+  id!: string;
+
+  @ApiProperty()
+  @Expose()
+  name!: string;
+
+  @ApiProperty()
+  @Expose()
+  slug!: string;
+
+  @ApiProperty({ nullable: true })
+  @Expose()
+  description!: string | null;
+
+  @ApiProperty({ nullable: true })
+  @Expose()
+  parentId!: string | null;
+
+  @ApiProperty()
+  @Expose()
+  order!: number;
+
   @ApiProperty({
-    description: 'Child categories (recursive)',
-    type: () => [CategoryTreeResponseDto],
+    type: () => CategoryTreeResponseDto,
+    isArray: true,
   })
   @Expose()
-  @Type(() => CategoryTreeResponseDto) // required for class-transformer recursion
-  @IsArray()
-  @ValidateNested({ each: true })
-  @IsOptional()
-  children: CategoryTreeResponseDto[] = [];
+  @Type(() => CategoryTreeResponseDto)
+  children!: CategoryTreeResponseDto[];
 }

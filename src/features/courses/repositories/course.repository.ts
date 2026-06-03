@@ -7,6 +7,7 @@ import {
   CourseOrderByInput,
   CourseWhereInput,
   CreateCourseInput,
+  CreateDraftCourseInput,
   FindManyCourseParams,
   ICourseRepository,
   UpdateCourseInput,
@@ -21,6 +22,7 @@ import {
 export class CourseRepository implements ICourseRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  ///=====================================================
   private toCourseModel(course: PrismaCourse): CourseModel {
     return {
       id: course.id,
@@ -34,7 +36,7 @@ export class CourseRepository implements ICourseRepository {
       cloudinaryPublicId: course.cloudinaryPublicId,
       level: course.level,
       status: course.status,
-      price: course.price,
+      price: course.price?.toNumber() ?? null,
       language: course.language,
       durationInMinutes: course.durationInMinutes,
       isActive: course.isActive,
@@ -167,6 +169,7 @@ export class CourseRepository implements ICourseRepository {
 
     return value;
   }
+  ///=====================================================
   async findMany(param?: FindManyCourseParams): Promise<CourseModel[]> {
     const courses = await this.prisma.course.findMany({
       where: this.buildWhere(param?.where),
@@ -179,6 +182,7 @@ export class CourseRepository implements ICourseRepository {
       return this.toCourseModel(course);
     });
   }
+
   async create(input: CreateCourseInput): Promise<CourseModel> {
     const course = await this.prisma.course.create({
       data: {
@@ -186,6 +190,60 @@ export class CourseRepository implements ICourseRepository {
         whatYouWillLearn: this.toPrismaJsonArray(input.whatYouWillLearn),
         requirements: this.toPrismaJsonArray(input.requirements),
       },
+    });
+
+    return this.toCourseModel(course);
+  }
+
+  async createDraftCourse(input: CreateDraftCourseInput): Promise<CourseModel> {
+    const {
+      instructorId,
+      categoryIds,
+      title,
+      slug,
+      shortDescription,
+      description,
+      whatYouWillLearn,
+      requirements,
+      level,
+      price,
+      language,
+      certificateEnabled,
+      status,
+    } = input;
+
+    const course = await this.prisma.$transaction(async (tx) => {
+      return tx.course.create({
+        data: {
+          title,
+          slug,
+          shortDescription,
+          description,
+          whatYouWillLearn: this.toPrismaJsonArray(whatYouWillLearn),
+          requirements: this.toPrismaJsonArray(requirements),
+          level,
+          price,
+          language,
+          certificateEnabled,
+          status,
+          isActive: true,
+
+          instructors: {
+            create: {
+              instructorId,
+              isPrimary: true,
+              order: 0,
+              isActive: true,
+            },
+          },
+
+          courseCategories: {
+            create: categoryIds.map((categoryId) => ({
+              categoryId,
+            })),
+          },
+        },
+      });
     });
 
     return this.toCourseModel(course);

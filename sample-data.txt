@@ -17,3 +17,11 @@
     "gender": "MALE"
 }
 //@123abcABC
+
+//instructor
+{
+  "fullName": "INSTRUCTOR_1",
+  "email": "INSTRUCTOR_1@example.com",
+  "password": "123@ABCabc",
+  "role": "INSTRUCTOR"
+}

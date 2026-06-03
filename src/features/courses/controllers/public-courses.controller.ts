@@ -1,3 +1,4 @@
+import { CategoriesService } from './../services/categories.service';
 //src\features\courses\controllers\public-courses.controller.ts
 import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import {
@@ -13,12 +14,29 @@ import { Throttle } from '@nestjs/throttler';
 import { CourseResponseDto } from '../dtos/course/course-response.dto';
 import { PaginatedCourseResponseDto } from '../dtos/course/paginated-course.dto';
 import { CourseSlugParamDto } from '../dtos/course/param-course.dto';
+import { CategoryTreeResponseDto } from '../dtos/category/category-response.dto';
 
 @ApiTags('Course - Public API')
-@Controller({ path: 'courses', version: '1' })
+@Controller({ path: 'courses/public', version: '1' })
 @Throttle({ default: { ttl: 60, limit: 60 } })
 export class PublicCoursesController {
-  constructor(private readonly coursesService: CoursesService) {}
+  constructor(
+    private readonly coursesService: CoursesService,
+    private readonly categoriesService: CategoriesService,
+  ) {}
+
+  @ApiOperation({
+    summary: 'Gets categories as a tree - Public API',
+  })
+  @ApiOkResponse({
+    type: CategoryTreeResponseDto,
+    isArray: true,
+  })
+  @ApiBadRequestResponse()
+  @Get('/category-tree')
+  async findAllAsTree(): Promise<CategoryTreeResponseDto[]> {
+    return this.categoriesService.findAllAsTree();
+  }
 
   @ApiOperation({ summary: 'Gets courses - Public API' })
   @ApiOkResponse({ type: PaginatedCourseResponseDto })
