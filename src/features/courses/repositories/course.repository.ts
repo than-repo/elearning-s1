@@ -18,11 +18,34 @@ import {
   CourseStatus,
 } from 'generated/prisma/client';
 
+// PrismaCourseListItem
+// PrismaCoursePublicDetail
+// PrismaCourseLearningContent
+// PrismaCourseAdminDetail
+const courseWithPublicDetail = {
+  courseCategories: {
+    include: {
+      category: true,
+    },
+  },
+
+  instructors: {
+    include: {
+      instructor: true,
+    },
+  },
+} satisfies Prisma.CourseInclude;
+
+export type PrismaCoursePublicDetail = Prisma.CourseGetPayload<{
+  include: typeof courseWithPublicDetail;
+}>;
+
 @Injectable()
 export class CourseRepository implements ICourseRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   ///=====================================================
+
   private toCourseModel(course: PrismaCourse): CourseModel {
     return {
       id: course.id,
@@ -146,6 +169,44 @@ export class CourseRepository implements ICourseRepository {
     return prismaWhere;
   }
 
+  private toCourseWithDetailsModel(
+    course: PrismaCoursePublicDetail,
+  ): CourseModel {
+    return {
+      ...this.toCourseModel(course),
+
+      categories: course.courseCategories.map((cc) => ({
+        id: cc.category.id,
+        name: cc.category.name,
+        slug: cc.category.slug,
+        description: cc.category.description,
+        parentId: cc.category.parentId,
+        order: cc.category.order,
+        isActive: cc.category.isActive,
+        createdAt: cc.category.createdAt,
+        updatedAt: cc.category.updatedAt,
+        deletedAt: cc.category.deletedAt,
+      })),
+
+      instructors: course.instructors.map((ci) => ({
+        id: ci.instructor.id,
+        fullName: ci.instructor.fullName,
+        email: ci.instructor.email,
+        avatarUrl: ci.instructor.avatarUrl,
+
+        courseInstructorId: ci.id,
+        courseId: ci.courseId,
+        instructorId: ci.instructorId,
+        isPrimary: ci.isPrimary,
+        order: ci.order,
+        isActive: ci.isActive,
+        createdAt: ci.createdAt,
+        updatedAt: ci.updatedAt,
+        deletedAt: ci.deletedAt,
+      })),
+    };
+  }
+
   private buildOrderBy(
     orderBy?: CourseOrderByInput,
   ): Prisma.CourseOrderByWithRelationInput {
@@ -169,6 +230,7 @@ export class CourseRepository implements ICourseRepository {
 
     return value;
   }
+
   ///=====================================================
   async findMany(param?: FindManyCourseParams): Promise<CourseModel[]> {
     const courses = await this.prisma.course.findMany({
@@ -176,10 +238,11 @@ export class CourseRepository implements ICourseRepository {
       orderBy: this.buildOrderBy(param?.orderBy),
       take: param?.limit,
       skip: param?.offset,
+      include: courseWithPublicDetail,
     });
 
     return courses.map((course) => {
-      return this.toCourseModel(course);
+      return this.toCourseWithDetailsModel(course);
     });
   }
 
@@ -243,17 +306,19 @@ export class CourseRepository implements ICourseRepository {
             })),
           },
         },
+        include: courseWithPublicDetail,
       });
     });
 
-    return this.toCourseModel(course);
+    return this.toCourseWithDetailsModel(course);
   }
   async findById(id: string): Promise<CourseModel | null> {
     const course = await this.prisma.course.findFirst({
       where: { id, deletedAt: null },
+      include: courseWithPublicDetail,
     });
 
-    return course ? this.toCourseModel(course) : null;
+    return course ? this.toCourseWithDetailsModel(course) : null;
   }
   async findActiveById(id: string): Promise<CourseModel | null> {
     const course = await this.prisma.course.findFirst({
@@ -286,7 +351,7 @@ export class CourseRepository implements ICourseRepository {
   }
   async update(id: string, input: UpdateCourseInput): Promise<CourseModel> {
     const course = await this.prisma.course.update({
-      where: { id },
+      where: { id, deletedAt: null },
       data: {
         ...input,
         whatYouWillLearn: this.toPrismaJsonArray(input.whatYouWillLearn),
@@ -295,6 +360,23 @@ export class CourseRepository implements ICourseRepository {
     });
 
     return this.toCourseModel(course);
+  }
+
+  async updateDraftCourse(
+    id: string,
+    input: UpdateCourseInput,
+  ): Promise<CourseModel> {
+    const course = await this.prisma.course.update({
+      where: { id, deletedAt: null },
+      data: {
+        ...input,
+        whatYouWillLearn: this.toPrismaJsonArray(input.whatYouWillLearn),
+        requirements: this.toPrismaJsonArray(input.requirements),
+      },
+      include: courseWithPublicDetail,
+    });
+
+    return this.toCourseWithDetailsModel(course);
   }
   async softDelete(id: string): Promise<CourseModel> {
     const course = await this.prisma.course.update({
@@ -343,6 +425,26 @@ export class CourseRepository implements ICourseRepository {
         slug,
         deletedAt: null,
         ...(excludeId ? { id: { not: excludeId } } : {}),
+      },
+    });
+
+    return count > 0;
+  }
+  async existsOwnedByInstructor(
+    courseId: string,
+    instructorId: string,
+  ): Promise<boolean> {
+    const count = await this.prisma.course.count({
+      where: {
+        id: courseId,
+        deletedAt: null,
+        instructors: {
+          some: {
+            instructorId,
+            isActive: true,
+            deletedAt: null,
+          },
+        },
       },
     });
 

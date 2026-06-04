@@ -79,6 +79,18 @@ export class CourseResponseDto {
   @Expose({ groups: ALL_COURSE_GROUPS })
   certificateEnabled!: boolean;
 
+  @ApiPropertyOptional({
+    type: () => [CourseCategoryResponseDto],
+  })
+  @Expose({ groups: ALL_COURSE_GROUPS })
+  categories?: CourseCategoryResponseDto[];
+
+  @ApiPropertyOptional({
+    type: () => [CourseInstructorResponseDto],
+  })
+  @Expose({ groups: ALL_COURSE_GROUPS })
+  instructors?: CourseInstructorResponseDto[];
+
   @ApiProperty({ enum: CourseStatus })
   @Expose({ groups: MANAGEMENT_COURSE_GROUPS })
   status!: CourseStatus;
@@ -102,4 +114,28 @@ export class CourseResponseDto {
   @ApiPropertyOptional({ nullable: true })
   @Expose({ groups: [COURSE_VIEW_GROUPS.ADMIN] })
   deletedAt?: Date | null;
+}
+
+export class CourseCategoryResponseDto {
+  @ApiProperty()
+  @Expose()
+  id!: string;
+
+  @ApiProperty()
+  @Expose()
+  name!: string;
+
+  @ApiProperty()
+  @Expose()
+  slug!: string;
+}
+
+export class CourseInstructorResponseDto {
+  @ApiProperty()
+  @Expose()
+  id!: string;
+
+  @ApiProperty()
+  @Expose()
+  fullName!: string;
 }

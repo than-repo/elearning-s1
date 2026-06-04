@@ -1,5 +1,6 @@
-import { CategoriesService } from './../services/categories.service';
 //src\features\courses\controllers\public-courses.controller.ts
+import { CategoriesService } from './../services/categories.service';
+
 import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -7,7 +8,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { LearnerCourseQueryDto } from '../dtos/course/course-query.dto';
+import { LearnerCourseQueryDto } from '../dtos/course/query-course.dto';
 import { CoursesService } from '../services/courses.service';
 import { PaginatedResponse } from '../dtos/paginated-response.dto';
 import { Throttle } from '@nestjs/throttler';

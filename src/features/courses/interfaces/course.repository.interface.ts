@@ -14,6 +14,17 @@ export type CourseSortField =
 
 export type SortDirection = 'asc' | 'desc';
 
+export interface CourseCategoryModel {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface CourseInstructorModel {
+  id: string;
+  fullName: string;
+}
+
 export interface CourseModel {
   id: string;
   title: string;
@@ -23,7 +34,9 @@ export interface CourseModel {
   whatYouWillLearn: string[] | null;
   requirements: string[] | null;
   thumbnailUrl: string | null;
+
   cloudinaryPublicId: string | null;
+
   level: CourseLevel;
   status: CourseStatus;
   price: number | null;
@@ -35,6 +48,9 @@ export interface CourseModel {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
+
+  categories?: CourseCategoryModel[];
+  instructors?: CourseInstructorModel[];
 }
 
 export interface CreateCourseInput {
@@ -85,10 +101,10 @@ export interface UpdateCourseInput {
   status?: CourseStatus;
   price?: number | null;
   language?: string | null;
-  durationInMinutes?: number | null;
-  isActive?: boolean;
   certificateEnabled?: boolean;
   publishedAt?: Date | null;
+  instructorId?: string;
+  categoryIds?: string[];
 }
 
 export interface CourseWhereInput {
@@ -141,6 +157,7 @@ export interface ICourseRepository {
 
   update(id: string, input: UpdateCourseInput): Promise<CourseModel>;
 
+  updateDraftCourse(id: string, input: UpdateCourseInput): Promise<CourseModel>;
   // deletedAt: new Date(),
   // isActive: false
   softDelete(id: string): Promise<CourseModel>;
@@ -151,5 +168,9 @@ export interface ICourseRepository {
 
   unpublish(id: string): Promise<CourseModel>;
 
+  existsOwnedByInstructor(
+    courseId: string,
+    instructorId: string,
+  ): Promise<Boolean>;
   existsBySlug(slug: string, excludeId?: string): Promise<boolean>;
 }
