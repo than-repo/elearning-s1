@@ -199,7 +199,12 @@ export class CoursesService {
       throw new ForbiddenException('ACCESS_DENIED');
     }
 
-    if (course.status !== CourseStatus.DRAFT) {
+    if (
+      !(
+        course.status === CourseStatus.DRAFT ||
+        course.status === CourseStatus.CHANGES_REQUESTED
+      )
+    ) {
       throw new BadRequestException('ONLY_DRAFT_COURSE_CAN_BE_UPDATED');
     }
 
@@ -296,5 +301,31 @@ export class CoursesService {
         hasPreviousPage: page > 1,
       },
     };
+  }
+
+  async deleteDraftCourse(
+    instructorId: string,
+    courseId: string,
+  ): Promise<void> {
+    const course = await this.iCourseRepository.findById(courseId);
+
+    if (!course) {
+      throw new NotFoundException('COURSE_NOT_FOUND');
+    }
+
+    const isOwner = await this.iCourseRepository.existsOwnedByInstructor(
+      courseId,
+      instructorId,
+    );
+
+    if (!isOwner) {
+      throw new ForbiddenException('ACCESS_DENIED');
+    }
+
+    if (course.status !== CourseStatus.DRAFT) {
+      throw new BadRequestException('ONLY_DRAFT_COURSE_CAN_BE_DELETED');
+    }
+
+    await this.iCourseRepository.softDelete(courseId);
   }
 }

@@ -2,7 +2,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -80,5 +83,22 @@ export class InstructorCoursesController {
     dto: UpdateCourseDto,
   ): Promise<CourseResponseDto> {
     return this.coursesService.updateDraftCourse(instructorId, courseId, dto);
+  }
+  @Delete(':id/draft')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete own draft course - Instructor' })
+  @ApiOkResponse({ type: CourseResponseDto })
+  @ApiBadRequestResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  async deleteDraftCourse(
+    @CurrentUser('sub') instructorId: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) courseId: string,
+  ): Promise<{ message: string }> {
+    await this.coursesService.deleteDraftCourse(instructorId, courseId);
+
+    return {
+      message: 'DRAFT_COURSE_DELETED_SUCCESSFULLY',
+    };
   }
 }
