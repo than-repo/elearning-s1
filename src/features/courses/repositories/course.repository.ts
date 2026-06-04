@@ -363,17 +363,36 @@ export class CourseRepository implements ICourseRepository {
   }
 
   async updateDraftCourse(
-    id: string,
+    courseId: string,
     input: UpdateCourseInput,
   ): Promise<CourseModel> {
-    const course = await this.prisma.course.update({
-      where: { id, deletedAt: null },
-      data: {
-        ...input,
-        whatYouWillLearn: this.toPrismaJsonArray(input.whatYouWillLearn),
-        requirements: this.toPrismaJsonArray(input.requirements),
-      },
-      include: courseWithPublicDetail,
+    const { categoryIds, ...courseData } = input;
+
+    const course = await this.prisma.$transaction(async (tx) => {
+      if (categoryIds !== undefined) {
+        await tx.courseCategory.deleteMany({
+          where: { courseId },
+        });
+
+        if (categoryIds.length > 0) {
+          await tx.courseCategory.createMany({
+            data: categoryIds.map((categoryId) => ({
+              categoryId,
+              courseId,
+            })),
+          });
+        }
+      }
+
+      return tx.course.update({
+        where: { id: courseId },
+        data: {
+          ...courseData,
+          requirements: this.toPrismaJsonArray(courseData.requirements),
+          whatYouWillLearn: this.toPrismaJsonArray(courseData.whatYouWillLearn),
+        },
+        include: courseWithPublicDetail,
+      });
     });
 
     return this.toCourseWithDetailsModel(course);

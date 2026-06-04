@@ -58,7 +58,7 @@ export class CoursesService {
   private async areValidCategories(iDs: string[]): Promise<Boolean> {
     const categories = await this.iCategoryRepository.findManyByIds(iDs);
 
-    return categories.length !== iDs.length;
+    return categories.length === iDs.length;
   }
 
   async findAllPublic(
@@ -207,7 +207,7 @@ export class CoursesService {
       const validCategories = await this.areValidCategories(dto.categoryIds);
 
       if (!validCategories) {
-        throw new NotFoundException('CATEGORIES_NOT_FOUND');
+        throw new NotFoundException('CATEGORIES NOT FOUND');
       }
     }
 

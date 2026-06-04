@@ -3,6 +3,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   ArrayMaxSize,
+  ArrayUnique,
   IsArray,
   IsBoolean,
   IsEnum,
@@ -65,6 +66,7 @@ export class CreateCourseDto {
   })
   @IsOptional()
   @IsArray()
+  @ArrayUnique()
   @ArrayMaxSize(25)
   @IsString({ each: true })
   @MaxLength(300, { each: true })
@@ -83,6 +85,7 @@ export class CreateCourseDto {
   })
   @IsOptional()
   @IsArray()
+  @ArrayUnique()
   @ArrayMaxSize(25)
   @IsString({ each: true })
   @MaxLength(300, { each: true })
