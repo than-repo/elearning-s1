@@ -2,7 +2,6 @@
 /**
  * Generic helper to clean data before sending to Prisma (or repository)
  * - Removes `undefined` values
- * - Trims strings and converts empty strings to `null`
  * - Preserves other types (number, boolean, Date, null, etc.)
  */
 export function cleanData<T extends Record<string, any>>(data: T): Partial<T> {
@@ -18,13 +17,7 @@ export function cleanData<T extends Record<string, any>>(data: T): Partial<T> {
       continue;
     }
 
-    if (typeof value === 'string') {
-      const trimmed = value.trim();
-      result[key] = trimmed === '' ? null : trimmed;
-      continue;
-    }
-
-    // For other types: number, boolean, Date, object, etc. → keep as is
+    // For other types: number, boolean, Date, object, etc. - keep as is
     result[key] = value;
   }
 

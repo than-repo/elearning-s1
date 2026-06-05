@@ -42,6 +42,10 @@ async function bootstrap() {
 
   app.use(urlencoded({ extended: true, limit: '2mb' }));
 
+  app.enableCors({
+    credentials: true,
+    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+  });
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

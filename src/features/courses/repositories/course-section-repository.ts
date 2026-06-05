@@ -103,7 +103,11 @@ export class CourseSectionRepository implements ICourseSectionRepository {
   async softDelete(id: string): Promise<void> {
     await this.prisma.courseSection.update({
       where: { id },
-      data: { deletedAt: new Date(), isActive: false },
+      data: {
+        deletedAt: new Date(),
+        isActive: false,
+        sectionIndex: -Number(Date.now()),
+      },
     });
   }
   async restore(id: string): Promise<CourseSection> {
@@ -186,29 +190,50 @@ export class CourseSectionRepository implements ICourseSectionRepository {
     courseId: string,
     orderedSectionIds: string[],
   ): Promise<CourseSection[]> {
-    await this.prisma.$transaction(
-      orderedSectionIds.map((sectionId, index) =>
-        this.prisma.courseSection.updateMany({
-          where: {
-            id: sectionId,
-            courseId,
-            deletedAt: null,
-          },
-          data: {
-            sectionIndex: index,
-          },
-        }),
-      ),
-    );
+    await this.prisma.$transaction(async (tx) => {
+      // await tx.courseSection.update({
+      //   where: {
+      //     courseId_sectionIndex: {
+      //       courseId,
+      //       sectionIndex: 0,
+      //     },
+      //   },
+      //   data: { sectionIndex: Number(new Date()) },
+      // });
+
+      await Promise.all(
+        orderedSectionIds.map((sectionId, index) =>
+          tx.courseSection.updateMany({
+            where: {
+              courseId,
+              deletedAt: null,
+              id: sectionId,
+            },
+            data: {
+              sectionIndex: -(1 + index),
+            },
+          }),
+        ),
+      );
+
+      await Promise.all(
+        orderedSectionIds.map((sectionId, index) =>
+          tx.courseSection.updateMany({
+            where: {
+              courseId,
+              deletedAt: null,
+              id: sectionId,
+            },
+            data: {
+              sectionIndex: index,
+            },
+          }),
+        ),
+      );
+    });
 
     const sections = await this.prisma.courseSection.findMany({
-      where: {
-        courseId,
-        deletedAt: null,
-      },
-      orderBy: {
-        sectionIndex: 'asc',
-      },
+      where: { deletedAt: null, courseId },
     });
 
     return sections.map((section) => this.toDomain(section));

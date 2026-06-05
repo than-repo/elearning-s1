@@ -269,6 +269,7 @@ export type LessonOrderByWithRelationInput = {
 
 export type LessonWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  sectionId_lessonIndex?: Prisma.LessonSectionIdLessonIndexCompoundUniqueInput
   AND?: Prisma.LessonWhereInput | Prisma.LessonWhereInput[]
   OR?: Prisma.LessonWhereInput[]
   NOT?: Prisma.LessonWhereInput | Prisma.LessonWhereInput[]
@@ -282,7 +283,7 @@ export type LessonWhereUniqueInput = Prisma.AtLeast<{
   deletedAt?: Prisma.DateTimeNullableFilter<"Lesson"> | Date | string | null
   section?: Prisma.XOR<Prisma.CourseSectionScalarRelationFilter, Prisma.CourseSectionWhereInput>
   files?: Prisma.FileMediaListRelationFilter
-}, "id">
+}, "id" | "sectionId_lessonIndex">
 
 export type LessonOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -417,6 +418,11 @@ export type LessonOrderByRelevanceInput = {
   fields: Prisma.LessonOrderByRelevanceFieldEnum | Prisma.LessonOrderByRelevanceFieldEnum[]
   sort: Prisma.SortOrder
   search: string
+}
+
+export type LessonSectionIdLessonIndexCompoundUniqueInput = {
+  sectionId: string
+  lessonIndex: number
 }
 
 export type LessonCountOrderByAggregateInput = {

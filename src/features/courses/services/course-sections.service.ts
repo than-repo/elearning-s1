@@ -6,11 +6,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import type { ILessonRepository } from '../interfaces/lesson.repository.interface';
 import { COURSE_SECTION_REPOSITORY } from '../repositories/course-section-repository.token';
 import type {
+  CourseSection,
+  CreateCourseSectionInput,
   FindManyCourseSectionParams,
   ICourseSectionRepository,
+  UpdateCourseSectionInput,
 } from '../interfaces/course-section.repository.interface';
 import type { ICourseRepository } from '../interfaces/course.repository.interface';
 import { COURSE_REPOSITORY } from '../repositories/course-repository.token';
@@ -24,6 +26,7 @@ import { UpdateSectionDto } from '../dtos/section-lesson/update-section.dto';
 import { ReorderSectionsDto } from '../dtos/section-lesson/reorder-sections.dto';
 import { QuerySectionsDto } from '../dtos/section-lesson/query-section.dto';
 import { PaginatedResponse } from '../dtos/paginated-response.dto';
+import { cleanData } from 'src/common/utils/clean-data-util';
 
 @Injectable()
 export class CourseSectionsService {
@@ -65,17 +68,18 @@ export class CourseSectionsService {
     await this.ensureInstructorCanManageCourse(courseId, instructorId);
 
     const sectionIndex =
-      dto.sectionIndex ??
-      (await this.iCourseSectionRepository.getNextSectionIndex(courseId));
+      await this.iCourseSectionRepository.getNextSectionIndex(courseId);
 
     const section = await this.iCourseSectionRepository.create({
       courseId,
       title: dto.title,
       description: dto.description,
       sectionIndex,
-    });
+    } satisfies CreateCourseSectionInput);
 
-    return plainToInstance(SectionResponseDto, section, {
+    const cleanedSection = cleanData(section);
+
+    return plainToInstance(SectionResponseDto, cleanedSection, {
       excludeExtraneousValues: true,
       groups: [SECTION_VIEW_GROUPS.INSTRUCTOR],
     });
@@ -124,7 +128,7 @@ export class CourseSectionsService {
       title: dto.title,
       description: dto.description,
       isActive: dto.isActive,
-    });
+    } satisfies UpdateCourseSectionInput);
 
     return plainToInstance(SectionResponseDto, section, {
       excludeExtraneousValues: true,
@@ -175,16 +179,18 @@ export class CourseSectionsService {
       );
     }
 
-    const reorderedSections =
+    const reorderedSections: CourseSection[] =
       await this.iCourseSectionRepository.reorderSections(
         courseId,
         dto.sectionIds,
       );
 
-    return plainToInstance(SectionResponseDto, reorderedSections, {
-      excludeExtraneousValues: true,
-      groups: [SECTION_VIEW_GROUPS.INSTRUCTOR],
-    });
+    return reorderedSections.map((reorderedSection) =>
+      plainToInstance(SectionResponseDto, reorderedSection, {
+        excludeExtraneousValues: true,
+        groups: [SECTION_VIEW_GROUPS.INSTRUCTOR],
+      }),
+    );
   }
 
   async getSections(

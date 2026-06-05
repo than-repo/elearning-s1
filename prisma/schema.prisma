@@ -311,6 +311,7 @@ model CourseSection {
   course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   lessons Lesson[]
 
+  @@unique([courseId, sectionIndex])
   @@map("course_sections")
 }
 
@@ -328,6 +329,7 @@ model Lesson {
   section CourseSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   files   FileMedia[]
 
+  @@unique([sectionId, lessonIndex])
   @@map("lessons")
 }
 

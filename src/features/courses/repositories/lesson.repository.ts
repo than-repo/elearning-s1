@@ -9,7 +9,8 @@ import {
   LessonWhereInput,
   UpdateLessonInput,
 } from '../interfaces/lesson.repository.interface';
-
+import { Injectable } from '@nestjs/common';
+@Injectable()
 export class LessonRepository implements ILessonRepository {
   constructor(private readonly prisma: PrismaService) {}
   private toDomain(lesson: PrismaLesson): Lesson {
@@ -111,6 +112,7 @@ export class LessonRepository implements ILessonRepository {
       data: {
         deletedAt: new Date(),
         isActive: false,
+        lessonIndex: -Number(-Date.now()),
       },
     });
 
@@ -198,26 +200,52 @@ export class LessonRepository implements ILessonRepository {
       },
     });
 
-    return (result._max.lessonIndex ?? 0) + 1;
+    return result._max.lessonIndex === null ? 0 : result._max.lessonIndex + 1;
   }
   async reorderLessons(
     sectionId: string,
     orderedLessonIds: string[],
   ): Promise<Lesson[]> {
-    await this.prisma.$transaction(
-      orderedLessonIds.map((lessonId, index) =>
-        this.prisma.lesson.updateMany({
-          where: {
-            id: lessonId,
-            sectionId,
-            deletedAt: null,
-          },
-          data: {
-            lessonIndex: index + 1,
-          },
-        }),
-      ),
-    );
+    await this.prisma.$transaction(async (tx) => {
+      /**
+       * Phase 1:
+       * Move all selected lessons to temporary negative indexes.
+       * This avoids @@unique([sectionId, lessonIndex]) collision.
+       */
+      await Promise.all(
+        orderedLessonIds.map((lessonId, index) =>
+          tx.lesson.updateMany({
+            where: {
+              id: lessonId,
+              sectionId,
+              deletedAt: null,
+            },
+            data: {
+              lessonIndex: -(index + 1),
+            },
+          }),
+        ),
+      );
+
+      /**
+       * Phase 2:
+       * Assign final zero-based indexes.
+       */
+      await Promise.all(
+        orderedLessonIds.map((lessonId, index) =>
+          tx.lesson.updateMany({
+            where: {
+              id: lessonId,
+              sectionId,
+              deletedAt: null,
+            },
+            data: {
+              lessonIndex: index,
+            },
+          }),
+        ),
+      );
+    });
 
     const lessons = await this.prisma.lesson.findMany({
       where: {
@@ -230,5 +258,57 @@ export class LessonRepository implements ILessonRepository {
     });
 
     return lessons.map((lesson) => this.toDomain(lesson));
+  }
+  async shiftLessonsAfterDelete(
+    sectionId: string,
+    deletedLessonIndex: number,
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.lesson.updateMany({
+        where: {
+          sectionId,
+          deletedAt: null,
+          lessonIndex: {
+            gt: deletedLessonIndex,
+          },
+        },
+        data: {
+          lessonIndex: {
+            decrement: 1,
+          },
+        },
+      });
+    });
+  }
+  async softDeleteAndShift(
+    lessonId: string,
+    sectionId: string,
+    deletedLessonIndex: number,
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.lesson.update({
+        where: { id: lessonId },
+        data: {
+          deletedAt: new Date(),
+          isActive: false,
+          lessonIndex: -Date.now(),
+        },
+      });
+
+      await tx.lesson.updateMany({
+        where: {
+          sectionId,
+          deletedAt: null,
+          lessonIndex: {
+            gt: deletedLessonIndex,
+          },
+        },
+        data: {
+          lessonIndex: {
+            decrement: 1,
+          },
+        },
+      });
+    });
   }
 }

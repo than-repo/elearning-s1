@@ -43,6 +43,12 @@ import { CourseSectionsService } from '../services/course-sections.service';
 import { UpdateSectionDto } from '../dtos/section-lesson/update-section.dto';
 import { ReorderSectionsDto } from '../dtos/section-lesson/reorder-sections.dto';
 import { QuerySectionsDto } from '../dtos/section-lesson/query-section.dto';
+import { LessonResponseDto } from '../dtos/lesson/lesson-response.dto';
+import { CreateLessonDto } from '../dtos/lesson/create-lesson.dto';
+import { LessonsService } from '../services/lessons.service';
+import { UpdateLessonDto } from '../dtos/lesson/update-lesson.dto';
+import { QueryLessonsDto } from '../dtos/lesson/query-lessons.dto';
+import { ReorderLessonsDto } from '../dtos/lesson/reorder-lesson.dto';
 
 @Controller({ path: 'instructor/courses', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -53,6 +59,7 @@ export class InstructorCoursesController {
   constructor(
     private readonly coursesService: CoursesService,
     private readonly courseSectionsService: CourseSectionsService,
+    private readonly lessonsService: LessonsService,
   ) {}
 
   @Get()
@@ -210,5 +217,150 @@ export class InstructorCoursesController {
     return {
       Message: 'Delete sucessfully',
     };
+  }
+
+  //==========================Lesson============================
+
+  @Post(':courseId/sections/:sectionId/lessons')
+  @ApiOperation({ summary: 'Create Lesson - Instructor' })
+  @ApiCreatedResponse({
+    description: 'Lesson created successfully.',
+    type: LessonResponseDto,
+  })
+  @ApiBadRequestResponse({ description: 'Invalid request data.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({
+    description: 'You do not have permission to access this course.',
+  })
+  @ApiNotFoundResponse({ description: 'Course or section not found.' })
+  async createLesson(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
+    @CurrentUser('sub') instructorId: string,
+    @Body() dto: CreateLessonDto,
+  ): Promise<LessonResponseDto> {
+    return this.lessonsService.createLesson(
+      courseId,
+      sectionId,
+      instructorId,
+      dto,
+    );
+  }
+
+  @Get(':courseId/sections/:sectionId/lessons')
+  @ApiOperation({ summary: 'Get Lessons - Instructor' })
+  @ApiOkResponse({
+    description: 'Lessons retrieved successfully.',
+    type: PaginatedResponse<LessonResponseDto>,
+  })
+  @ApiBadRequestResponse({ description: 'Invalid query parameters.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({
+    description: 'You do not have permission to manage this course.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Course or section not found.',
+  })
+  async getLessons(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
+    @CurrentUser('sub') instructorId: string,
+    @Query() query: QueryLessonsDto,
+  ): Promise<PaginatedResponse<LessonResponseDto>> {
+    return this.lessonsService.getLessons(
+      courseId,
+      sectionId,
+      instructorId,
+      query,
+    );
+  }
+
+  @Patch(':courseId/sections/:sectionId/lessons/reorder')
+  @ApiOperation({ summary: 'Reorder Lessons - Instructor' })
+  @ApiOkResponse({
+    description: 'Lessons reordered successfully.',
+    type: [LessonResponseDto],
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Invalid request data or lesson IDs do not match this section.',
+  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({
+    description: 'You do not have permission to manage this course.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Course or section not found.',
+  })
+  async reorderLessons(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
+    @CurrentUser('sub') instructorId: string,
+    @Body() dto: ReorderLessonsDto,
+  ): Promise<LessonResponseDto[]> {
+    return this.lessonsService.reorderLessons(
+      courseId,
+      sectionId,
+      instructorId,
+      dto,
+    );
+  }
+
+  @Patch(':courseId/sections/:sectionId/lessons/:lessonId')
+  @ApiOperation({ summary: 'Update Lesson - Instructor' })
+  @ApiOkResponse({
+    description: 'Lesson updated successfully.',
+    type: LessonResponseDto,
+  })
+  @ApiBadRequestResponse({ description: 'Invalid request data.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({
+    description: 'You do not have permission to manage this course.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Course, section, or lesson not found.',
+  })
+  async updateLesson(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
+    @Param('lessonId', ParseUUIDPipe) lessonId: string,
+    @CurrentUser('sub') instructorId: string,
+    @Body() dto: UpdateLessonDto,
+  ): Promise<LessonResponseDto> {
+    return this.lessonsService.updateLesson(
+      courseId,
+      sectionId,
+      lessonId,
+      instructorId,
+      dto,
+    );
+  }
+
+  @Delete(':courseId/sections/:sectionId/lessons/:lessonId')
+  @HttpCode(204)
+  @ApiOperation({ summary: 'Delete Lesson - Instructor' })
+  @ApiNoContentResponse({
+    description: 'Lesson deleted successfully.',
+  })
+  @ApiBadRequestResponse({ description: 'Invalid request parameters.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({
+    description: 'You do not have permission to manage this course.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Course, section, or lesson not found.',
+  })
+  async deleteLesson(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
+    @Param('lessonId', ParseUUIDPipe) lessonId: string,
+    @CurrentUser('sub') instructorId: string,
+  ): Promise<void> {
+    await this.lessonsService.deleteLesson(
+      courseId,
+      sectionId,
+      lessonId,
+      instructorId,
+    );
   }
 }

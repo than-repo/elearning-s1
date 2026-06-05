@@ -1,45 +1,44 @@
-// src/features/courses/dtos/section-lesson/create-section.dto.ts
+// src\features\courses\dtos\lesson\create-lesson.dto.ts
 
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
-  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
   MaxLength,
-  Min,
+  MinLength,
 } from 'class-validator';
 
-export class CreateSectionDto {
+export class CreateLessonDto {
   @ApiProperty({
-    description: 'Title of the course section.',
-    example: 'Introduction to React Fundamentals',
+    example: 'Introduction to HTML',
+    description: 'Lesson title.',
     minLength: 3,
     maxLength: 255,
   })
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @IsNotEmpty()
+  @MinLength(3)
   @MaxLength(255)
   title!: string;
 
   @ApiPropertyOptional({
-    description:
-      'Optional short description explaining what this section covers.',
-    example:
-      'This section introduces the basic concepts, setup, and workflow before building React components.',
-    maxLength: 1000,
+    example: 'This lesson introduces the basic structure of an HTML document.',
+    description: 'Optional lesson description.',
+    maxLength: 2000,
     nullable: true,
   })
   @Transform(({ value }) => {
     if (typeof value !== 'string') return value;
 
     const trimmed = value.trim();
-    return trimmed.length > 0 ? trimmed : undefined;
+
+    return trimmed.length > 0 ? trimmed : null;
   })
   @IsOptional()
   @IsString()
-  @MaxLength(1000)
-  description?: string;
+  @MaxLength(2000)
+  description?: string | null;
 }

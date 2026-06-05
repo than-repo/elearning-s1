@@ -91,4 +91,15 @@ export interface ILessonRepository {
     sectionId: string,
     orderedLessonIds: string[],
   ): Promise<Lesson[]>;
+
+  shiftLessonsAfterDelete(
+    sectionId: string,
+    deletedLessonIndex: number,
+  ): Promise<void>;
+
+  softDeleteAndShift(
+    lessonId: string,
+    sectionId: string,
+    deletedLessonIndex: number,
+  ): Promise<void>;
 }

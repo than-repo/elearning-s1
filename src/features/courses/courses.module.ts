@@ -20,6 +20,11 @@ import { FileMediaService } from './services/file-media.service';
 import { CourseSectionsService } from './services/course-sections.service';
 import { PublicCoursesController } from './controllers/public-courses.controller';
 import { InstructorCoursesController } from './controllers/instructor-course.controller';
+import { ReviewerCoursesController } from './controllers/reviewer-courses.controller';
+import { ReviewerCoursesService } from './services/reviewer-courses.service';
+
+import { PrismaCourseReviewRepository } from './repositories/prisma-course-review.repository';
+import { COURSE_REVIEW_REPOSITORY } from './repositories/course-review-repository.token';
 
 @Module({
   providers: [
@@ -59,6 +64,14 @@ import { InstructorCoursesController } from './controllers/instructor-course.con
       useClass: FileMediaRepository,
     },
     FileMediaService,
+
+    //Reviewer
+    ReviewerCoursesService,
+
+    {
+      provide: COURSE_REVIEW_REPOSITORY,
+      useClass: PrismaCourseReviewRepository,
+    },
   ],
   exports: [],
   imports: [PrismaModule],
@@ -66,6 +79,7 @@ import { InstructorCoursesController } from './controllers/instructor-course.con
     CategoriesController,
     PublicCoursesController,
     InstructorCoursesController,
+    ReviewerCoursesController,
   ],
 })
 export class CoursesModule {}

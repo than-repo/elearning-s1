@@ -9,6 +9,7 @@ import {
   IsOptional,
   IsString,
   Max,
+  MaxLength,
   Min,
 } from 'class-validator';
 
@@ -30,9 +31,10 @@ export class QuerySectionsDto {
     description: 'Search keyword for section title.',
     example: 'react',
   })
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsOptional()
   @IsString()
+  @MaxLength(255)
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   search?: string;
 
   @ApiPropertyOptional({
@@ -44,8 +46,8 @@ export class QuerySectionsDto {
       return undefined;
     }
 
-    if (value === 'true') return true;
-    if (value === 'false') return false;
+    if (value === 'true' || value === true) return true;
+    if (value === 'false' || value === false) return false;
 
     return value;
   })
@@ -59,17 +61,17 @@ export class QuerySectionsDto {
     example: false,
     default: false,
   })
+  @IsOptional()
   @Transform(({ value }) => {
     if (value === undefined || value === null || value === '') {
       return undefined;
     }
 
-    if (value === 'true') return true;
-    if (value === 'false') return false;
+    if (value === 'true' || value === true) return true;
+    if (value === 'false' || value === false) return false;
 
     return value;
   })
-  @IsOptional()
   @IsBoolean()
   includeDeleted?: boolean;
 

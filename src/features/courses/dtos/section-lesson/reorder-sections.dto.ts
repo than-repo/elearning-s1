@@ -20,9 +20,9 @@ export class ReorderSectionsDto {
     ],
     type: [String],
   })
+  @ArrayNotEmpty()
   @IsArray()
   @ArrayUnique()
-  @ArrayNotEmpty()
   @ArrayMinSize(1)
   @IsUUID('4', { each: true })
   sectionIds!: string[];
