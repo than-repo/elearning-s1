@@ -17,6 +17,8 @@ import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -35,6 +37,12 @@ import { UpdateCourseDto } from '../dtos/course/update-course.dto';
 import { InstructorCourseQueryDto } from '../dtos/course/query-course.dto';
 import { PaginatedResponse } from '../dtos/paginated-response.dto';
 import { PaginatedCourseResponseDto } from '../dtos/course/paginated-course.dto';
+import { CreateSectionDto } from '../dtos/section-lesson/create-section.dti';
+import { SectionResponseDto } from '../dtos/section-lesson/section-response.dto';
+import { CourseSectionsService } from '../services/course-sections.service';
+import { UpdateSectionDto } from '../dtos/section-lesson/update-section.dto';
+import { ReorderSectionsDto } from '../dtos/section-lesson/reorder-sections.dto';
+import { QuerySectionsDto } from '../dtos/section-lesson/query-section.dto';
 
 @Controller({ path: 'instructor/courses', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -42,7 +50,10 @@ import { PaginatedCourseResponseDto } from '../dtos/course/paginated-course.dto'
 @ApiTags('Instructor Courses')
 @Throttle({ default: { ttl: 60, limit: 60 } })
 export class InstructorCoursesController {
-  constructor(private readonly coursesService: CoursesService) {}
+  constructor(
+    private readonly coursesService: CoursesService,
+    private readonly courseSectionsService: CourseSectionsService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Get my courses - Instructor' })
@@ -85,7 +96,6 @@ export class InstructorCoursesController {
     return this.coursesService.updateDraftCourse(instructorId, courseId, dto);
   }
   @Delete(':id/draft')
-  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete own draft course - Instructor' })
   @ApiOkResponse({ type: CourseResponseDto })
   @ApiBadRequestResponse()
@@ -99,6 +109,106 @@ export class InstructorCoursesController {
 
     return {
       message: 'DRAFT_COURSE_DELETED_SUCCESSFULLY',
+    };
+  }
+  //===================section======================
+
+  @Post(':courseId/sections')
+  @ApiOperation({ summary: 'Create Section - Instructor' })
+  @ApiCreatedResponse({ type: SectionResponseDto })
+  @ApiBadRequestResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  async createSection(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @CurrentUser('sub') instructorId: string,
+    @Body() dto: CreateSectionDto,
+  ): Promise<SectionResponseDto> {
+    return this.courseSectionsService.createSection(
+      courseId,
+      instructorId,
+      dto,
+    );
+  }
+
+  @Get(':courseId/sections')
+  @ApiOperation({ summary: 'Get Sections - Instructor' })
+  @ApiOkResponse({ type: PaginatedResponse<SectionResponseDto> })
+  @ApiBadRequestResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiNotFoundResponse()
+  async getSections(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @CurrentUser('sub') instructorId: string,
+    @Query() query: QuerySectionsDto,
+  ): Promise<PaginatedResponse<SectionResponseDto>> {
+    return this.courseSectionsService.getSections(
+      courseId,
+      instructorId,
+      query,
+    );
+  }
+
+  @Patch(':courseId/sections/reorder')
+  @ApiOperation({ summary: 'Reorder Sections - Instructor' })
+  @ApiOkResponse({ type: [SectionResponseDto] })
+  @ApiBadRequestResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiNotFoundResponse()
+  async reorderSections(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @CurrentUser('sub') instructorId: string,
+    @Body() dto: ReorderSectionsDto,
+  ): Promise<SectionResponseDto[]> {
+    return this.courseSectionsService.reorderSections(
+      courseId,
+      instructorId,
+      dto,
+    );
+  }
+
+  @Patch(':courseId/sections/:sectionId')
+  @ApiOperation({ summary: 'Update Section - Instructor' })
+  @ApiOkResponse({ type: SectionResponseDto })
+  @ApiBadRequestResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiNotFoundResponse()
+  async updateSection(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
+    @CurrentUser('sub') instructorId: string,
+    @Body() dto: UpdateSectionDto,
+  ): Promise<SectionResponseDto> {
+    return this.courseSectionsService.updateSection(
+      courseId,
+      sectionId,
+      instructorId,
+      dto,
+    );
+  }
+
+  @Delete(':courseId/sections/:sectionId')
+  @ApiOperation({ summary: 'Delete Section - Instructor' })
+  @ApiNoContentResponse({ description: 'Section deleted successfully.' })
+  @ApiBadRequestResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiNotFoundResponse()
+  async deleteSection(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
+    @CurrentUser('sub') instructorId: string,
+  ): Promise<{ Message: string }> {
+    await this.courseSectionsService.deleteSection(
+      courseId,
+      sectionId,
+      instructorId,
+    );
+    return {
+      Message: 'Delete sucessfully',
     };
   }
 }

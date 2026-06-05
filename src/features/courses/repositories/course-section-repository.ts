@@ -14,6 +14,8 @@ import {
   Prisma,
   CourseSection as PrismaCourseSection,
 } from 'generated/prisma/client';
+import { Injectable } from '@nestjs/common';
+@Injectable()
 export class CourseSectionRepository implements ICourseSectionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -98,13 +100,11 @@ export class CourseSectionRepository implements ICourseSectionRepository {
 
     return this.toDomain(section);
   }
-  async softDelete(id: string): Promise<CourseSection> {
-    const section = await this.prisma.courseSection.update({
+  async softDelete(id: string): Promise<void> {
+    await this.prisma.courseSection.update({
       where: { id },
       data: { deletedAt: new Date(), isActive: false },
     });
-
-    return this.toDomain(section);
   }
   async restore(id: string): Promise<CourseSection> {
     const section = await this.prisma.courseSection.update({
@@ -155,12 +155,17 @@ export class CourseSectionRepository implements ICourseSectionRepository {
     return sections.map((section) => this.toDomain(section));
   }
   async getNextSectionIndex(courseId: string): Promise<number> {
-    const lastSectionIndex = await this.prisma.courseSection.aggregate({
-      where: { courseId },
-      _max: { sectionIndex: true },
+    const result = await this.prisma.courseSection.aggregate({
+      where: {
+        courseId,
+        deletedAt: null,
+      },
+      _max: {
+        sectionIndex: true,
+      },
     });
 
-    return (lastSectionIndex._max.sectionIndex ?? 0) + 1;
+    return result._max.sectionIndex === null ? 0 : result._max.sectionIndex + 1;
   }
   async existsInCourse(sectionId: string, courseId: string): Promise<boolean> {
     const count = await this.prisma.courseSection.count({
@@ -190,7 +195,7 @@ export class CourseSectionRepository implements ICourseSectionRepository {
             deletedAt: null,
           },
           data: {
-            sectionIndex: index + 1,
+            sectionIndex: index,
           },
         }),
       ),
@@ -207,5 +212,27 @@ export class CourseSectionRepository implements ICourseSectionRepository {
     });
 
     return sections.map((section) => this.toDomain(section));
+  }
+
+  async shiftSectionsAfterDelete(
+    courseId: string,
+    deletedSectionIndex: number,
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.courseSection.updateMany({
+        where: {
+          courseId,
+          deletedAt: null,
+          sectionIndex: {
+            gt: deletedSectionIndex,
+          },
+        },
+        data: {
+          sectionIndex: {
+            decrement: 1,
+          },
+        },
+      });
+    });
   }
 }

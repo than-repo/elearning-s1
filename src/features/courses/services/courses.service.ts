@@ -196,7 +196,9 @@ export class CoursesService {
     );
 
     if (!isOwner) {
-      throw new ForbiddenException('ACCESS_DENIED');
+      throw new ForbiddenException(
+        'You are not allowed to manage this course.',
+      );
     }
 
     if (

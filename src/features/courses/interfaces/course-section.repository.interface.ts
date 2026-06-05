@@ -67,7 +67,7 @@ export interface ICourseSectionRepository {
 
   update(id: string, input: UpdateCourseSectionInput): Promise<CourseSection>;
 
-  softDelete(id: string): Promise<CourseSection>;
+  softDelete(id: string): Promise<void>;
 
   restore(id: string): Promise<CourseSection>;
 
@@ -89,4 +89,9 @@ export interface ICourseSectionRepository {
     courseId: string,
     orderedSectionIds: string[],
   ): Promise<CourseSection[]>;
+
+  shiftSectionsAfterDelete(
+    courseId: string,
+    deletedSectionIndex: number,
+  ): Promise<void>;
 }
