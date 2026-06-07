@@ -457,6 +457,7 @@ export class CourseRepository implements ICourseRepository {
       where: {
         id: courseId,
         deletedAt: null,
+        isActive: true,
         instructors: {
           some: {
             instructorId,

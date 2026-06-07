@@ -31,7 +31,7 @@ export interface UpdateCourseSectionInput {
 
 export interface CourseSectionWhereInput {
   id?: string;
-  courseId?: string;
+  courseId: string;
   isActive?: boolean;
   includeDeleted?: boolean;
   titleContains?: string;
@@ -67,7 +67,11 @@ export interface ICourseSectionRepository {
 
   update(id: string, input: UpdateCourseSectionInput): Promise<CourseSection>;
 
-  softDelete(id: string): Promise<void>;
+  softDeleteAndShiftSections(
+    sectionId: string,
+    courseId: string,
+    sectionIndex: number,
+  ): Promise<boolean>;
 
   restore(id: string): Promise<CourseSection>;
 
@@ -94,4 +98,6 @@ export interface ICourseSectionRepository {
     courseId: string,
     deletedSectionIndex: number,
   ): Promise<void>;
+
+  //Helper
 }

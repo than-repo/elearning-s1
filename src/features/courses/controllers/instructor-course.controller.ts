@@ -112,11 +112,7 @@ export class InstructorCoursesController {
     @CurrentUser('sub') instructorId: string,
     @Param('id', new ParseUUIDPipe({ version: '4' })) courseId: string,
   ): Promise<{ message: string }> {
-    await this.coursesService.deleteDraftCourse(instructorId, courseId);
-
-    return {
-      message: 'DRAFT_COURSE_DELETED_SUCCESSFULLY',
-    };
+    return this.coursesService.deleteDraftCourse(instructorId, courseId);
   }
   //===================section======================
 
@@ -199,7 +195,6 @@ export class InstructorCoursesController {
 
   @Delete(':courseId/sections/:sectionId')
   @ApiOperation({ summary: 'Delete Section - Instructor' })
-  @ApiNoContentResponse({ description: 'Section deleted successfully.' })
   @ApiBadRequestResponse()
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
@@ -209,14 +204,11 @@ export class InstructorCoursesController {
     @Param('sectionId', ParseUUIDPipe) sectionId: string,
     @CurrentUser('sub') instructorId: string,
   ): Promise<{ Message: string }> {
-    await this.courseSectionsService.deleteSection(
+    return this.courseSectionsService.deleteSection(
       courseId,
       sectionId,
       instructorId,
     );
-    return {
-      Message: 'Delete sucessfully',
-    };
   }
 
   //==========================Lesson============================

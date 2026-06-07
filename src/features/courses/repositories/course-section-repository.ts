@@ -15,6 +15,7 @@ import {
   CourseSection as PrismaCourseSection,
 } from 'generated/prisma/client';
 import { Injectable } from '@nestjs/common';
+import { text } from 'node:stream/consumers';
 @Injectable()
 export class CourseSectionRepository implements ICourseSectionRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -92,7 +93,7 @@ export class CourseSectionRepository implements ICourseSectionRepository {
     input: UpdateCourseSectionInput,
   ): Promise<CourseSection> {
     const section = await this.prisma.courseSection.update({
-      where: { id },
+      where: { id, deletedAt: null },
       data: {
         ...input,
       },
@@ -100,14 +101,48 @@ export class CourseSectionRepository implements ICourseSectionRepository {
 
     return this.toDomain(section);
   }
-  async softDelete(id: string): Promise<void> {
-    await this.prisma.courseSection.update({
-      where: { id },
-      data: {
-        deletedAt: new Date(),
-        isActive: false,
-        sectionIndex: -Number(Date.now()),
-      },
+  async softDeleteAndShiftSections(
+    sectionId: string,
+    courseId: string,
+    sectionIndex: number,
+  ): Promise<boolean> {
+    const date = new Date();
+    return this.prisma.$transaction(async (tx) => {
+      const result = await tx.courseSection.updateMany({
+        where: { id: sectionId, deletedAt: null, courseId },
+        data: {
+          deletedAt: date,
+          sectionIndex: -date.getTime(),
+          isActive: false,
+        },
+      });
+      if (result.count === 0) {
+        return false;
+      }
+
+      const sections = await tx.courseSection.findMany({
+        where: {
+          courseId,
+          sectionIndex: { gt: sectionIndex },
+          deletedAt: null,
+        },
+        orderBy: {
+          sectionIndex: 'asc',
+        },
+        select: {
+          sectionIndex: true,
+          id: true,
+        },
+      });
+
+      for (const section of sections) {
+        await tx.courseSection.update({
+          where: { deletedAt: null, id: section.id },
+          data: { sectionIndex: section.sectionIndex - 1 },
+        });
+      }
+
+      return true;
     });
   }
   async restore(id: string): Promise<CourseSection> {
@@ -177,15 +212,17 @@ export class CourseSectionRepository implements ICourseSectionRepository {
         id: sectionId,
         courseId,
         deletedAt: null,
+        course: {
+          isActive: true,
+          deletedAt: null,
+        },
       },
     });
 
     return count > 0;
   }
 
-  /**
-   * Support drags and drop
-   */
+  //Support drags and drop
   async reorderSections(
     courseId: string,
     orderedSectionIds: string[],
@@ -238,7 +275,6 @@ export class CourseSectionRepository implements ICourseSectionRepository {
 
     return sections.map((section) => this.toDomain(section));
   }
-
   async shiftSectionsAfterDelete(
     courseId: string,
     deletedSectionIndex: number,

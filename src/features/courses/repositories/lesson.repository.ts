@@ -184,6 +184,10 @@ export class LessonRepository implements ILessonRepository {
         id: lessonId,
         sectionId,
         deletedAt: null,
+        section: {
+          deletedAt: null,
+          isActive: true,
+        },
       },
     });
 

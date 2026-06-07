@@ -27,10 +27,13 @@ import { ReorderSectionsDto } from '../dtos/section-lesson/reorder-sections.dto'
 import { QuerySectionsDto } from '../dtos/section-lesson/query-section.dto';
 import { PaginatedResponse } from '../dtos/paginated-response.dto';
 import { cleanData } from 'src/common/utils/clean-data-util';
+import { CourseAccessService } from './course-access.service';
 
 @Injectable()
 export class CourseSectionsService {
   constructor(
+    private readonly courseAccessService: CourseAccessService,
+
     @Inject(COURSE_SECTION_REPOSITORY)
     private readonly iCourseSectionRepository: ICourseSectionRepository,
 
@@ -65,7 +68,10 @@ export class CourseSectionsService {
     instructorId: string,
     dto: CreateSectionDto,
   ): Promise<SectionResponseDto> {
-    await this.ensureInstructorCanManageCourse(courseId, instructorId);
+    await this.courseAccessService.ensureInstructorCanManageCourse(
+      courseId,
+      instructorId,
+    );
 
     const sectionIndex =
       await this.iCourseSectionRepository.getNextSectionIndex(courseId);
@@ -85,35 +91,20 @@ export class CourseSectionsService {
     });
   }
 
-  private async ensureInstructorCanManageCourse(
-    courseId: string,
-    instructorId: string,
-  ): Promise<void> {
-    const course = await this.iCourseRepository.findById(courseId);
-
-    if (!course) {
-      throw new NotFoundException('Course not found.');
-    }
-
-    const isOwner = await this.iCourseRepository.existsOwnedByInstructor(
-      courseId,
-      instructorId,
-    );
-
-    if (!isOwner) {
-      throw new ForbiddenException(
-        'You are not allowed to manage this course.',
-      );
-    }
-  }
-
   async updateSection(
     courseId: string,
     sectionId: string,
     instructorId: string,
     dto: UpdateSectionDto,
   ): Promise<SectionResponseDto> {
-    await this.ensureInstructorCanManageCourse(courseId, instructorId);
+    if (Object.keys(dto).length === 0) {
+      throw new BadRequestException('At least one field must be provided.');
+    }
+    await this.courseAccessService.ensureInstructorCanManageSection(
+      courseId,
+      instructorId,
+      sectionId,
+    );
 
     const existsInCourse = await this.iCourseSectionRepository.existsInCourse(
       sectionId,
@@ -124,11 +115,14 @@ export class CourseSectionsService {
       throw new NotFoundException('Section not found.');
     }
 
-    const section = await this.iCourseSectionRepository.update(sectionId, {
-      title: dto.title,
-      description: dto.description,
-      isActive: dto.isActive,
-    } satisfies UpdateCourseSectionInput);
+    const section = await this.iCourseSectionRepository.update(
+      sectionId,
+      cleanData({
+        title: dto.title,
+        description: dto.description,
+        isActive: dto.isActive,
+      } satisfies UpdateCourseSectionInput),
+    );
 
     return plainToInstance(SectionResponseDto, section, {
       excludeExtraneousValues: true,
@@ -140,8 +134,12 @@ export class CourseSectionsService {
     courseId: string,
     sectionId: string,
     instructorId: string,
-  ): Promise<void> {
-    await this.ensureInstructorCanManageCourse(courseId, instructorId);
+  ): Promise<{ Message: string }> {
+    await this.courseAccessService.ensureInstructorCanManageSection(
+      courseId,
+      instructorId,
+      sectionId,
+    );
 
     const section = await this.iCourseSectionRepository.findById(sectionId);
 
@@ -149,12 +147,18 @@ export class CourseSectionsService {
       throw new NotFoundException('Section not found.');
     }
 
-    await this.iCourseSectionRepository.softDelete(sectionId);
+    const isSoftDeleted =
+      await this.iCourseSectionRepository.softDeleteAndShiftSections(
+        sectionId,
+        courseId,
+        section.sectionIndex,
+      );
 
-    await this.iCourseSectionRepository.shiftSectionsAfterDelete(
-      courseId,
-      section.sectionIndex,
-    );
+    return isSoftDeleted
+      ? {
+          Message: 'Delete successfully',
+        }
+      : { Message: 'Delete unsuccessfully' };
   }
 
   async reorderSections(
@@ -162,7 +166,10 @@ export class CourseSectionsService {
     instructorId: string,
     dto: ReorderSectionsDto,
   ): Promise<SectionResponseDto[]> {
-    await this.ensureInstructorCanManageCourse(courseId, instructorId);
+    await this.courseAccessService.ensureInstructorCanManageCourse(
+      courseId,
+      instructorId,
+    );
 
     const sections =
       await this.iCourseSectionRepository.findByCourseId(courseId);
@@ -198,7 +205,10 @@ export class CourseSectionsService {
     instructorId: string,
     query: QuerySectionsDto,
   ): Promise<PaginatedResponse<SectionResponseDto>> {
-    await this.ensureInstructorCanManageCourse(courseId, instructorId);
+    await this.courseAccessService.ensureInstructorCanManageCourse(
+      courseId,
+      instructorId,
+    );
 
     const params = this.buildFindManySectionsParams(courseId, query);
 

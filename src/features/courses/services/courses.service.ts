@@ -31,10 +31,13 @@ import { CreateCourseDto } from '../dtos/course/create-course.dto';
 import { slugify } from 'src/common/utils/slugify.util';
 import { CATEGORY_REPOSITORY } from '../repositories/category-repository.token';
 import { UpdateCourseDto } from '../dtos/course/update-course.dto';
+import { CourseAccessService } from './course-access.service';
 
 @Injectable()
 export class CoursesService {
   constructor(
+    private readonly courseAccessService: CourseAccessService,
+
     @Inject(COURSE_REPOSITORY)
     private readonly iCourseRepository: ICourseRepository,
 
@@ -190,16 +193,10 @@ export class CoursesService {
       throw new NotFoundException('COURSE_NOT_FOUND');
     }
 
-    const isOwner = await this.iCourseRepository.existsOwnedByInstructor(
+    await this.courseAccessService.ensureInstructorCanManageCourse(
       courseId,
       instructorId,
     );
-
-    if (!isOwner) {
-      throw new ForbiddenException(
-        'You are not allowed to manage this course.',
-      );
-    }
 
     if (
       !(
@@ -308,26 +305,25 @@ export class CoursesService {
   async deleteDraftCourse(
     instructorId: string,
     courseId: string,
-  ): Promise<void> {
+  ): Promise<{ message: string }> {
     const course = await this.iCourseRepository.findById(courseId);
 
     if (!course) {
       throw new NotFoundException('COURSE_NOT_FOUND');
     }
 
-    const isOwner = await this.iCourseRepository.existsOwnedByInstructor(
+    await this.courseAccessService.ensureInstructorCanManageCourse(
       courseId,
       instructorId,
     );
-
-    if (!isOwner) {
-      throw new ForbiddenException('ACCESS_DENIED');
-    }
 
     if (course.status !== CourseStatus.DRAFT) {
       throw new BadRequestException('ONLY_DRAFT_COURSE_CAN_BE_DELETED');
     }
 
     await this.iCourseRepository.softDelete(courseId);
+    return {
+      message: 'DRAFT_COURSE_DELETED_SUCCESSFULLY',
+    };
   }
 }
