@@ -1,5 +1,10 @@
 //src\features\courses\interfaces\lesson.repository.interface.ts
-
+export class InvalidLessonOrderError extends Error {
+  constructor() {
+    super('Invalid lesson section order.');
+    this.name = 'InvalidLessonOrderError';
+  }
+}
 export interface Lesson {
   id: string;
   sectionId: string;
@@ -19,6 +24,7 @@ export interface CreateLessonInput {
   description?: string | null;
   lessonIndex: number;
 }
+export type CreateLessonAtEndInput = Omit<CreateLessonInput, 'lessonIndex'>;
 
 export interface UpdateLessonInput {
   title?: string;
@@ -61,14 +67,18 @@ export interface FindManyLessonParams {
 export interface ILessonRepository {
   // Basic CRUD
   create(input: CreateLessonInput): Promise<Lesson>;
-
+  createAtEnd(input: CreateLessonAtEndInput): Promise<Lesson | null>;
   findById(id: string): Promise<Lesson | null>;
 
   findByIdIncludingDeleted(id: string): Promise<Lesson | null>;
 
   update(id: string, input: UpdateLessonInput): Promise<Lesson>;
 
-  softDelete(id: string): Promise<Lesson>;
+  updateInSection(
+    lessonId: string,
+    sectionId: string,
+    input: UpdateLessonInput,
+  ): Promise<Lesson | null>;
 
   restore(id: string, lessonIndex: number): Promise<Lesson>;
 
@@ -91,11 +101,6 @@ export interface ILessonRepository {
     sectionId: string,
     orderedLessonIds: string[],
   ): Promise<Lesson[]>;
-
-  shiftLessonsAfterDelete(
-    sectionId: string,
-    deletedLessonIndex: number,
-  ): Promise<void>;
 
   softDeleteAndShift(
     lessonId: string,

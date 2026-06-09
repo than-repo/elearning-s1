@@ -1,14 +1,19 @@
 //src\features\courses\services\course-sections.service.ts
 import {
   BadRequestException,
-  ForbiddenException,
+  ConflictException,
   Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { COURSE_SECTION_REPOSITORY } from '../repositories/course-section-repository.token';
+import {
+  InvalidCourseSectionDeleteError,
+  InvalidCourseSectionOrderError,
+} from '../interfaces/course-section.repository.interface';
 import type {
   CourseSection,
+  CreateAtEndCourseSectionInput,
   CreateCourseSectionInput,
   FindManyCourseSectionParams,
   ICourseSectionRepository,
@@ -23,6 +28,7 @@ import {
 } from '../dtos/section-lesson/section-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { UpdateSectionDto } from '../dtos/section-lesson/update-section.dto';
+import { ChangeSectionStatusDto } from '../dtos/section-lesson/change-section-status.dto';
 import { ReorderSectionsDto } from '../dtos/section-lesson/reorder-sections.dto';
 import { QuerySectionsDto } from '../dtos/section-lesson/query-section.dto';
 import { PaginatedResponse } from '../dtos/paginated-response.dto';
@@ -73,19 +79,19 @@ export class CourseSectionsService {
       instructorId,
     );
 
-    const sectionIndex =
-      await this.iCourseSectionRepository.getNextSectionIndex(courseId);
-
-    const section = await this.iCourseSectionRepository.create({
+    const input: CreateAtEndCourseSectionInput = {
       courseId,
       title: dto.title,
       description: dto.description,
-      sectionIndex,
-    } satisfies CreateCourseSectionInput);
+    };
 
-    const cleanedSection = cleanData(section);
-
-    return plainToInstance(SectionResponseDto, cleanedSection, {
+    const section = await this.iCourseSectionRepository.createAtEnd(input);
+    if (!section) {
+      throw new BadRequestException(
+        'Could not create section order. Please try again.',
+      );
+    }
+    return plainToInstance(SectionResponseDto, section, {
       excludeExtraneousValues: true,
       groups: [SECTION_VIEW_GROUPS.INSTRUCTOR],
     });
@@ -106,23 +112,41 @@ export class CourseSectionsService {
       sectionId,
     );
 
-    const existsInCourse = await this.iCourseSectionRepository.existsInCourse(
-      sectionId,
-      courseId,
-    );
-
-    if (!existsInCourse) {
-      throw new NotFoundException('Section not found.');
-    }
-
     const section = await this.iCourseSectionRepository.update(
       sectionId,
       cleanData({
         title: dto.title,
         description: dto.description,
-        isActive: dto.isActive,
       } satisfies UpdateCourseSectionInput),
     );
+
+    return plainToInstance(SectionResponseDto, section, {
+      excludeExtraneousValues: true,
+      groups: [SECTION_VIEW_GROUPS.INSTRUCTOR],
+    });
+  }
+
+  async changeSectionActiveStatus(
+    courseId: string,
+    sectionId: string,
+    instructorId: string,
+    dto: ChangeSectionStatusDto,
+  ): Promise<SectionResponseDto> {
+    await this.courseAccessService.ensureInstructorCanManageSection(
+      courseId,
+      instructorId,
+      sectionId,
+    );
+
+    const section = await this.iCourseSectionRepository.changeActive(
+      sectionId,
+      courseId,
+      dto.isActive,
+    );
+
+    if (!section) {
+      throw new NotFoundException('Section not found.');
+    }
 
     return plainToInstance(SectionResponseDto, section, {
       excludeExtraneousValues: true,
@@ -147,18 +171,25 @@ export class CourseSectionsService {
       throw new NotFoundException('Section not found.');
     }
 
-    const isSoftDeleted =
+    try {
       await this.iCourseSectionRepository.softDeleteAndShiftSections(
         sectionId,
         courseId,
         section.sectionIndex,
       );
+    } catch (error) {
+      if (error instanceof InvalidCourseSectionDeleteError) {
+        throw new ConflictException(
+          'Could not delete section order. Please try again.',
+        );
+      }
 
-    return isSoftDeleted
-      ? {
-          Message: 'Delete successfully',
-        }
-      : { Message: 'Delete unsuccessfully' };
+      throw error;
+    }
+
+    return {
+      Message: 'Delete successfully',
+    };
   }
 
   async reorderSections(
@@ -186,18 +217,28 @@ export class CourseSectionsService {
       );
     }
 
-    const reorderedSections: CourseSection[] =
-      await this.iCourseSectionRepository.reorderSections(
-        courseId,
-        dto.sectionIds,
-      );
+    try {
+      const reorderedSections =
+        await this.iCourseSectionRepository.reorderSections(
+          courseId,
+          dto.sectionIds,
+        );
 
-    return reorderedSections.map((reorderedSection) =>
-      plainToInstance(SectionResponseDto, reorderedSection, {
-        excludeExtraneousValues: true,
-        groups: [SECTION_VIEW_GROUPS.INSTRUCTOR],
-      }),
-    );
+      return reorderedSections.map((reorderedSection) =>
+        plainToInstance(SectionResponseDto, reorderedSection, {
+          excludeExtraneousValues: true,
+          groups: [SECTION_VIEW_GROUPS.INSTRUCTOR],
+        }),
+      );
+    } catch (error) {
+      if (error instanceof InvalidCourseSectionOrderError) {
+        throw new BadRequestException(
+          'Invalid section order. Some sections do not belong to this course or were deleted.',
+        );
+      }
+
+      throw error;
+    }
   }
 
   async getSections(

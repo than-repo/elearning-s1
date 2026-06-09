@@ -8,7 +8,7 @@ import { UpdateUserDto } from '../dtos/update-user.dto';
 
 import bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { UserCreateInput, UserUpdateInput } from 'generated/prisma/models';
+import { UserUpdateInput } from 'generated/prisma/models';
 import { cleanData } from 'src/common/utils/clean-data-util';
 import { PrismaErrorHandler } from 'src/common/utils/prisma-error.util';
 

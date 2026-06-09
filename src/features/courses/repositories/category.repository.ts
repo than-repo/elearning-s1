@@ -1,9 +1,7 @@
 import { PrismaService } from 'src/core/database/prisma.service';
 import {
   Category,
-  CategoryOrderByInput,
   CategoryWhereInput,
-  CategoryWithChildren,
   CreateCategoryInput,
   FindManyCategoryParams,
   ICategoryRepository,

@@ -2,13 +2,13 @@ import type { ICategoryRepository } from './../interfaces/category.repository.in
 //src\features\courses\services\courses.service.ts
 import {
   BadRequestException,
-  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { COURSE_REPOSITORY } from '../repositories/course-repository.token';
 import type {
+  CourseModel,
   CourseOrderByInput,
   CourseWhereInput,
   FindManyCourseParams,
@@ -27,11 +27,14 @@ import { cleanData } from 'src/common/utils/clean-data-util';
 import { plainToInstance } from 'class-transformer';
 import { PaginatedResponse } from '../dtos/paginated-response.dto';
 import { CourseStatus } from 'generated/prisma/enums';
+import { Prisma } from 'generated/prisma/client';
 import { CreateCourseDto } from '../dtos/course/create-course.dto';
 import { slugify } from 'src/common/utils/slugify.util';
 import { CATEGORY_REPOSITORY } from '../repositories/category-repository.token';
 import { UpdateCourseDto } from '../dtos/course/update-course.dto';
 import { CourseAccessService } from './course-access.service';
+
+const MAX_SLUG_RETRY_ATTEMPTS = 3;
 
 @Injectable()
 export class CoursesService {
@@ -49,6 +52,11 @@ export class CoursesService {
     courseId?: string,
   ): Promise<string> {
     const baseSlug = slugify(title);
+
+    if (!baseSlug) {
+      throw new BadRequestException('COURSE_TITLE_CANNOT_GENERATE_SLUG');
+    }
+
     let slug = baseSlug;
     let count = 1;
 
@@ -58,15 +66,71 @@ export class CoursesService {
 
     return slug;
   }
-  private async areValidCategories(iDs: string[]): Promise<Boolean> {
-    const categories = await this.iCategoryRepository.findManyByIds(iDs);
+  private async ensureCategoriesCanBeAssigned(ids: string[]): Promise<void> {
+    const uniqueIds = new Set(ids);
 
-    return categories.length === iDs.length;
+    if (uniqueIds.size === 0) {
+      throw new BadRequestException('COURSE_REQUIRES_AT_LEAST_ONE_CATEGORY');
+    }
+
+    if (uniqueIds.size !== ids.length) {
+      throw new BadRequestException('DUPLICATE_CATEGORY_IDS');
+    }
+
+    const categories = await this.iCategoryRepository.findManyByIds([
+      ...uniqueIds,
+    ]);
+
+    if (
+      categories.length !== uniqueIds.size ||
+      categories.some((category) => !category.isActive)
+    ) {
+      throw new NotFoundException('CATEGORY_ID_NOT_FOUND');
+    }
+  }
+
+  private validateCourseQueryRange(dto: {
+    minPrice?: number;
+    maxPrice?: number;
+    publishedFrom?: string;
+    publishedTo?: string;
+  }): void {
+    if (
+      dto.minPrice !== undefined &&
+      dto.maxPrice !== undefined &&
+      dto.minPrice > dto.maxPrice
+    ) {
+      throw new BadRequestException('MIN_PRICE_CANNOT_EXCEED_MAX_PRICE');
+    }
+
+    if (
+      dto.publishedFrom !== undefined &&
+      dto.publishedTo !== undefined &&
+      new Date(dto.publishedFrom) > new Date(dto.publishedTo)
+    ) {
+      throw new BadRequestException(
+        'PUBLISHED_FROM_CANNOT_EXCEED_PUBLISHED_TO',
+      );
+    }
+  }
+
+  private isUniqueSlugConflict(error: unknown): boolean {
+    if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
+      return false;
+    }
+
+    const target = error.meta?.target;
+
+    return (
+      error.code === 'P2002' && Array.isArray(target) && target.includes('slug')
+    );
   }
 
   async findAllPublic(
     dto: LearnerCourseQueryDto,
   ): Promise<PaginatedResponse<CourseResponseDto>> {
+    this.validateCourseQueryRange(dto);
+
     const where: CourseWhereInput = {
       search: dto.search,
       level: dto.level,
@@ -155,26 +219,43 @@ export class CoursesService {
       certificateEnabled,
     } = dto;
 
-    if (!this.areValidCategories(categoryIds)) {
-      throw new NotFoundException('CATEGORY ID NOT FOUND');
-    }
-    const slug = await this.generateUniqueSlug(title);
+    await this.ensureCategoriesCanBeAssigned(categoryIds);
 
-    const course = await this.iCourseRepository.createDraftCourse({
-      title,
-      slug,
-      shortDescription,
-      description,
-      whatYouWillLearn,
-      requirements,
-      level,
-      price,
-      language,
-      certificateEnabled,
-      status: CourseStatus.DRAFT,
-      instructorId,
-      categoryIds,
-    });
+    let course: CourseModel | undefined;
+
+    for (let attempt = 1; attempt <= MAX_SLUG_RETRY_ATTEMPTS; attempt++) {
+      const slug = await this.generateUniqueSlug(title);
+
+      try {
+        course = await this.iCourseRepository.createDraftCourse({
+          title,
+          slug,
+          shortDescription,
+          description,
+          whatYouWillLearn,
+          requirements,
+          level,
+          price,
+          language,
+          certificateEnabled,
+          status: CourseStatus.DRAFT,
+          instructorId,
+          categoryIds,
+        });
+        break;
+      } catch (error) {
+        if (
+          !this.isUniqueSlugConflict(error) ||
+          attempt === MAX_SLUG_RETRY_ATTEMPTS
+        ) {
+          throw error;
+        }
+      }
+    }
+
+    if (!course) {
+      throw new BadRequestException('COURSE_SLUG_GENERATION_FAILED');
+    }
 
     return plainToInstance(CourseResponseDto, course, {
       excludeExtraneousValues: true,
@@ -207,12 +288,8 @@ export class CoursesService {
       throw new BadRequestException('ONLY_DRAFT_COURSE_CAN_BE_UPDATED');
     }
 
-    if (dto.categoryIds?.length) {
-      const validCategories = await this.areValidCategories(dto.categoryIds);
-
-      if (!validCategories) {
-        throw new NotFoundException('CATEGORIES NOT FOUND');
-      }
+    if (dto.categoryIds !== undefined) {
+      await this.ensureCategoriesCanBeAssigned(dto.categoryIds);
     }
 
     const input: UpdateCourseInput = {
@@ -229,14 +306,32 @@ export class CoursesService {
       categoryIds: dto.categoryIds,
     };
 
-    if (dto.title && dto.title !== course.title) {
-      input.slug = await this.generateUniqueSlug(dto.title, course.id);
+    let updatedCourse: CourseModel | undefined;
+
+    for (let attempt = 1; attempt <= MAX_SLUG_RETRY_ATTEMPTS; attempt++) {
+      if (dto.title && dto.title !== course.title) {
+        input.slug = await this.generateUniqueSlug(dto.title, course.id);
+      }
+
+      try {
+        updatedCourse = await this.iCourseRepository.updateDraftCourse(
+          courseId,
+          cleanData(input),
+        );
+        break;
+      } catch (error) {
+        if (
+          !this.isUniqueSlugConflict(error) ||
+          attempt === MAX_SLUG_RETRY_ATTEMPTS
+        ) {
+          throw error;
+        }
+      }
     }
 
-    const updatedCourse = await this.iCourseRepository.updateDraftCourse(
-      courseId,
-      cleanData(input),
-    );
+    if (!updatedCourse) {
+      throw new BadRequestException('COURSE_SLUG_GENERATION_FAILED');
+    }
 
     return plainToInstance(CourseResponseDto, updatedCourse, {
       excludeExtraneousValues: true,
@@ -248,6 +343,8 @@ export class CoursesService {
     instructorId: string,
     dto: InstructorCourseQueryDto,
   ): Promise<PaginatedResponse<CourseResponseDto>> {
+    this.validateCourseQueryRange(dto);
+
     const page = Math.max(dto.page ?? 1, 1);
     const limit = Math.min(Math.max(dto.limit ?? 10, 1), 50);
     const offset = (page - 1) * limit;

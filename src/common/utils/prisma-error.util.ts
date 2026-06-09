@@ -34,7 +34,7 @@ export class PrismaErrorHandler {
           throw new ConflictException(`${entity} already exists`);
         }
 
-        for (let field of target) {
+        for (const field of target) {
           const msg = fieldMsg[field];
           if (msg) {
             throw new ConflictException(msg);

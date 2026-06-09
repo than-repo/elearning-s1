@@ -5,7 +5,6 @@ import {
   IsEnum,
   IsNotEmpty,
   IsOptional,
-  IsPhoneNumber,
   IsString,
   IsUrl,
   Matches,

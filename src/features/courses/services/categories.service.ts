@@ -73,7 +73,7 @@ export class CategoriesService {
   }
   async createCategory(dto: CreateCategoryDto): Promise<CategoryResponseDto> {
     // 1. Slug generation
-    let slug: string = await this.generateSlug(dto.name);
+    const slug: string = await this.generateSlug(dto.name);
 
     // 2. Parent validation
     if (dto.parentId) {
@@ -131,7 +131,7 @@ export class CategoriesService {
       input.order = await this.iCategoryRepository.getNextOrder(dto.parentId);
     }
 
-    const cleanedInput = cleanData(input);
+    const cleanedInput: UpdateCategoryInput = cleanData(input);
     try {
       const updatedCategory: Category = await this.iCategoryRepository.update(
         id,
@@ -227,7 +227,7 @@ export class CategoriesService {
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: plainToInstance(CategoryResponseDto, categories) as Category[],
+      data: plainToInstance(CategoryResponseDto, categories),
       meta: {
         page,
         limit,

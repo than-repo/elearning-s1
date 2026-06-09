@@ -50,20 +50,6 @@ export class QueryLessonsDto {
   isActive?: boolean;
 
   @ApiPropertyOptional({
-    example: false,
-    description: 'Include soft-deleted lessons. Usually owner/admin only.',
-    default: false,
-  })
-  @Transform(({ value }) => {
-    if (value === 'true' || value === true) return true;
-    if (value === 'false' || value === false) return false;
-    return value;
-  })
-  @IsOptional()
-  @IsBoolean()
-  includeDeleted?: boolean;
-
-  @ApiPropertyOptional({
     enum: LessonSortFieldDto,
     example: LessonSortFieldDto.LESSON_INDEX,
     default: LessonSortFieldDto.LESSON_INDEX,

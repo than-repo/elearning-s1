@@ -2,14 +2,7 @@
 
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import {
-  IsBoolean,
-  IsInt,
-  IsOptional,
-  IsString,
-  MaxLength,
-  Min,
-} from 'class-validator';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class UpdateSectionDto {
   @ApiPropertyOptional({
@@ -42,16 +35,4 @@ export class UpdateSectionDto {
   @MaxLength(1000)
   description?: string | null;
 
-  @ApiPropertyOptional({
-    description: 'Whether this section is active.',
-    example: true,
-  })
-  @Transform(({ value }) => {
-    if (value === 'true') return true;
-    if (value === 'false') return false;
-    return value;
-  })
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
 }

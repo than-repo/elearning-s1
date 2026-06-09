@@ -7,6 +7,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  IsUUID,
   Max,
   MaxLength,
   Min,
@@ -15,9 +16,22 @@ import { CourseLevel, CourseStatus } from 'generated/prisma/enums';
 
 const ToBoolean = () =>
   Transform(({ value }) => {
+    if (value === undefined || value === null || value === '') {
+      return undefined;
+    }
     if (value === 'true') return true;
     if (value === 'false') return false;
     return value;
+  });
+
+const TrimToUndefined = () =>
+  Transform(({ value }) => {
+    if (typeof value !== 'string') {
+      return value;
+    }
+
+    const trimmed = value.trim();
+    return trimmed === '' ? undefined : trimmed;
   });
 
 export const COURSE_SORT_FIELDS = [
@@ -38,6 +52,7 @@ export type SortDirection = (typeof SORT_DIRECTIONS)[number];
 
 export class BaseCourseQueryDto {
   @ApiPropertyOptional({ example: 'nestjs', maxLength: 100 })
+  @TrimToUndefined()
   @IsString()
   @IsOptional()
   @MaxLength(100)
@@ -49,7 +64,8 @@ export class BaseCourseQueryDto {
   level?: CourseLevel;
 
   @ApiPropertyOptional({ example: 'category-id' })
-  @IsString()
+  @TrimToUndefined()
+  @IsUUID('4')
   @IsOptional()
   categoryId?: string;
 
@@ -66,6 +82,7 @@ export class BaseCourseQueryDto {
   maxPrice?: number;
 
   @ApiPropertyOptional({ example: 'en' })
+  @TrimToUndefined()
   @IsString()
   @IsOptional()
   language?: string;
@@ -87,7 +104,8 @@ export class BaseCourseQueryDto {
   certificateEnabled?: boolean;
 
   @ApiPropertyOptional({ example: 'instructor-id' })
-  @IsString()
+  @TrimToUndefined()
+  @IsUUID('4')
   @IsOptional()
   instructorId?: string;
 

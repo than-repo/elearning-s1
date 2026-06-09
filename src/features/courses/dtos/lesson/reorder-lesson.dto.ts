@@ -24,7 +24,6 @@ export class ReorderLessonsDto {
   @IsArray()
   @ArrayUnique()
   @ArrayMinSize(1)
-  @ArrayUnique()
   @IsUUID('4', { each: true })
   lessonIds!: string[];
 }

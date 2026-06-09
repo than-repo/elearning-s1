@@ -31,15 +31,15 @@ export class PrismaService
 
     super({ adapter });
   }
-  async onModuleInit() {
-    await this.$connect;
+  async onModuleInit(): Promise<void> {
+    await this.$connect();
     this.logger.log('Prisma connected to MySql successfully');
 
     const user = await this.user.count();
     this.logger.log(`Prisma test OK - User: ${user}`);
   }
   async onModuleDestroy() {
-    await this.$disconnect;
+    await this.$disconnect();
     this.logger.log('Prisma disconnected');
   }
 }

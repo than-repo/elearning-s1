@@ -35,7 +35,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return {
       ...payload,
       ip: req.ip || req.ips?.[0],
-      userAgent: req.headers['user-agent'] as string | undefined,
+      userAgent: req.headers['user-agent'],
     };
   }
 }

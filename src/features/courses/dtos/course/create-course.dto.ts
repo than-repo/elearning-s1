@@ -3,6 +3,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   ArrayMaxSize,
+  ArrayMinSize,
   ArrayUnique,
   IsArray,
   IsBoolean,
@@ -16,7 +17,7 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import { CourseLevel } from 'generated/prisma/enums';
 
 export class CreateCourseDto {
@@ -145,7 +146,9 @@ export class CreateCourseDto {
     example: ['550e8400-e29b-41d4-a716-446655440000'],
   })
   @IsArray()
+  @ArrayMinSize(1)
   @ArrayMaxSize(5)
+  @ArrayUnique()
   @IsUUID('4', { each: true })
   @IsNotEmpty({ each: true })
   categoryIds!: string[];

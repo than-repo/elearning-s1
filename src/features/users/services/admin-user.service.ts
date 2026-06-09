@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 //src\features\users\services\admin-user.service.ts
 
 import { ConfigService } from '@nestjs/config';
@@ -130,7 +129,7 @@ export class AdminUsersService {
       const { users, total } = result;
       const totalPages: number = Math.ceil(total / limit);
       return {
-        data: plainToInstance(UserResponseDto, users) as UserResponseDto[],
+        data: plainToInstance(UserResponseDto, users),
         meta: { page, limit, total, totalPages },
       };
     } catch (error) {

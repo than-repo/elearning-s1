@@ -1,7 +1,7 @@
 //src\features\courses\controllers\public-courses.controller.ts
 import { CategoriesService } from './../services/categories.service';
 
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiOkResponse,

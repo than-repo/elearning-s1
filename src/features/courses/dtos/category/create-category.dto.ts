@@ -2,13 +2,11 @@
 
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
   MaxLength,
-  Min,
 } from 'class-validator';
 
 export class CreateCategoryDto {

@@ -171,6 +171,6 @@ export interface ICourseRepository {
   existsOwnedByInstructor(
     courseId: string,
     instructorId: string,
-  ): Promise<Boolean>;
+  ): Promise<boolean>;
   existsBySlug(slug: string, excludeId?: string): Promise<boolean>;
 }

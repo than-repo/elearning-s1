@@ -18,7 +18,6 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
-  ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -30,9 +29,6 @@ import { LoginDto } from './dtos/login.dto';
 import { AuthService } from './services/auth.service';
 
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { RolesGuard } from './guards/roles.guard';
-import { Roles } from './decorators/roles.decorator';
-import { UserRole } from 'generated/prisma/enums';
 import { AuthResponseDto } from './dtos/login-response.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import type { RequestWithCookies } from './interfaces/request-with-cookies';
@@ -96,9 +92,9 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const result = await this.authService.login(loginDto);
-    this.setRefreshTokenCookie(res, result.refreshToken);
 
     const { refreshToken, ...response } = result;
+    this.setRefreshTokenCookie(res, refreshToken);
     return response;
   }
 
@@ -123,9 +119,8 @@ export class AuthController {
 
     const result = await this.authService.refreshToken(refreshToken);
 
-    this.setRefreshTokenCookie(res, result.refreshToken);
-
     const { refreshToken: _, ...response } = result;
+    this.setRefreshTokenCookie(res, _);
     return response;
   }
 
@@ -147,10 +142,8 @@ export class AuthController {
     // req.user contains the JwtPayload from GoogleStrategy
     const result = await this.authService.googleLogin(req.user);
 
-    this.setRefreshTokenCookie(res, result.refreshToken);
-
     const { refreshToken, ...response } = result;
-
+    this.setRefreshTokenCookie(res, refreshToken);
     // Note: has not redirect to frontend dashboard yet
     // res.redirect(${frontendUrl}/auth/success?token=...')`
     // For now returning Json instead
@@ -195,21 +188,5 @@ export class AuthController {
   async logoutAll(@Req() req: Request & { user: any }) {
     await this.authService.logoutAll(req.user.sub);
     return { message: 'Logged out from all devices successfully' };
-  }
-
-  // Test endpoints
-  @Get('TestAccessToken')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  async TestAccessToken(@Req() req: Request & { user: any }) {
-    return { success: true, message: 'JWT OK', user: req.user };
-  }
-
-  @Get('TestRBAC')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.LEARNER)
-  @ApiBearerAuth()
-  async getMe(@Req() req: Request & { user: any }) {
-    return { success: true, message: 'RBAC OK', user: req.user };
   }
 }

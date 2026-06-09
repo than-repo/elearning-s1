@@ -4,9 +4,12 @@ import {
   CourseSection,
   CourseSectionOrderByInput,
   CourseSectionWhereInput,
+  CreateAtEndCourseSectionInput,
   CreateCourseSectionInput,
   FindManyCourseSectionParams,
   ICourseSectionRepository,
+  InvalidCourseSectionDeleteError,
+  InvalidCourseSectionOrderError,
   UpdateCourseSectionInput,
 } from '../interfaces/course-section.repository.interface';
 
@@ -15,7 +18,7 @@ import {
   CourseSection as PrismaCourseSection,
 } from 'generated/prisma/client';
 import { Injectable } from '@nestjs/common';
-import { text } from 'node:stream/consumers';
+
 @Injectable()
 export class CourseSectionRepository implements ICourseSectionRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -57,7 +60,14 @@ export class CourseSectionRepository implements ICourseSectionRepository {
       [orderBy?.field]: orderBy?.direction,
     };
   }
-
+  private isUniqueConstraintError(error: unknown): boolean {
+    return (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      error.code === 'P2002'
+    );
+  }
   private readonly DEFAULT_LIMIT = 10;
   private readonly MAX_LIMIT = 100;
 
@@ -73,6 +83,27 @@ export class CourseSectionRepository implements ICourseSectionRepository {
       },
     });
     return this.toDomain(section);
+  }
+  async createAtEnd(
+    input: CreateAtEndCourseSectionInput,
+  ): Promise<CourseSection | null> {
+    const maxAttempts = 3;
+    for (let i = 0; i < maxAttempts; i++) {
+      try {
+        const nextCourseSectionIndex = await this.getNextSectionIndex(
+          input.courseId,
+        );
+        return await this.create({
+          ...input,
+          sectionIndex: nextCourseSectionIndex,
+        } satisfies CreateCourseSectionInput);
+      } catch (error) {
+        if (!this.isUniqueConstraintError(error) || i === maxAttempts - 1) {
+          throw error;
+        }
+      }
+    }
+    return null;
   }
   async findById(id: string): Promise<CourseSection | null> {
     const section = await this.prisma.courseSection.findFirst({
@@ -106,42 +137,70 @@ export class CourseSectionRepository implements ICourseSectionRepository {
     courseId: string,
     sectionIndex: number,
   ): Promise<boolean> {
-    const date = new Date();
     return this.prisma.$transaction(async (tx) => {
-      const result = await tx.courseSection.updateMany({
-        where: { id: sectionId, deletedAt: null, courseId },
+      const sectionAggregate = await tx.courseSection.aggregate({
+        where: {
+          courseId,
+        },
+        _min: {
+          sectionIndex: true,
+        },
+      });
+
+      const lowerSectionIndex = sectionAggregate._min.sectionIndex ?? 0;
+
+      const softDeletedSectionIndex = lowerSectionIndex - 1;
+
+      const softDeleteResult = await tx.courseSection.updateMany({
+        where: {
+          id: sectionId,
+          courseId,
+          deletedAt: null,
+          sectionIndex,
+        },
         data: {
-          deletedAt: date,
-          sectionIndex: -date.getTime(),
+          sectionIndex: softDeletedSectionIndex,
+          deletedAt: new Date(),
           isActive: false,
         },
       });
-      if (result.count === 0) {
-        return false;
+
+      if (softDeleteResult.count !== 1) {
+        throw new InvalidCourseSectionDeleteError();
       }
 
-      const sections = await tx.courseSection.findMany({
+      const sectionToShift = await tx.courseSection.findMany({
         where: {
           courseId,
-          sectionIndex: { gt: sectionIndex },
           deletedAt: null,
+          sectionIndex: { gt: sectionIndex },
         },
         orderBy: {
           sectionIndex: 'asc',
         },
         select: {
-          sectionIndex: true,
           id: true,
+          sectionIndex: true,
         },
       });
 
-      for (const section of sections) {
-        await tx.courseSection.update({
-          where: { deletedAt: null, id: section.id },
-          data: { sectionIndex: section.sectionIndex - 1 },
+      for (const section of sectionToShift) {
+        const shiftResult = await tx.courseSection.updateMany({
+          where: {
+            id: section.id,
+            courseId,
+            deletedAt: null,
+            sectionIndex: section.sectionIndex,
+          },
+          data: {
+            sectionIndex: section.sectionIndex - 1,
+          },
         });
-      }
 
+        if (shiftResult.count !== 1) {
+          throw new InvalidCourseSectionDeleteError();
+        }
+      }
       return true;
     });
   }
@@ -153,13 +212,35 @@ export class CourseSectionRepository implements ICourseSectionRepository {
 
     return this.toDomain(section);
   }
-  async changeActive(id: string, isActive: boolean): Promise<CourseSection> {
-    const section = await this.prisma.courseSection.update({
-      where: { id },
-      data: { isActive: isActive },
+  async changeActive(
+    sectionId: string,
+    courseId: string,
+    isActive: boolean,
+  ): Promise<CourseSection | null> {
+    const section = await this.prisma.$transaction(async (tx) => {
+      const updateResult = await tx.courseSection.updateMany({
+        where: {
+          id: sectionId,
+          courseId,
+          deletedAt: null,
+        },
+        data: { isActive },
+      });
+
+      if (updateResult.count !== 1) {
+        return null;
+      }
+
+      return tx.courseSection.findFirst({
+        where: {
+          id: sectionId,
+          courseId,
+          deletedAt: null,
+        },
+      });
     });
 
-    return this.toDomain(section);
+    return section ? this.toDomain(section) : null;
   }
 
   // Query / pagination
@@ -227,73 +308,89 @@ export class CourseSectionRepository implements ICourseSectionRepository {
     courseId: string,
     orderedSectionIds: string[],
   ): Promise<CourseSection[]> {
-    await this.prisma.$transaction(async (tx) => {
-      // await tx.courseSection.update({
-      //   where: {
-      //     courseId_sectionIndex: {
-      //       courseId,
-      //       sectionIndex: 0,
-      //     },
-      //   },
-      //   data: { sectionIndex: Number(new Date()) },
-      // });
-
-      await Promise.all(
-        orderedSectionIds.map((sectionId, index) =>
-          tx.courseSection.updateMany({
-            where: {
-              courseId,
-              deletedAt: null,
-              id: sectionId,
-            },
-            data: {
-              sectionIndex: -(1 + index),
-            },
-          }),
-        ),
-      );
-
-      await Promise.all(
-        orderedSectionIds.map((sectionId, index) =>
-          tx.courseSection.updateMany({
-            where: {
-              courseId,
-              deletedAt: null,
-              id: sectionId,
-            },
-            data: {
-              sectionIndex: index,
-            },
-          }),
-        ),
-      );
-    });
-
-    const sections = await this.prisma.courseSection.findMany({
-      where: { deletedAt: null, courseId },
-    });
-
-    return sections.map((section) => this.toDomain(section));
-  }
-  async shiftSectionsAfterDelete(
-    courseId: string,
-    deletedSectionIndex: number,
-  ): Promise<void> {
-    await this.prisma.$transaction(async (tx) => {
-      await tx.courseSection.updateMany({
+    const sections = await this.prisma.$transaction(async (tx) => {
+      const currentSections = await tx.courseSection.findMany({
         where: {
           courseId,
           deletedAt: null,
-          sectionIndex: {
-            gt: deletedSectionIndex,
-          },
         },
-        data: {
-          sectionIndex: {
-            decrement: 1,
+        orderBy: {
+          sectionIndex: 'asc',
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      const orderedSectionIdSet = new Set(orderedSectionIds);
+      const currentSectionIdSet = new Set(
+        currentSections.map((section) => section.id),
+      );
+
+      const hasInvalidOrder: boolean =
+        orderedSectionIdSet.size !== orderedSectionIds.length ||
+        orderedSectionIds.length !== currentSections.length ||
+        orderedSectionIds.some(
+          (sectionId) => !currentSectionIdSet.has(sectionId),
+        );
+
+      if (hasInvalidOrder) {
+        throw new InvalidCourseSectionOrderError();
+      }
+
+      const sectionIndexAggregate = await tx.courseSection.aggregate({
+        where: {
+          courseId,
+        },
+        _min: {
+          sectionIndex: true,
+        },
+      });
+      const lowestSectionIndex = sectionIndexAggregate._min.sectionIndex ?? 0;
+      const temporaryStartIndex = lowestSectionIndex - orderedSectionIds.length;
+
+      for (const [index, sectionId] of orderedSectionIds.entries()) {
+        const temporaryUpdateResult = await tx.courseSection.updateMany({
+          where: {
+            courseId,
+            deletedAt: null,
+            id: sectionId,
           },
+          data: {
+            sectionIndex: temporaryStartIndex + index,
+          },
+        });
+
+        if (temporaryUpdateResult.count !== 1) {
+          throw new InvalidCourseSectionOrderError();
+        }
+      }
+
+      for (const [index, sectionId] of orderedSectionIds.entries()) {
+        const finalUpdateResult = await tx.courseSection.updateMany({
+          where: {
+            courseId,
+            deletedAt: null,
+            id: sectionId,
+          },
+          data: {
+            sectionIndex: index,
+          },
+        });
+
+        if (finalUpdateResult.count !== 1) {
+          throw new InvalidCourseSectionOrderError();
+        }
+      }
+
+      return tx.courseSection.findMany({
+        where: { deletedAt: null, courseId },
+        orderBy: {
+          sectionIndex: 'asc',
         },
       });
     });
+
+    return sections.map((section) => this.toDomain(section));
   }
 }

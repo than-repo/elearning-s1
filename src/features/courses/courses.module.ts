@@ -25,6 +25,7 @@ import { ReviewerCoursesService } from './services/reviewer-courses.service';
 
 import { PrismaCourseReviewRepository } from './repositories/prisma-course-review.repository';
 import { COURSE_REVIEW_REPOSITORY } from './repositories/course-review-repository.token';
+import { CourseAccessService } from './services/course-access.service';
 
 @Module({
   providers: [
@@ -67,7 +68,7 @@ import { COURSE_REVIEW_REPOSITORY } from './repositories/course-review-repositor
 
     //Reviewer
     ReviewerCoursesService,
-
+    CourseAccessService,
     {
       provide: COURSE_REVIEW_REPOSITORY,
       useClass: PrismaCourseReviewRepository,

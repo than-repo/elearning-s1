@@ -24,14 +24,41 @@ import {
 // PrismaCourseAdminDetail
 const courseWithPublicDetail = {
   courseCategories: {
+    where: {
+      category: {
+        deletedAt: null,
+        isActive: true,
+      },
+    },
     include: {
-      category: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
     },
   },
 
   instructors: {
+    where: {
+      deletedAt: null,
+      isActive: true,
+      instructor: {
+        isActive: true,
+      },
+    },
     include: {
-      instructor: true,
+      instructor: {
+        select: {
+          id: true,
+          fullName: true,
+        },
+      },
+    },
+    orderBy: {
+      order: 'asc',
     },
   },
 } satisfies Prisma.CourseInclude;
@@ -136,11 +163,21 @@ export class CourseRepository implements ICourseRepository {
       prismaWhere.courseCategories = {
         some: {
           categoryId,
+          category: {
+            deletedAt: null,
+            isActive: true,
+          },
         },
       };
     }
     if (instructorId) {
-      prismaWhere.instructors = { some: { instructorId } };
+      prismaWhere.instructors = {
+        some: {
+          instructorId,
+          deletedAt: null,
+          isActive: true,
+        },
+      };
     }
     if (minPrice !== undefined || maxPrice !== undefined) {
       prismaWhere.price = {};
@@ -148,7 +185,7 @@ export class CourseRepository implements ICourseRepository {
         prismaWhere.price.gte = minPrice;
       }
       if (maxPrice !== undefined) {
-        prismaWhere.price.lt = maxPrice;
+        prismaWhere.price.lte = maxPrice;
       }
     }
     if (language) {
@@ -179,30 +216,11 @@ export class CourseRepository implements ICourseRepository {
         id: cc.category.id,
         name: cc.category.name,
         slug: cc.category.slug,
-        description: cc.category.description,
-        parentId: cc.category.parentId,
-        order: cc.category.order,
-        isActive: cc.category.isActive,
-        createdAt: cc.category.createdAt,
-        updatedAt: cc.category.updatedAt,
-        deletedAt: cc.category.deletedAt,
       })),
 
       instructors: course.instructors.map((ci) => ({
         id: ci.instructor.id,
         fullName: ci.instructor.fullName,
-        email: ci.instructor.email,
-        avatarUrl: ci.instructor.avatarUrl,
-
-        courseInstructorId: ci.id,
-        courseId: ci.courseId,
-        instructorId: ci.instructorId,
-        isPrimary: ci.isPrimary,
-        order: ci.order,
-        isActive: ci.isActive,
-        createdAt: ci.createdAt,
-        updatedAt: ci.updatedAt,
-        deletedAt: ci.deletedAt,
       })),
     };
   }
@@ -247,15 +265,23 @@ export class CourseRepository implements ICourseRepository {
   }
 
   async create(input: CreateCourseInput): Promise<CourseModel> {
+    const { categoryIds, ...courseData } = input;
+
     const course = await this.prisma.course.create({
       data: {
-        ...input,
+        ...courseData,
         whatYouWillLearn: this.toPrismaJsonArray(input.whatYouWillLearn),
         requirements: this.toPrismaJsonArray(input.requirements),
+        courseCategories: {
+          create: categoryIds.map((categoryId) => ({
+            categoryId,
+          })),
+        },
       },
+      include: courseWithPublicDetail,
     });
 
-    return this.toCourseModel(course);
+    return this.toCourseWithDetailsModel(course);
   }
 
   async createDraftCourse(input: CreateDraftCourseInput): Promise<CourseModel> {
@@ -327,9 +353,10 @@ export class CourseRepository implements ICourseRepository {
         deletedAt: null,
         isActive: true,
       },
+      include: courseWithPublicDetail,
     });
 
-    return course ? this.toCourseModel(course) : null;
+    return course ? this.toCourseWithDetailsModel(course) : null;
   }
   async findBySlug(slug: string): Promise<CourseModel | null> {
     const course = await this.prisma.course.findFirst({
@@ -339,9 +366,10 @@ export class CourseRepository implements ICourseRepository {
         isActive: true,
         status: CourseStatus.PUBLISHED,
       },
+      include: courseWithPublicDetail,
     });
 
-    return course ? this.toCourseModel(course) : null;
+    return course ? this.toCourseWithDetailsModel(course) : null;
   }
 
   async count(where?: CourseWhereInput): Promise<number> {
@@ -350,23 +378,43 @@ export class CourseRepository implements ICourseRepository {
     });
   }
   async update(id: string, input: UpdateCourseInput): Promise<CourseModel> {
-    const course = await this.prisma.course.update({
-      where: { id, deletedAt: null },
-      data: {
-        ...input,
-        whatYouWillLearn: this.toPrismaJsonArray(input.whatYouWillLearn),
-        requirements: this.toPrismaJsonArray(input.requirements),
-      },
+    const { categoryIds, instructorId: _instructorId, ...courseData } = input;
+
+    const course = await this.prisma.$transaction(async (tx) => {
+      if (categoryIds !== undefined) {
+        await tx.courseCategory.deleteMany({
+          where: { courseId: id },
+        });
+
+        if (categoryIds.length > 0) {
+          await tx.courseCategory.createMany({
+            data: categoryIds.map((categoryId) => ({
+              categoryId,
+              courseId: id,
+            })),
+          });
+        }
+      }
+
+      return tx.course.update({
+        where: { id, deletedAt: null },
+        data: {
+          ...courseData,
+          whatYouWillLearn: this.toPrismaJsonArray(courseData.whatYouWillLearn),
+          requirements: this.toPrismaJsonArray(courseData.requirements),
+        },
+        include: courseWithPublicDetail,
+      });
     });
 
-    return this.toCourseModel(course);
+    return this.toCourseWithDetailsModel(course);
   }
 
   async updateDraftCourse(
     courseId: string,
     input: UpdateCourseInput,
   ): Promise<CourseModel> {
-    const { categoryIds, ...courseData } = input;
+    const { categoryIds, instructorId: _instructorId, ...courseData } = input;
 
     const course = await this.prisma.$transaction(async (tx) => {
       if (categoryIds !== undefined) {
@@ -385,7 +433,13 @@ export class CourseRepository implements ICourseRepository {
       }
 
       return tx.course.update({
-        where: { id: courseId },
+        where: {
+          id: courseId,
+          deletedAt: null,
+          status: {
+            in: [CourseStatus.DRAFT, CourseStatus.CHANGES_REQUESTED],
+          },
+        },
         data: {
           ...courseData,
           requirements: this.toPrismaJsonArray(courseData.requirements),

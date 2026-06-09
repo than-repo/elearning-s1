@@ -1,29 +1,26 @@
-import type { CourseAccessService } from './course-access.service';
+import { CourseAccessService } from './course-access.service';
 // src/features/courses/services/lessons.service.ts
 
 import {
   BadRequestException,
-  ForbiddenException,
+  ConflictException,
   Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 
-import type {
-  CreateLessonInput,
-  ILessonRepository,
-  Lesson,
-  LessonOrderByInput,
-  LessonWhereInput,
-  UpdateLessonInput,
+import {
+  InvalidLessonOrderError,
+  type CreateLessonAtEndInput,
+  type ILessonRepository,
+  type Lesson,
+  type LessonOrderByInput,
+  type LessonWhereInput,
+  type UpdateLessonInput,
 } from '../interfaces/lesson.repository.interface';
 
-import type { ICourseSectionRepository } from '../interfaces/course-section.repository.interface';
-import type { ICourseRepository } from '../interfaces/course.repository.interface';
 import { LESSON_REPOSITORY } from '../repositories/lesson-repository.token';
-import { COURSE_SECTION_REPOSITORY } from '../repositories/course-section-repository.token';
-import { COURSE_REPOSITORY } from '../repositories/course-repository.token';
 import { CreateLessonDto } from '../dtos/lesson/create-lesson.dto';
 import {
   LESSON_VIEW_GROUPS,
@@ -40,40 +37,8 @@ export class LessonsService {
     @Inject(LESSON_REPOSITORY)
     private readonly lessonRepository: ILessonRepository,
 
-    @Inject(COURSE_SECTION_REPOSITORY)
-    private readonly courseSectionRepository: ICourseSectionRepository,
-
-    @Inject(COURSE_REPOSITORY)
-    private readonly courseRepository: ICourseRepository,
-
     private readonly courseAccessService: CourseAccessService,
   ) {}
-
-  private async validateInstructorSectionAccess(
-    courseId: string,
-    sectionId: string,
-    instructorId: string,
-  ): Promise<void> {
-    const isOwner = await this.courseRepository.existsOwnedByInstructor(
-      courseId,
-      instructorId,
-    );
-
-    if (!isOwner) {
-      throw new ForbiddenException(
-        'You do not have permission to manage this course.',
-      );
-    }
-
-    const sectionExists = await this.courseSectionRepository.existsInCourse(
-      sectionId,
-      courseId,
-    );
-
-    if (!sectionExists) {
-      throw new NotFoundException('Section not found in this course.');
-    }
-  }
 
   private toOwnerLessonResponse(lesson: Lesson): LessonResponseDto {
     return plainToInstance(LessonResponseDto, lesson, {
@@ -94,16 +59,17 @@ export class LessonsService {
       sectionId,
     );
 
-    const lessonIndex =
-      await this.lessonRepository.getNextLessonIndex(sectionId);
-
-    const lesson = await this.lessonRepository.create({
+    const lesson = await this.lessonRepository.createAtEnd({
       sectionId,
       title: dto.title,
       description: dto.description ?? null,
-      lessonIndex,
-    } satisfies CreateLessonInput);
+    } satisfies CreateLessonAtEndInput);
 
+    if (!lesson) {
+      throw new ConflictException(
+        'Could not create lesson order. Please try again.',
+      );
+    }
     return this.toOwnerLessonResponse(lesson);
   }
 
@@ -114,20 +80,12 @@ export class LessonsService {
     instructorId: string,
     dto: UpdateLessonDto,
   ): Promise<LessonResponseDto> {
-    await this.validateInstructorSectionAccess(
+    await this.courseAccessService.ensureInstructorCanManageLesson(
       courseId,
-      sectionId,
       instructorId,
-    );
-
-    const lessonExists = await this.lessonRepository.existsInSection(
-      lessonId,
       sectionId,
+      lessonId,
     );
-
-    if (!lessonExists) {
-      throw new NotFoundException('Lesson not found in this section.');
-    }
 
     const updateData = this.buildUpdateLessonInput(dto);
 
@@ -135,10 +93,15 @@ export class LessonsService {
       throw new BadRequestException('No valid lesson fields provided.');
     }
 
-    const updatedLesson = await this.lessonRepository.update(
+    const updatedLesson = await this.lessonRepository.updateInSection(
       lessonId,
+      sectionId,
       updateData,
     );
+
+    if (!updatedLesson) {
+      throw new NotFoundException('Lesson not found in this section.');
+    }
 
     return this.toOwnerLessonResponse(updatedLesson);
   }
@@ -154,6 +117,10 @@ export class LessonsService {
       updateData.description = dto.description;
     }
 
+    if (dto.isActive !== undefined) {
+      updateData.isActive = dto.isActive;
+    }
+
     return updateData;
   }
 
@@ -163,10 +130,10 @@ export class LessonsService {
     instructorId: string,
     query: QueryLessonsDto,
   ): Promise<PaginatedResponse<LessonResponseDto>> {
-    await this.validateInstructorSectionAccess(
+    await this.courseAccessService.ensureInstructorCanManageSection(
       courseId,
-      sectionId,
       instructorId,
+      sectionId,
     );
 
     const page = query.page ?? 1;
@@ -218,10 +185,11 @@ export class LessonsService {
     lessonId: string,
     instructorId: string,
   ): Promise<void> {
-    await this.validateInstructorSectionAccess(
+    await this.courseAccessService.ensureInstructorCanManageLesson(
       courseId,
-      sectionId,
       instructorId,
+      sectionId,
+      lessonId,
     );
 
     const lesson = await this.lessonRepository.findById(lessonId);
@@ -243,10 +211,10 @@ export class LessonsService {
     instructorId: string,
     dto: ReorderLessonsDto,
   ): Promise<LessonResponseDto[]> {
-    await this.validateInstructorSectionAccess(
+    await this.courseAccessService.ensureInstructorCanManageSection(
       courseId,
-      sectionId,
       instructorId,
+      sectionId,
     );
 
     const existingLessons =
@@ -258,13 +226,18 @@ export class LessonsService {
 
     if (dto.lessonIds.length !== existingLessons.length) {
       throw new BadRequestException(
-        'Lesson IDs must include all active lessons in this section.',
+        'Lesson IDs must include all non-deleted lessons in this section.',
       );
     }
 
     const existingLessonIdSet = new Set(
       existingLessons.map((lesson) => lesson.id),
     );
+    const requestedLessonIdSet = new Set(dto.lessonIds);
+
+    if (requestedLessonIdSet.size !== dto.lessonIds.length) {
+      throw new BadRequestException('Lesson IDs must be unique.');
+    }
 
     const invalidLessonIds = dto.lessonIds.filter(
       (lessonId) => !existingLessonIdSet.has(lessonId),
@@ -276,11 +249,22 @@ export class LessonsService {
       );
     }
 
-    const reorderedLessons = await this.lessonRepository.reorderLessons(
-      sectionId,
-      dto.lessonIds,
-    );
+    try {
+      const reorderedLessons = await this.lessonRepository.reorderLessons(
+        sectionId,
+        dto.lessonIds,
+      );
 
-    return reorderedLessons.map((lesson) => this.toOwnerLessonResponse(lesson));
+      return reorderedLessons.map((lesson) =>
+        this.toOwnerLessonResponse(lesson),
+      );
+    } catch (error: unknown) {
+      if (error instanceof InvalidLessonOrderError) {
+        throw new BadRequestException(
+          'Invalid lesson order. Some lessons do not belong to this section or were deleted.',
+        );
+      }
+      throw error;
+    }
   }
 }

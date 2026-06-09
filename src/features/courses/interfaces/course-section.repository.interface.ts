@@ -1,5 +1,19 @@
 //src\features\courses\interfaces\course-section.repository.interface.ts
 
+export class InvalidCourseSectionOrderError extends Error {
+  constructor() {
+    super('Invalid course section order.');
+    this.name = 'InvalidCourseSectionOrderError';
+  }
+}
+
+export class InvalidCourseSectionDeleteError extends Error {
+  constructor() {
+    super('Invalid course section delete.');
+    this.name = 'InvalidCourseSectionDeleteError';
+  }
+}
+
 //Domain entity
 export interface CourseSection {
   id: string;
@@ -20,6 +34,11 @@ export interface CreateCourseSectionInput {
   description?: string | null;
   sectionIndex: number;
 }
+
+export type CreateAtEndCourseSectionInput = Omit<
+  CreateCourseSectionInput,
+  'sectionIndex'
+>;
 
 export interface UpdateCourseSectionInput {
   title?: string;
@@ -62,6 +81,9 @@ export interface ICourseSectionRepository {
   //Basic CRUD
   create(input: CreateCourseSectionInput): Promise<CourseSection>;
 
+  createAtEnd(
+    input: CreateAtEndCourseSectionInput,
+  ): Promise<CourseSection | null>;
   findById(id: string): Promise<CourseSection | null>;
 
   findByIdIncludingDeleted(id: string): Promise<CourseSection | null>;
@@ -76,7 +98,11 @@ export interface ICourseSectionRepository {
 
   restore(id: string, sectionIndex: number): Promise<CourseSection>;
 
-  changeActive(id: string, isActive: boolean): Promise<CourseSection>;
+  changeActive(
+    sectionId: string,
+    courseId: string,
+    isActive: boolean,
+  ): Promise<CourseSection | null>;
   // Query / pagination
   findMany(params?: FindManyCourseSectionParams): Promise<CourseSection[]>;
 
@@ -94,11 +120,4 @@ export interface ICourseSectionRepository {
     courseId: string,
     orderedSectionIds: string[],
   ): Promise<CourseSection[]>;
-
-  shiftSectionsAfterDelete(
-    courseId: string,
-    deletedSectionIndex: number,
-  ): Promise<void>;
-
-  //Helper
 }

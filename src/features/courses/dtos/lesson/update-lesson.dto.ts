@@ -2,7 +2,13 @@
 
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class UpdateLessonDto {
   @ApiPropertyOptional({
@@ -35,4 +41,17 @@ export class UpdateLessonDto {
   @IsString()
   @MaxLength(2000)
   description?: string | null;
+
+  @ApiPropertyOptional({
+    description: 'Whether this lesson is active.',
+    example: true,
+  })
+  @Transform(({ value }) => {
+    if (value === 'true' || value === true) return true;
+    if (value === 'false' || value === false) return false;
+    return value;
+  })
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
 }

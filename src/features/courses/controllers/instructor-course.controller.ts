@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -41,6 +40,7 @@ import { CreateSectionDto } from '../dtos/section-lesson/create-section.dti';
 import { SectionResponseDto } from '../dtos/section-lesson/section-response.dto';
 import { CourseSectionsService } from '../services/course-sections.service';
 import { UpdateSectionDto } from '../dtos/section-lesson/update-section.dto';
+import { ChangeSectionStatusDto } from '../dtos/section-lesson/change-section-status.dto';
 import { ReorderSectionsDto } from '../dtos/section-lesson/reorder-sections.dto';
 import { QuerySectionsDto } from '../dtos/section-lesson/query-section.dto';
 import { LessonResponseDto } from '../dtos/lesson/lesson-response.dto';
@@ -186,6 +186,27 @@ export class InstructorCoursesController {
     @Body() dto: UpdateSectionDto,
   ): Promise<SectionResponseDto> {
     return this.courseSectionsService.updateSection(
+      courseId,
+      sectionId,
+      instructorId,
+      dto,
+    );
+  }
+
+  @Patch(':courseId/sections/:sectionId/status')
+  @ApiOperation({ summary: 'Change Section Active Status - Instructor' })
+  @ApiOkResponse({ type: SectionResponseDto })
+  @ApiBadRequestResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiNotFoundResponse()
+  async changeSectionActiveStatus(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
+    @CurrentUser('sub') instructorId: string,
+    @Body() dto: ChangeSectionStatusDto,
+  ): Promise<SectionResponseDto> {
+    return this.courseSectionsService.changeSectionActiveStatus(
       courseId,
       sectionId,
       instructorId,

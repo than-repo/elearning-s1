@@ -2,7 +2,6 @@
 
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
-import { IsArray, IsOptional, ValidateNested } from 'class-validator';
 
 /**
  * Flat category response – used for:

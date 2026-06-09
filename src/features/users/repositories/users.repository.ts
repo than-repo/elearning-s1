@@ -1,17 +1,14 @@
 //src\features\users\repositories\users.repository.ts
 import { ConfigService } from '@nestjs/config';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../../core/database/prisma.service';
 
-import { UpdateUserDto } from '../dtos/update-user.dto';
-import { FindAllUsersQuery } from '../dtos/find-all-users-query.dto';
 import { UserSelectResult } from '../interfaces/user-select-result.interface';
 import { UpdateUserPayload } from '../interfaces/update-user-payload.interface';
 import { UserRole } from 'generated/prisma/enums';
 import { CreateUserPayload } from '../interfaces/create-user-payload.interface';
 import { GetUsersPayload } from '../interfaces/get-users-payload.interface';
-import { UserCreateInput, UserUpdateInput } from 'generated/prisma/models';
+import { UserUpdateInput } from 'generated/prisma/models';
 
 @Injectable()
 export class UsersRepository {
