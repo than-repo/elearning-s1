@@ -33,6 +33,7 @@ export interface CourseSectionWhereInput {
   id?: string;
   courseId: string;
   isActive?: boolean;
+  deletedAt?: Date;
   includeDeleted?: boolean;
   titleContains?: string;
 }
@@ -73,7 +74,7 @@ export interface ICourseSectionRepository {
     sectionIndex: number,
   ): Promise<boolean>;
 
-  restore(id: string): Promise<CourseSection>;
+  restore(id: string, sectionIndex: number): Promise<CourseSection>;
 
   changeActive(id: string, isActive: boolean): Promise<CourseSection>;
   // Query / pagination

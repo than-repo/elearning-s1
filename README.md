@@ -118,6 +118,8 @@ elearning-system
 │     │  ├─ Course.ts
 │     │  ├─ CourseCategory.ts
 │     │  ├─ CourseInstructor.ts
+│     │  ├─ CourseReview.ts
+│     │  ├─ CourseReviewerCategory.ts
 │     │  ├─ CourseSection.ts
 │     │  ├─ Enrollment.ts
 │     │  ├─ FileMedia.ts
@@ -142,6 +144,8 @@ elearning-system
 │  │  ├─ cloudinary
 │  │  │  ├─ cloudinary.module.ts
 │  │  │  └─ cloudinary.service.ts
+│  │  ├─ decorators
+│  │  │  └─ current-user.decorator.ts
 │  │  ├─ filters
 │  │  │  ├─ prisma-client-exception.filter.spec.ts
 │  │  │  └─ prisma-client-exception.filter.ts
@@ -152,7 +156,9 @@ elearning-system
 │  │  │  └─ request-with-user.ts
 │  │  ├─ pipes
 │  │  └─ utils
+│  │     ├─ clean-data-util.spec.ts
 │  │     ├─ clean-data-util.ts
+│  │     ├─ prisma-error.util.spec.ts
 │  │     ├─ prisma-error.util.ts
 │  │     └─ slugify.util.ts
 │  ├─ config
@@ -194,23 +200,68 @@ elearning-system
 │  │  │     └─ jwt.strategy.ts
 │  │  ├─ courses
 │  │  │  ├─ controllers
+│  │  │  │  ├─ categories.controller.ts
 │  │  │  │  ├─ courses.controller.ts
-│  │  │  │  ├─ instructors-courses.controller.ts
+│  │  │  │  ├─ instructor-course.controller.ts
+│  │  │  │  ├─ public-courses.controller.ts
 │  │  │  │  └─ reviewer-courses.controller.ts
 │  │  │  ├─ courses.module.ts
 │  │  │  ├─ dtos
-│  │  │  │  ├─ category-response.dto.ts
-│  │  │  │  ├─ course-response.dto.ts
-│  │  │  │  ├─ create-category.dto.ts
-│  │  │  │  ├─ create-course.dto.ts
-│  │  │  │  └─ update-category.dto.ts
+│  │  │  │  ├─ category
+│  │  │  │  │  ├─ category-query.dto.ts
+│  │  │  │  │  ├─ category-response.dto.ts
+│  │  │  │  │  ├─ create-category.dto.ts
+│  │  │  │  │  ├─ set-category-active-status.dto.ts
+│  │  │  │  │  └─ update-category.dto.ts
+│  │  │  │  ├─ course
+│  │  │  │  │  ├─ course-response.dto.ts
+│  │  │  │  │  ├─ create-course.dto.ts
+│  │  │  │  │  ├─ paginated-course.dto.ts
+│  │  │  │  │  ├─ param-course.dto.ts
+│  │  │  │  │  ├─ query-course.dto.ts
+│  │  │  │  │  ├─ reviewer-course-query.dto.ts
+│  │  │  │  │  └─ update-course.dto.ts
+│  │  │  │  ├─ lesson
+│  │  │  │  │  ├─ create-lesson.dto.ts
+│  │  │  │  │  ├─ lesson-response.dto.ts
+│  │  │  │  │  ├─ query-lessons.dto.ts
+│  │  │  │  │  ├─ reorder-lesson.dto.ts
+│  │  │  │  │  └─ update-lesson.dto.ts
+│  │  │  │  ├─ paginated-response.dto.ts
+│  │  │  │  └─ section-lesson
+│  │  │  │     ├─ create-section.dti.ts
+│  │  │  │     ├─ query-section.dto.ts
+│  │  │  │     ├─ reorder-sections.dto.ts
+│  │  │  │     ├─ section-response.dto.ts
+│  │  │  │     └─ update-section.dto.ts
 │  │  │  ├─ interfaces
-│  │  │  │  └─ category.repository.interface.ts
+│  │  │  │  ├─ category.repository.interface.ts
+│  │  │  │  ├─ course-review.repository.interface.ts
+│  │  │  │  ├─ course-section.repository.interface.ts
+│  │  │  │  ├─ course.repository.interface.ts
+│  │  │  │  ├─ file-media.repository.interface.ts
+│  │  │  │  └─ lesson.repository.interface.ts
 │  │  │  ├─ repositories
+│  │  │  │  ├─ category-repository.token.ts
 │  │  │  │  ├─ category.repository.ts
-│  │  │  │  └─ courses.repository.ts
+│  │  │  │  ├─ course-repository.token.ts
+│  │  │  │  ├─ course-review-repository.token.ts
+│  │  │  │  ├─ course-section-repository.token.ts
+│  │  │  │  ├─ course-section-repository.ts
+│  │  │  │  ├─ course.repository.ts
+│  │  │  │  ├─ file-media.repository.token.ts
+│  │  │  │  ├─ file-media.repository.ts
+│  │  │  │  ├─ lesson-repository.token.ts
+│  │  │  │  ├─ lesson.repository.ts
+│  │  │  │  └─ prisma-course-review.repository.ts
 │  │  │  └─ services
-│  │  │     └─ courses.service.ts
+│  │  │     ├─ categories.service.ts
+│  │  │     ├─ course-access.service.ts
+│  │  │     ├─ course-sections.service.ts
+│  │  │     ├─ courses.service.ts
+│  │  │     ├─ file-media.service.ts
+│  │  │     ├─ lessons.service.ts
+│  │  │     └─ reviewer-courses.service.ts
 │  │  ├─ upload
 │  │  │  ├─ dtos
 │  │  │  │  └─ get-upload-signature.dto.ts
@@ -240,10 +291,7 @@ elearning-system
 │  │     │  ├─ admin-user.service.ts
 │  │     │  └─ users.service.ts
 │  │     └─ users.module.ts
-│  ├─ main.ts
-│  └─ __mocks__
-│     └─ @prisma
-│        └─ client.ts
+│  └─ main.ts
 ├─ structure.txt
 ├─ test
 │  ├─ app.e2e-spec.ts

@@ -1,7 +1,7 @@
 //src\features\upload\upload.service.ts
 import { ConfigService } from '@nestjs/config';
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { CloudinaryService } from '../../common/cloudinary/cloudinary.service';
+import { CloudinaryService } from '../../core/storage/cloudinary/cloudinary.service';
 import {
   GetUploadSignatureDto,
   SignatureResponseDto,

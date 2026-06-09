@@ -112,14 +112,14 @@ export class LessonRepository implements ILessonRepository {
       data: {
         deletedAt: new Date(),
         isActive: false,
-        lessonIndex: -Number(-Date.now()),
+        lessonIndex: -Number(Date.now()),
       },
     });
 
     return this.toDomain(lesson);
   }
 
-  async restore(id: string): Promise<Lesson> {
+  async restore(id: string, lessonIndex: number): Promise<Lesson> {
     const lesson = await this.prisma.lesson.update({
       where: {
         id,
@@ -127,6 +127,7 @@ export class LessonRepository implements ILessonRepository {
       data: {
         deletedAt: null,
         isActive: true,
+        lessonIndex,
       },
     });
 
@@ -303,6 +304,7 @@ export class LessonRepository implements ILessonRepository {
         where: {
           sectionId,
           deletedAt: null,
+          isActive: true,
           lessonIndex: {
             gt: deletedLessonIndex,
           },

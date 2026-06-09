@@ -70,7 +70,7 @@ export interface ILessonRepository {
 
   softDelete(id: string): Promise<Lesson>;
 
-  restore(id: string): Promise<Lesson>;
+  restore(id: string, lessonIndex: number): Promise<Lesson>;
 
   changeActive(id: string, isActive: boolean): Promise<Lesson>;
 

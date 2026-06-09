@@ -145,10 +145,10 @@ export class CourseSectionRepository implements ICourseSectionRepository {
       return true;
     });
   }
-  async restore(id: string): Promise<CourseSection> {
+  async restore(id: string, sectionIndex: number): Promise<CourseSection> {
     const section = await this.prisma.courseSection.update({
       where: { id },
-      data: { deletedAt: null },
+      data: { deletedAt: null, isActive: true, sectionIndex },
     });
 
     return this.toDomain(section);

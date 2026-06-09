@@ -1,3 +1,4 @@
+import type { CourseAccessService } from './course-access.service';
 // src/features/courses/services/lessons.service.ts
 
 import {
@@ -44,6 +45,8 @@ export class LessonsService {
 
     @Inject(COURSE_REPOSITORY)
     private readonly courseRepository: ICourseRepository,
+
+    private readonly courseAccessService: CourseAccessService,
   ) {}
 
   private async validateInstructorSectionAccess(
@@ -85,10 +88,10 @@ export class LessonsService {
     instructorId: string,
     dto: CreateLessonDto,
   ): Promise<LessonResponseDto> {
-    await this.validateInstructorSectionAccess(
+    await this.courseAccessService.ensureInstructorCanManageSection(
       courseId,
-      sectionId,
       instructorId,
+      sectionId,
     );
 
     const lessonIndex =
