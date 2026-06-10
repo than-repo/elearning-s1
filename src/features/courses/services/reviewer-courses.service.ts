@@ -2,14 +2,14 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { CourseReviewStatus } from 'generated/prisma/enums';
+import { CourseReviewStatus, CourseStatus } from 'generated/prisma/enums';
 
 import {
   COURSE_VIEW_GROUPS,
-  CourseResponseDto,
 } from '../dtos/course/course-response.dto';
 import { ReviewerCourseQueryDto } from '../dtos/course/reviewer-course-query.dto';
 import { PaginatedResponse } from '../dtos/paginated-response.dto';
+import { ReviewerCourseResponseDto } from '../dtos/course/reviewer-course-response.dto';
 
 import { COURSE_REVIEW_REPOSITORY } from '../repositories/course-review-repository.token';
 import type { ICourseReviewRepository } from '../interfaces/course-review.repository.interface';
@@ -29,22 +29,16 @@ export class ReviewerCoursesService {
   async findReviewableCourses(
     reviewerId: string,
     dto: ReviewerCourseQueryDto,
-  ): Promise<PaginatedResponse<CourseResponseDto>> {
-    const page = this.normalizePage(dto.page);
-    const limit = this.normalizeLimit(dto.limit);
+  ): Promise<PaginatedResponse<ReviewerCourseResponseDto>> {
+    const { search, categoryId } = dto;
+
+    const limit = dto.limit ?? 10;
+    const page = dto.page ?? 1;
     const offset = (page - 1) * limit;
 
-    const search = this.normalizeSearch(dto.search);
-    const categoryId = this.normalizeString(dto.categoryId);
+    const reviewStatus = dto.reviewStatus ?? CourseReviewStatus.PENDING;
 
-    /**
-     * "Reviewable" means the reviewer can still take action.
-     * Therefore this endpoint should only return PENDING reviews.
-     *
-     * Approved / rejected / changes-requested reviews should belong to
-     * another endpoint, for example: findMyReviewHistory().
-     */
-    const reviewStatus = CourseReviewStatus.PENDING;
+    const courseStatus = dto.status ?? CourseStatus.IN_REVIEW;
 
     const sortField = dto.sortField ?? ReviewerCourseSortField.SUBMITTED_AT;
 
@@ -55,7 +49,7 @@ export class ReviewerCoursesService {
         reviewerId,
         search,
         level: dto.level,
-        status: dto.status,
+        status: courseStatus,
         categoryId,
         reviewStatus,
         limit,
@@ -68,7 +62,7 @@ export class ReviewerCoursesService {
         reviewerId,
         search,
         level: dto.level,
-        status: dto.status,
+        status: courseStatus,
         categoryId,
         reviewStatus,
       }),
@@ -77,8 +71,8 @@ export class ReviewerCoursesService {
     const totalPages = Math.ceil(total / limit);
 
     const data = plainToInstance(
-      CourseResponseDto,
-      reviewTasks.map((reviewTask) => reviewTask.course),
+      ReviewerCourseResponseDto,
+      reviewTasks,
       {
         excludeExtraneousValues: true,
         groups: [COURSE_VIEW_GROUPS.REVIEWER],
@@ -96,49 +90,5 @@ export class ReviewerCoursesService {
         hasPreviousPage: page > 1,
       },
     };
-  }
-
-  private normalizePage(page?: number): number {
-    if (!page || Number.isNaN(page) || page < 1) {
-      return 1;
-    }
-
-    return page;
-  }
-
-  private normalizeLimit(limit?: number): number {
-    if (!limit || Number.isNaN(limit) || limit < 1) {
-      return 10;
-    }
-
-    return Math.min(limit, 50);
-  }
-
-  private normalizeSearch(search?: string): string | undefined {
-    if (!search) {
-      return undefined;
-    }
-
-    const normalizedSearch = search.trim();
-
-    if (!normalizedSearch) {
-      return undefined;
-    }
-
-    return normalizedSearch;
-  }
-
-  private normalizeString(value?: string): string | undefined {
-    if (!value) {
-      return undefined;
-    }
-
-    const normalizedValue = value.trim();
-
-    if (!normalizedValue) {
-      return undefined;
-    }
-
-    return normalizedValue;
   }
 }

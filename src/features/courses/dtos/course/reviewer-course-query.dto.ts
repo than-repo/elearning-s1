@@ -2,7 +2,16 @@
 
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
 import {
   CourseLevel,
   CourseReviewStatus,
@@ -29,6 +38,7 @@ export class ReviewerCourseQueryDto {
   })
   @IsOptional()
   @IsString()
+  @MaxLength(100)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   search?: string;
 
@@ -64,6 +74,7 @@ export class ReviewerCourseQueryDto {
     description: 'Filter courses by category ID',
   })
   @IsOptional()
+  @IsUUID('4')
   @IsString()
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   categoryId?: string;

@@ -6,7 +6,6 @@ import { PrismaModule } from 'src/core/database/prisma.module';
 import { CategoryRepository } from './repositories/category.repository';
 import { CATEGORY_REPOSITORY } from './repositories/category-repository.token';
 import { CategoriesService } from './services/categories.service';
-import { CategoriesController } from './controllers/categories.controller';
 import { COURSE_REPOSITORY } from './repositories/course-repository.token';
 import { CoursesService } from './services/courses.service';
 import { COURSE_SECTION_REPOSITORY } from './repositories/course-section-repository.token';
@@ -23,9 +22,13 @@ import { InstructorCoursesController } from './controllers/instructor-course.con
 import { ReviewerCoursesController } from './controllers/reviewer-courses.controller';
 import { ReviewerCoursesService } from './services/reviewer-courses.service';
 
-import { PrismaCourseReviewRepository } from './repositories/prisma-course-review.repository';
+import { CourseReviewRepository } from './repositories/course-review.repository';
 import { COURSE_REVIEW_REPOSITORY } from './repositories/course-review-repository.token';
 import { CourseAccessService } from './services/course-access.service';
+import { AdminCoursesController } from './controllers/admin-courses.controller';
+import { CourseReviewAuthorizationService } from './services/course-review-authorization.service';
+import { REVIEWER_CATEGORY_AUTHORIZATION_REPOSITORY } from './repositories/reviewer-category-authorization-repository.token';
+import { ReviewerCategoryAuthorizationRepository } from './repositories/reviewer-category-authorization.repository';
 
 @Module({
   providers: [
@@ -68,19 +71,24 @@ import { CourseAccessService } from './services/course-access.service';
 
     //Reviewer
     ReviewerCoursesService,
+    CourseReviewAuthorizationService,
     CourseAccessService,
     {
       provide: COURSE_REVIEW_REPOSITORY,
-      useClass: PrismaCourseReviewRepository,
+      useClass: CourseReviewRepository,
+    },
+    {
+      provide: REVIEWER_CATEGORY_AUTHORIZATION_REPOSITORY,
+      useClass: ReviewerCategoryAuthorizationRepository,
     },
   ],
   exports: [],
   imports: [PrismaModule],
   controllers: [
-    CategoriesController,
     PublicCoursesController,
     InstructorCoursesController,
     ReviewerCoursesController,
+    AdminCoursesController,
   ],
 })
 export class CoursesModule {}

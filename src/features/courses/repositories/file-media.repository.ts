@@ -31,6 +31,9 @@ export class FileMediaRepository implements IFileMediaRepository {
       filename: fileMedia.filename,
       mimeType: fileMedia.mimeType,
       sizeInBytes: fileMedia.sizeInBytes,
+      createdAt: fileMedia.createdAt,
+      updatedAt: fileMedia.updatedAt,
+      deletedAt: fileMedia.deletedAt,
     };
   }
 
@@ -51,6 +54,7 @@ export class FileMediaRepository implements IFileMediaRepository {
       type,
       filenameContains,
       mimeType,
+      includeDeleted,
     } = where ?? {};
 
     if (id) wherePrisma.id = id;
@@ -73,6 +77,10 @@ export class FileMediaRepository implements IFileMediaRepository {
 
     if (mimeType) {
       wherePrisma.mimeType = mimeType;
+    }
+
+    if (includeDeleted !== true) {
+      wherePrisma.deletedAt = null;
     }
 
     return wherePrisma;
@@ -104,9 +112,25 @@ export class FileMediaRepository implements IFileMediaRepository {
   }
 
   async findById(id: string): Promise<FileMedia | null> {
-    const fileMedia = await this.prisma.fileMedia.findUnique({
+    const fileMedia = await this.prisma.fileMedia.findFirst({
       where: {
         id,
+        deletedAt: null,
+      },
+    });
+
+    return fileMedia ? this.toDomain(fileMedia) : null;
+  }
+
+  async findByIdInLesson(
+    fileMediaId: string,
+    lessonId: string,
+  ): Promise<FileMedia | null> {
+    const fileMedia = await this.prisma.fileMedia.findFirst({
+      where: {
+        id: fileMediaId,
+        lessonId,
+        deletedAt: null,
       },
     });
 
@@ -126,6 +150,39 @@ export class FileMediaRepository implements IFileMediaRepository {
     return this.toDomain(fileMedia);
   }
 
+  async updateInLesson(
+    fileMediaId: string,
+    lessonId: string,
+    input: UpdateFileMediaInput,
+  ): Promise<FileMedia | null> {
+    const fileMedia = await this.prisma.$transaction(async (tx) => {
+      const result = await tx.fileMedia.updateMany({
+        where: {
+          id: fileMediaId,
+          lessonId,
+          deletedAt: null,
+        },
+        data: {
+          ...input,
+        },
+      });
+
+      if (result.count !== 1) {
+        return null;
+      }
+
+      return tx.fileMedia.findFirst({
+        where: {
+          id: fileMediaId,
+          lessonId,
+          deletedAt: null,
+        },
+      });
+    });
+
+    return fileMedia ? this.toDomain(fileMedia) : null;
+  }
+
   async delete(id: string): Promise<FileMedia> {
     const fileMedia = await this.prisma.fileMedia.delete({
       where: {
@@ -134,6 +191,24 @@ export class FileMediaRepository implements IFileMediaRepository {
     });
 
     return this.toDomain(fileMedia);
+  }
+
+  async softDeleteInLesson(
+    fileMediaId: string,
+    lessonId: string,
+  ): Promise<boolean> {
+    const result = await this.prisma.fileMedia.updateMany({
+      where: {
+        id: fileMediaId,
+        lessonId,
+        deletedAt: null,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+
+    return result.count === 1;
   }
 
   // Query / Pagination
@@ -161,6 +236,7 @@ export class FileMediaRepository implements IFileMediaRepository {
     const fileMediaList = await this.prisma.fileMedia.findMany({
       where: {
         lessonId,
+        deletedAt: null,
       },
       orderBy: {
         filename: 'asc',
@@ -178,6 +254,7 @@ export class FileMediaRepository implements IFileMediaRepository {
       where: {
         id: fileMediaId,
         lessonId,
+        deletedAt: null,
       },
     });
 
@@ -187,9 +264,10 @@ export class FileMediaRepository implements IFileMediaRepository {
   async findByCloudinaryPublicId(
     cloudinaryPublicId: string,
   ): Promise<FileMedia | null> {
-    const fileMedia = await this.prisma.fileMedia.findUnique({
+    const fileMedia = await this.prisma.fileMedia.findFirst({
       where: {
         cloudinaryPublicId,
+        deletedAt: null,
       },
     });
 

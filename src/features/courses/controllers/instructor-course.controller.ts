@@ -49,6 +49,11 @@ import { LessonsService } from '../services/lessons.service';
 import { UpdateLessonDto } from '../dtos/lesson/update-lesson.dto';
 import { QueryLessonsDto } from '../dtos/lesson/query-lessons.dto';
 import { ReorderLessonsDto } from '../dtos/lesson/reorder-lesson.dto';
+import { CreateFileMediaDto } from '../dtos/file-media/create-file-media.dto';
+import { FileMediaResponseDto } from '../dtos/file-media/file-media-response.dto';
+import { QueryFileMediaDto } from '../dtos/file-media/query-file-media.dto';
+import { UpdateFileMediaDto } from '../dtos/file-media/update-file-media.dto';
+import { FileMediaService } from '../services/file-media.service';
 
 @Controller({ path: 'instructor/courses', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -60,6 +65,7 @@ export class InstructorCoursesController {
     private readonly coursesService: CoursesService,
     private readonly courseSectionsService: CourseSectionsService,
     private readonly lessonsService: LessonsService,
+    private readonly fileMediaService: FileMediaService,
   ) {}
 
   @Get()
@@ -373,6 +379,160 @@ export class InstructorCoursesController {
       courseId,
       sectionId,
       lessonId,
+      instructorId,
+    );
+  }
+
+  //==========================File Media============================
+
+  @Post(':courseId/sections/:sectionId/lessons/:lessonId/files')
+  @ApiOperation({ summary: 'Create File Media - Instructor' })
+  @ApiCreatedResponse({
+    description: 'File media created successfully.',
+    type: FileMediaResponseDto,
+  })
+  @ApiBadRequestResponse({ description: 'Invalid request data.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({
+    description: 'You do not have permission to manage this course.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Course, section, or lesson not found.',
+  })
+  async createFileMedia(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
+    @Param('lessonId', ParseUUIDPipe) lessonId: string,
+    @CurrentUser('sub') instructorId: string,
+    @Body() dto: CreateFileMediaDto,
+  ): Promise<FileMediaResponseDto> {
+    return this.fileMediaService.createFileMedia(
+      courseId,
+      sectionId,
+      lessonId,
+      instructorId,
+      dto,
+    );
+  }
+
+  @Get(':courseId/sections/:sectionId/lessons/:lessonId/files')
+  @ApiOperation({ summary: 'Get File Media List - Instructor' })
+  @ApiOkResponse({
+    description: 'File media list retrieved successfully.',
+    type: PaginatedResponse<FileMediaResponseDto>,
+  })
+  @ApiBadRequestResponse({ description: 'Invalid query parameters.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({
+    description: 'You do not have permission to manage this course.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Course, section, or lesson not found.',
+  })
+  async getFileMediaList(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
+    @Param('lessonId', ParseUUIDPipe) lessonId: string,
+    @CurrentUser('sub') instructorId: string,
+    @Query() query: QueryFileMediaDto,
+  ): Promise<PaginatedResponse<FileMediaResponseDto>> {
+    return this.fileMediaService.getFileMediaList(
+      courseId,
+      sectionId,
+      lessonId,
+      instructorId,
+      query,
+    );
+  }
+
+  @Get(':courseId/sections/:sectionId/lessons/:lessonId/files/:fileMediaId')
+  @ApiOperation({ summary: 'Get File Media Detail - Instructor' })
+  @ApiOkResponse({
+    description: 'File media retrieved successfully.',
+    type: FileMediaResponseDto,
+  })
+  @ApiBadRequestResponse({ description: 'Invalid request parameters.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({
+    description: 'You do not have permission to manage this course.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Course, section, lesson, or file media not found.',
+  })
+  async getFileMedia(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
+    @Param('lessonId', ParseUUIDPipe) lessonId: string,
+    @Param('fileMediaId', ParseUUIDPipe) fileMediaId: string,
+    @CurrentUser('sub') instructorId: string,
+  ): Promise<FileMediaResponseDto> {
+    return this.fileMediaService.getFileMedia(
+      courseId,
+      sectionId,
+      lessonId,
+      fileMediaId,
+      instructorId,
+    );
+  }
+
+  @Patch(':courseId/sections/:sectionId/lessons/:lessonId/files/:fileMediaId')
+  @ApiOperation({ summary: 'Update File Media - Instructor' })
+  @ApiOkResponse({
+    description: 'File media updated successfully.',
+    type: FileMediaResponseDto,
+  })
+  @ApiBadRequestResponse({ description: 'Invalid request data.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({
+    description: 'You do not have permission to manage this course.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Course, section, lesson, or file media not found.',
+  })
+  async updateFileMedia(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
+    @Param('lessonId', ParseUUIDPipe) lessonId: string,
+    @Param('fileMediaId', ParseUUIDPipe) fileMediaId: string,
+    @CurrentUser('sub') instructorId: string,
+    @Body() dto: UpdateFileMediaDto,
+  ): Promise<FileMediaResponseDto> {
+    return this.fileMediaService.updateFileMedia(
+      courseId,
+      sectionId,
+      lessonId,
+      fileMediaId,
+      instructorId,
+      dto,
+    );
+  }
+
+  @Delete(':courseId/sections/:sectionId/lessons/:lessonId/files/:fileMediaId')
+  @HttpCode(204)
+  @ApiOperation({ summary: 'Delete File Media - Instructor' })
+  @ApiNoContentResponse({
+    description: 'File media deleted successfully.',
+  })
+  @ApiBadRequestResponse({ description: 'Invalid request parameters.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({
+    description: 'You do not have permission to manage this course.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Course, section, lesson, or file media not found.',
+  })
+  async deleteFileMedia(
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
+    @Param('lessonId', ParseUUIDPipe) lessonId: string,
+    @Param('fileMediaId', ParseUUIDPipe) fileMediaId: string,
+    @CurrentUser('sub') instructorId: string,
+  ): Promise<void> {
+    await this.fileMediaService.deleteFileMedia(
+      courseId,
+      sectionId,
+      lessonId,
+      fileMediaId,
       instructorId,
     );
   }

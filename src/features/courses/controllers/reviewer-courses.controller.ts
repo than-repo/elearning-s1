@@ -15,10 +15,12 @@ import { JwtAuthGuard } from 'src/features/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/features/auth/guards/roles.guard';
 import { ReviewerCoursesService } from '../services/reviewer-courses.service';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
-import { PaginatedCourseResponseDto } from '../dtos/course/paginated-course.dto';
 import { PaginatedResponse } from '../dtos/paginated-response.dto';
-import { CourseResponseDto } from '../dtos/course/course-response.dto';
 import { ReviewerCourseQueryDto } from '../dtos/course/reviewer-course-query.dto';
+import {
+  PaginatedReviewerCourseResponseDto,
+  ReviewerCourseResponseDto,
+} from '../dtos/course/reviewer-course-response.dto';
 
 @Controller({ path: 'reviewer/courses', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -31,14 +33,14 @@ export class ReviewerCoursesController {
   ) {}
   @Get()
   @ApiOperation({ summary: 'Get courses available for review - Reviewer' })
-  @ApiOkResponse({ type: PaginatedCourseResponseDto })
+  @ApiOkResponse({ type: PaginatedReviewerCourseResponseDto })
   @ApiBadRequestResponse()
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
   async findReviewableCourses(
     @CurrentUser('sub') reviewerId: string,
     @Query() dto: ReviewerCourseQueryDto,
-  ): Promise<PaginatedResponse<CourseResponseDto>> {
+  ): Promise<PaginatedResponse<ReviewerCourseResponseDto>> {
     return this.reviewerCoursesService.findReviewableCourses(reviewerId, dto);
   }
 }

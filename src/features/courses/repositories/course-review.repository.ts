@@ -25,14 +25,29 @@ const courseReviewWithCourseInclude = {
   course: {
     include: {
       courseCategories: {
+        where: {
+          category: {
+            deletedAt: null,
+            isActive: true,
+          },
+        },
         include: {
-          category: true,
+          category: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
         },
       },
       instructors: {
         where: {
           deletedAt: null,
           isActive: true,
+          instructor: {
+            isActive: true,
+          },
         },
         include: {
           instructor: {
@@ -55,7 +70,7 @@ type PrismaCourseReviewWithCourse = Prisma.CourseReviewGetPayload<{
 }>;
 
 @Injectable()
-export class PrismaCourseReviewRepository implements ICourseReviewRepository {
+export class CourseReviewRepository implements ICourseReviewRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findReviewableCourses(

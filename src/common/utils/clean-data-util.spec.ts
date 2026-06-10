@@ -12,23 +12,23 @@ describe('cleanData', () => {
     });
   });
 
-  it('trims string values', () => {
+  it('preserves string values without trimming', () => {
     const result = cleanData({
       name: '   NestJS   ',
     });
 
     expect(result).toEqual({
-      name: 'NestJS',
+      name: '   NestJS   ',
     });
   });
 
-  it('converts empty string to null', () => {
+  it('preserves empty string values without converting to null', () => {
     const result = cleanData({
       description: '   ',
     });
 
     expect(result).toEqual({
-      description: null,
+      description: '   ',
     });
   });
 
@@ -102,8 +102,8 @@ describe('cleanData', () => {
     });
 
     expect(result).toEqual({
-      name: 'Category',
-      description: null,
+      name: '  Category ',
+      description: '   ',
       order: 1,
       isActive: true,
       deletedAt: null,

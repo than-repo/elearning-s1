@@ -200,7 +200,7 @@ elearning-system
 │  │  │     └─ jwt.strategy.ts
 │  │  ├─ courses
 │  │  │  ├─ controllers
-│  │  │  │  ├─ categories.controller.ts
+│  │  │  │  ├─ admin-courses.controller.ts
 │  │  │  │  ├─ courses.controller.ts
 │  │  │  │  ├─ instructor-course.controller.ts
 │  │  │  │  ├─ public-courses.controller.ts

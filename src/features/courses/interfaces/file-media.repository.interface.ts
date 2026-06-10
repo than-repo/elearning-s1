@@ -12,6 +12,9 @@ export interface FileMedia {
   filename?: string | null;
   mimeType?: string | null;
   sizeInBytes?: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date | null;
 }
 
 /** Input for creating a new file media */
@@ -43,10 +46,16 @@ export interface FileMediaWhereInput {
   type?: MediaTypeEnum;
   filenameContains?: string;
   mimeType?: string;
+  includeDeleted?: boolean;
 }
 
 /** Ordering options */
-export type FileMediaSortField = 'filename' | 'type' | 'sizeInBytes';
+export type FileMediaSortField =
+  | 'filename'
+  | 'type'
+  | 'sizeInBytes'
+  | 'createdAt'
+  | 'updatedAt';
 
 export type SortDirection = 'asc' | 'desc';
 
@@ -69,9 +78,22 @@ export interface IFileMediaRepository {
 
   findById(id: string): Promise<FileMedia | null>;
 
+  findByIdInLesson(
+    fileMediaId: string,
+    lessonId: string,
+  ): Promise<FileMedia | null>;
+
   update(id: string, input: UpdateFileMediaInput): Promise<FileMedia>;
 
+  updateInLesson(
+    fileMediaId: string,
+    lessonId: string,
+    input: UpdateFileMediaInput,
+  ): Promise<FileMedia | null>;
+
   delete(id: string): Promise<FileMedia>;
+
+  softDeleteInLesson(fileMediaId: string, lessonId: string): Promise<boolean>;
 
   // Query / pagination
   findMany(params?: FindManyFileMediaParams): Promise<FileMedia[]>;

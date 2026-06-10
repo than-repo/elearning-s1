@@ -1558,7 +1558,10 @@ export const FileMediaScalarFieldEnum = {
   type: 'type',
   filename: 'filename',
   mimeType: 'mimeType',
-  sizeInBytes: 'sizeInBytes'
+  sizeInBytes: 'sizeInBytes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type FileMediaScalarFieldEnum = (typeof FileMediaScalarFieldEnum)[keyof typeof FileMediaScalarFieldEnum]
