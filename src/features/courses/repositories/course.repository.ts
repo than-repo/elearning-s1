@@ -92,6 +92,8 @@ export class CourseRepository implements ICourseRepository {
       isActive: course.isActive,
       certificateEnabled: course.certificateEnabled,
       publishedAt: course.publishedAt,
+      reviewClaimedById: course.reviewClaimedById,
+      reviewClaimedAt: course.reviewClaimedAt,
       createdAt: course.createdAt,
       updatedAt: course.updatedAt,
       deletedAt: course.deletedAt,
@@ -450,6 +452,39 @@ export class CourseRepository implements ICourseRepository {
     });
 
     return this.toCourseWithDetailsModel(course);
+  }
+  async submitForReview(courseId: string): Promise<CourseModel | null> {
+    const course = await this.prisma.$transaction(async (tx) => {
+      const updateResult = await tx.course.updateMany({
+        where: {
+          id: courseId,
+          deletedAt: null,
+          status: {
+            in: [CourseStatus.DRAFT, CourseStatus.CHANGES_REQUESTED],
+          },
+        },
+        data: {
+          status: CourseStatus.IN_REVIEW,
+          publishedAt: null,
+          reviewClaimedById: null,
+          reviewClaimedAt: null,
+        },
+      });
+
+      if (updateResult.count !== 1) {
+        return null;
+      }
+
+      return tx.course.findFirst({
+        where: {
+          id: courseId,
+          deletedAt: null,
+        },
+        include: courseWithPublicDetail,
+      });
+    });
+
+    return course ? this.toCourseWithDetailsModel(course) : null;
   }
   async softDelete(id: string): Promise<CourseModel> {
     const course = await this.prisma.course.update({

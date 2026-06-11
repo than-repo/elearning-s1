@@ -57,3 +57,15 @@ export class PaginatedReviewerCourseResponseDto {
   })
   meta!: PaginationMetaDto;
 }
+
+export class PaginatedAvailableReviewerCourseResponseDto {
+  @ApiProperty({
+    type: () => [CourseResponseDto],
+  })
+  data!: CourseResponseDto[];
+
+  @ApiProperty({
+    type: () => PaginationMetaDto,
+  })
+  meta!: PaginationMetaDto;
+}

@@ -12,9 +12,7 @@ import {
   InvalidCourseSectionOrderError,
 } from '../interfaces/course-section.repository.interface';
 import type {
-  CourseSection,
   CreateAtEndCourseSectionInput,
-  CreateCourseSectionInput,
   FindManyCourseSectionParams,
   ICourseSectionRepository,
   UpdateCourseSectionInput,

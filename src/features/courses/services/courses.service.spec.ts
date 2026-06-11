@@ -759,6 +759,96 @@ describe('CoursesService', () => {
       expect(courseRepository.softDelete).not.toHaveBeenCalled();
     });
   });
+
+  describe('submitDraftCourseForReview', () => {
+    it('submits an owned draft course for review', async () => {
+      const submittedCourse = makeCourse({ status: CourseStatus.IN_REVIEW });
+      courseRepository.findById.mockResolvedValue(
+        makeCourse({ status: CourseStatus.DRAFT }),
+      );
+      courseRepository.submitForReview.mockResolvedValue(submittedCourse);
+
+      const result = await service.submitDraftCourseForReview(
+        instructorId,
+        courseId,
+      );
+
+      expect(courseRepository.findById).toHaveBeenCalledWith(courseId);
+      expect(
+        courseAccessService.ensureInstructorCanManageCourse,
+      ).toHaveBeenCalledWith(courseId, instructorId);
+      expect(courseRepository.submitForReview).toHaveBeenCalledWith(courseId);
+      expect(result.status).toBe(CourseStatus.IN_REVIEW);
+    });
+
+    it('submits an owned changes-requested course for review', async () => {
+      const submittedCourse = makeCourse({ status: CourseStatus.IN_REVIEW });
+      courseRepository.findById.mockResolvedValue(
+        makeCourse({ status: CourseStatus.CHANGES_REQUESTED }),
+      );
+      courseRepository.submitForReview.mockResolvedValue(submittedCourse);
+
+      const result = await service.submitDraftCourseForReview(
+        instructorId,
+        courseId,
+      );
+
+      expect(courseRepository.submitForReview).toHaveBeenCalledWith(courseId);
+      expect(result.status).toBe(CourseStatus.IN_REVIEW);
+    });
+
+    it('throws when submitting a missing course', async () => {
+      courseRepository.findById.mockResolvedValue(null);
+
+      await expect(
+        service.submitDraftCourseForReview(instructorId, courseId),
+      ).rejects.toThrow('COURSE_NOT_FOUND');
+      expect(courseRepository.submitForReview).not.toHaveBeenCalled();
+    });
+
+    it('propagates instructor access errors during submit', async () => {
+      const error = new NotFoundException('COURSE NOT FOUND');
+      courseRepository.findById.mockResolvedValue(
+        makeCourse({ status: CourseStatus.DRAFT }),
+      );
+      courseAccessService.ensureInstructorCanManageCourse.mockRejectedValue(
+        error,
+      );
+
+      await expect(
+        service.submitDraftCourseForReview(otherInstructorId, courseId),
+      ).rejects.toBe(error);
+      expect(courseRepository.submitForReview).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      CourseStatus.IN_REVIEW,
+      CourseStatus.PUBLISHED,
+      CourseStatus.ARCHIVED,
+    ])('rejects submitting %s courses', async (status) => {
+      courseRepository.findById.mockResolvedValue(makeCourse({ status }));
+
+      await expect(
+        service.submitDraftCourseForReview(instructorId, courseId),
+      ).rejects.toThrow(
+        'ONLY_DRAFT_OR_CHANGES_REQUESTED_COURSE_CAN_BE_SUBMITTED_FOR_REVIEW',
+      );
+      expect(courseRepository.submitForReview).not.toHaveBeenCalled();
+    });
+
+    it('returns an invalid status error when the repository update loses a race', async () => {
+      courseRepository.findById.mockResolvedValue(
+        makeCourse({ status: CourseStatus.DRAFT }),
+      );
+      courseRepository.submitForReview.mockResolvedValue(null);
+
+      await expect(
+        service.submitDraftCourseForReview(instructorId, courseId),
+      ).rejects.toThrow(
+        'ONLY_DRAFT_OR_CHANGES_REQUESTED_COURSE_CAN_BE_SUBMITTED_FOR_REVIEW',
+      );
+    });
+  });
 });
 
 function createCourseRepositoryMock(): CourseRepositoryMock {
@@ -772,6 +862,7 @@ function createCourseRepositoryMock(): CourseRepositoryMock {
     count: jest.fn(),
     update: jest.fn(),
     updateDraftCourse: jest.fn(),
+    submitForReview: jest.fn(),
     softDelete: jest.fn(),
     restore: jest.fn(),
     publish: jest.fn(),

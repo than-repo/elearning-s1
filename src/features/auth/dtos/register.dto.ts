@@ -18,13 +18,13 @@ export class RegisterDto {
   @IsString()
   @MinLength(2, { message: 'Full name must be at least 2 characters' })
   @MaxLength(100, { message: 'Full name cannot exceed 100 characters' })
-  @Transform(({ value }) => value?.trim())
+  @Transform(({ value }) => (value ? value.trim() : value))
   fullName!: string;
 
   @IsNotEmpty({ message: 'Email is required' })
   @IsEmail({}, { message: 'Please provide a valid email address' })
   @MaxLength(255)
-  @Transform(({ value }) => value?.toLowerCase().trim())
+  @Transform(({ value }) => (value ? value.toLowerCase().trim() : value))
   email!: string;
 
   @IsNotEmpty({ message: 'Password is required' })

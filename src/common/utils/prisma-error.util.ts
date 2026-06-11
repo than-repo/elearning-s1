@@ -25,7 +25,7 @@ export class PrismaErrorHandler {
 
     const { code, meta } = prismaError;
     const entity = context?.entity ?? 'Record';
-    const fieldMsg = context?.fieldMsg ?? {};
+    const fieldMsg = context?.fieldMsg ?? null;
 
     const target = meta?.target;
     switch (code) {
@@ -35,7 +35,7 @@ export class PrismaErrorHandler {
         }
 
         for (const field of target) {
-          const msg = fieldMsg[field];
+          const msg = fieldMsg !== null ? fieldMsg[field] : 'Have no message';
           if (msg) {
             throw new ConflictException(msg);
           }

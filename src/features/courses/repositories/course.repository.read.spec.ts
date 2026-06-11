@@ -356,7 +356,10 @@ describe('CourseRepository read queries', () => {
   it('existsBySlug ignores soft-deleted rows and can exclude the current course', async () => {
     prisma.course.count.mockResolvedValue(1);
 
-    const result = await repository.existsBySlug('nestjs-masterclass', courseId);
+    const result = await repository.existsBySlug(
+      'nestjs-masterclass',
+      courseId,
+    );
 
     expect(prisma.course.count).toHaveBeenCalledWith({
       where: {

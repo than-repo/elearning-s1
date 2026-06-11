@@ -44,6 +44,8 @@ import { CourseRepository } from './course.repository';
 type TransactionClientMock = {
   course: {
     update: jest.Mock;
+    updateMany: jest.Mock;
+    findFirst: jest.Mock;
   };
   courseCategory: {
     deleteMany: jest.Mock;
@@ -69,6 +71,8 @@ describe('CourseRepository update behavior', () => {
     tx = {
       course: {
         update: jest.fn(),
+        updateMany: jest.fn(),
+        findFirst: jest.fn(),
       },
       courseCategory: {
         deleteMany: jest.fn(),
@@ -77,8 +81,8 @@ describe('CourseRepository update behavior', () => {
     };
 
     prisma = {
-      $transaction: jest.fn((callback: (client: TransactionClientMock) => unknown) =>
-        callback(tx),
+      $transaction: jest.fn(
+        (callback: (client: TransactionClientMock) => unknown) => callback(tx),
       ),
     };
 
@@ -323,6 +327,84 @@ describe('CourseRepository update behavior', () => {
       );
       expect(result.whatYouWillLearn).toBeNull();
       expect(result.requirements).toEqual(['Need TypeScript']);
+    });
+  });
+
+  describe('submitForReview', () => {
+    it('updates only non-deleted draft or changes-requested courses', async () => {
+      tx.course.updateMany.mockResolvedValue({ count: 1 });
+      tx.course.findFirst.mockResolvedValue(
+        makeCourseWithDetails({
+          status: CourseStatus.IN_REVIEW,
+          publishedAt: null,
+          reviewClaimedById: null,
+          reviewClaimedAt: null,
+        }),
+      );
+
+      const result = await repository.submitForReview(courseId);
+
+      expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+      expect(tx.course.updateMany).toHaveBeenCalledWith({
+        where: {
+          id: courseId,
+          deletedAt: null,
+          status: {
+            in: [CourseStatus.DRAFT, CourseStatus.CHANGES_REQUESTED],
+          },
+        },
+        data: {
+          status: CourseStatus.IN_REVIEW,
+          publishedAt: null,
+          reviewClaimedById: null,
+          reviewClaimedAt: null,
+        },
+      });
+      expect(result?.status).toBe(CourseStatus.IN_REVIEW);
+      expect(result?.publishedAt).toBeNull();
+      expect(result?.reviewClaimedById).toBeNull();
+      expect(result?.reviewClaimedAt).toBeNull();
+    });
+
+    it('returns null when no eligible course was updated', async () => {
+      tx.course.updateMany.mockResolvedValue({ count: 0 });
+
+      const result = await repository.submitForReview(courseId);
+
+      expect(result).toBeNull();
+      expect(tx.course.findFirst).not.toHaveBeenCalled();
+    });
+
+    it('returns course details after submitting for review', async () => {
+      tx.course.updateMany.mockResolvedValue({ count: 1 });
+      tx.course.findFirst.mockResolvedValue(
+        makeCourseWithDetails({
+          status: CourseStatus.IN_REVIEW,
+        }),
+      );
+
+      const result = await repository.submitForReview(courseId);
+
+      expect(tx.course.findFirst).toHaveBeenCalledWith({
+        where: {
+          id: courseId,
+          deletedAt: null,
+        },
+        include: expect.any(Object),
+      });
+      expect(result?.categories).toEqual([
+        {
+          id: categoryId,
+          name: 'Backend',
+          slug: 'backend',
+        },
+      ]);
+      expect(result?.instructors).toEqual([
+        {
+          id: instructorId,
+          fullName: 'Instructor One',
+        },
+      ]);
     });
   });
 });

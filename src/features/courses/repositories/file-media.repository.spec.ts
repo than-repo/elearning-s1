@@ -76,8 +76,8 @@ describe('FileMediaRepository', () => {
         delete: jest.fn(),
         count: jest.fn(),
       },
-      $transaction: jest.fn((callback: (client: TransactionClientMock) => unknown) =>
-        callback(tx),
+      $transaction: jest.fn(
+        (callback: (client: TransactionClientMock) => unknown) => callback(tx),
       ),
     };
 

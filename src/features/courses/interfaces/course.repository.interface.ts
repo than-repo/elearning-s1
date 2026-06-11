@@ -45,6 +45,8 @@ export interface CourseModel {
   isActive: boolean;
   certificateEnabled: boolean;
   publishedAt: Date | null;
+  reviewClaimedById?: string | null;
+  reviewClaimedAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -158,6 +160,8 @@ export interface ICourseRepository {
   update(id: string, input: UpdateCourseInput): Promise<CourseModel>;
 
   updateDraftCourse(id: string, input: UpdateCourseInput): Promise<CourseModel>;
+
+  submitForReview(id: string): Promise<CourseModel | null>;
   // deletedAt: new Date(),
   // isActive: false
   softDelete(id: string): Promise<CourseModel>;

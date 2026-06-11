@@ -33,6 +33,7 @@ import { AuthResponseDto } from './dtos/login-response.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import type { RequestWithCookies } from './interfaces/request-with-cookies';
 import type { RequestWithUser } from '../../common/interfaces/request-with-user';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 
 @ApiTags('Auth')
 @Controller({ path: 'auth', version: '1' })
@@ -72,9 +73,9 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const result = await this.authService.register(registerDto);
-    this.setRefreshTokenCookie(res, result.refreshToken);
 
     const { refreshToken, ...response } = result;
+    this.setRefreshTokenCookie(res, refreshToken);
     return response;
   }
 
@@ -185,8 +186,8 @@ export class AuthController {
   @Throttle({ default: { ttl: 60000, limit: 5 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout from all devices' })
-  async logoutAll(@Req() req: Request & { user: any }) {
-    await this.authService.logoutAll(req.user.sub);
+  async logoutAll(@CurrentUser('sub') userId: string) {
+    await this.authService.logoutAll(userId);
     return { message: 'Logged out from all devices successfully' };
   }
 }

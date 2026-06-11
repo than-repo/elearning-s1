@@ -34,5 +34,4 @@ export class UpdateSectionDto {
   @IsString()
   @MaxLength(1000)
   description?: string | null;
-
 }

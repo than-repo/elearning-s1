@@ -99,7 +99,7 @@ export class LessonRepository implements ILessonRepository {
     const maxAttempts = 3;
     for (let i = 0; i < maxAttempts; i++) {
       try {
-        let lessonIndex = await this.getNextLessonIndex(input.sectionId);
+        const lessonIndex = await this.getNextLessonIndex(input.sectionId);
 
         return await this.create({
           ...input,

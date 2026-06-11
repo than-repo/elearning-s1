@@ -94,6 +94,23 @@ export class InstructorCoursesController {
     return this.coursesService.createDraftCourse(instructorId, dto);
   }
 
+  @Patch(':id/submit-for-review')
+  @ApiOperation({ summary: 'Submit draft course for review - instructor' })
+  @ApiOkResponse({ type: CourseResponseDto })
+  @ApiBadRequestResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiNotFoundResponse()
+  async submitDraftCourseForReview(
+    @CurrentUser('sub') instructorId: string,
+    @Param('id', ParseUUIDPipe) courseId: string,
+  ): Promise<CourseResponseDto> {
+    return this.coursesService.submitDraftCourseForReview(
+      instructorId,
+      courseId,
+    );
+  }
+
   @Patch(':id')
   @ApiOperation({ summary: 'Update draft course - instructor' })
   @ApiOkResponse({ type: CourseResponseDto })

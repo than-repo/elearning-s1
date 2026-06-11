@@ -47,8 +47,7 @@ describe('CourseReviewAuthorizationService', () => {
     repository.existsActiveReviewer.mockResolvedValue(true);
     repository.findAuthorizedCategories.mockResolvedValue([makeCategory()]);
 
-    const result =
-      await service.getReviewerCategoryAuthorizations(reviewerId);
+    const result = await service.getReviewerCategoryAuthorizations(reviewerId);
 
     expect(repository.existsActiveReviewer).toHaveBeenCalledWith(reviewerId);
     expect(repository.findAuthorizedCategories).toHaveBeenCalledWith(

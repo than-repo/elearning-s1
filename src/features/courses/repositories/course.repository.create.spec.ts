@@ -75,8 +75,8 @@ describe('CourseRepository create behavior', () => {
       course: {
         create: jest.fn(),
       },
-      $transaction: jest.fn((callback: (client: TransactionClientMock) => unknown) =>
-        callback(tx),
+      $transaction: jest.fn(
+        (callback: (client: TransactionClientMock) => unknown) => callback(tx),
       ),
     };
 

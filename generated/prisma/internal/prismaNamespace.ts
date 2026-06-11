@@ -1487,6 +1487,8 @@ export const CourseScalarFieldEnum = {
   isActive: 'isActive',
   certificateEnabled: 'certificateEnabled',
   publishedAt: 'publishedAt',
+  reviewClaimedById: 'reviewClaimedById',
+  reviewClaimedAt: 'reviewClaimedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'
@@ -1715,7 +1717,8 @@ export const CourseOrderByRelevanceFieldEnum = {
   description: 'description',
   thumbnailUrl: 'thumbnailUrl',
   cloudinaryPublicId: 'cloudinaryPublicId',
-  language: 'language'
+  language: 'language',
+  reviewClaimedById: 'reviewClaimedById'
 } as const
 
 export type CourseOrderByRelevanceFieldEnum = (typeof CourseOrderByRelevanceFieldEnum)[keyof typeof CourseOrderByRelevanceFieldEnum]

@@ -13,7 +13,7 @@ export class LoginDto {
   @IsNotEmpty({ message: 'Email is required' })
   @IsEmail({}, { message: 'Please provide a valid email address' })
   @MaxLength(255)
-  @Transform(({ value }) => value?.toLowerCase().trim())
+  @Transform(({ value }) => (value ? value.toLowerCase().trim() : value))
   email!: string;
 
   @IsNotEmpty({ message: 'Password is required' })

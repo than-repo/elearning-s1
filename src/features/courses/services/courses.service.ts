@@ -339,6 +339,47 @@ export class CoursesService {
     });
   }
 
+  async submitDraftCourseForReview(
+    instructorId: string,
+    courseId: string,
+  ): Promise<CourseResponseDto> {
+    const course = await this.iCourseRepository.findById(courseId);
+
+    if (!course) {
+      throw new NotFoundException('COURSE_NOT_FOUND');
+    }
+
+    await this.courseAccessService.ensureInstructorCanManageCourse(
+      courseId,
+      instructorId,
+    );
+
+    if (
+      !(
+        course.status === CourseStatus.DRAFT ||
+        course.status === CourseStatus.CHANGES_REQUESTED
+      )
+    ) {
+      throw new BadRequestException(
+        'ONLY_DRAFT_OR_CHANGES_REQUESTED_COURSE_CAN_BE_SUBMITTED_FOR_REVIEW',
+      );
+    }
+
+    const submittedCourse =
+      await this.iCourseRepository.submitForReview(courseId);
+
+    if (!submittedCourse) {
+      throw new BadRequestException(
+        'ONLY_DRAFT_OR_CHANGES_REQUESTED_COURSE_CAN_BE_SUBMITTED_FOR_REVIEW',
+      );
+    }
+
+    return plainToInstance(CourseResponseDto, submittedCourse, {
+      excludeExtraneousValues: true,
+      groups: [COURSE_VIEW_GROUPS.INSTRUCTOR],
+    });
+  }
+
   async findInstructorCourses(
     instructorId: string,
     dto: InstructorCourseQueryDto,
