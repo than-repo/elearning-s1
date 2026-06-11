@@ -29,8 +29,6 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  app.enableCors({ credentials: true });
-
   app.useGlobalFilters(new PrismaClientExceptionFilter());
 
   app.setGlobalPrefix('api');
