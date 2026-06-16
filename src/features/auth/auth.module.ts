@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 
 import { AuthController } from './auth.controller';
+import { GoogleOAuthController } from './google-oauth.controller';
 import { AuthService } from './services/auth.service';
 import { AuthRepository } from './repositories/auth.repository';
 
@@ -14,6 +15,8 @@ import { RolesGuard } from './guards/roles.guard';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { TokenCleanupService } from './services/token-cleanup.service';
+import { MailerModule } from 'src/core/mailer/mailer.module';
+import { AccountRecoveryService } from './services/account-recovery.service';
 
 @Module({
   imports: [
@@ -30,9 +33,11 @@ import { TokenCleanupService } from './services/token-cleanup.service';
         },
       }),
     }),
+
+    MailerModule,
   ],
 
-  controllers: [AuthController],
+  controllers: [AuthController, GoogleOAuthController],
 
   providers: [
     AuthService,
@@ -43,6 +48,7 @@ import { TokenCleanupService } from './services/token-cleanup.service';
     GoogleStrategy,
     GoogleAuthGuard,
     TokenCleanupService,
+    AccountRecoveryService,
   ],
 
   exports: [AuthService, JwtStrategy, JwtAuthGuard, RolesGuard],

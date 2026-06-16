@@ -54,6 +54,7 @@ export const ModelName = {
   User: 'User',
   UserIdentity: 'UserIdentity',
   RefreshToken: 'RefreshToken',
+  PasswordResetToken: 'PasswordResetToken',
   CourseReview: 'CourseReview',
   CourseReviewerCategory: 'CourseReviewerCategory',
   CourseInstructor: 'CourseInstructor',
@@ -129,6 +130,18 @@ export const RefreshTokenScalarFieldEnum = {
 } as const
 
 export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum]
+
+
+export const PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
 
 
 export const CourseReviewScalarFieldEnum = {
@@ -299,8 +312,10 @@ export const PaymentScalarFieldEnum = {
   paymentMethod: 'paymentMethod',
   status: 'status',
   provider: 'provider',
+  txnRef: 'txnRef',
   providerPaymentId: 'providerPaymentId',
   providerMetadata: 'providerMetadata',
+  paidAt: 'paidAt',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -366,6 +381,15 @@ export const RefreshTokenOrderByRelevanceFieldEnum = {
 } as const
 
 export type RefreshTokenOrderByRelevanceFieldEnum = (typeof RefreshTokenOrderByRelevanceFieldEnum)[keyof typeof RefreshTokenOrderByRelevanceFieldEnum]
+
+
+export const PasswordResetTokenOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash'
+} as const
+
+export type PasswordResetTokenOrderByRelevanceFieldEnum = (typeof PasswordResetTokenOrderByRelevanceFieldEnum)[keyof typeof PasswordResetTokenOrderByRelevanceFieldEnum]
 
 
 export const CourseReviewOrderByRelevanceFieldEnum = {
@@ -494,6 +518,7 @@ export const PaymentOrderByRelevanceFieldEnum = {
   courseId: 'courseId',
   currency: 'currency',
   provider: 'provider',
+  txnRef: 'txnRef',
   providerPaymentId: 'providerPaymentId'
 } as const
 

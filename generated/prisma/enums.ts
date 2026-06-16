@@ -37,18 +37,6 @@ export const AuthProviderEnum = {
 export type AuthProviderEnum = (typeof AuthProviderEnum)[keyof typeof AuthProviderEnum]
 
 
-export const PaymentMethod = {
-  CREDIT_CARD: 'CREDIT_CARD',
-  BANK_TRANSFER: 'BANK_TRANSFER',
-  E_WALLET: 'E_WALLET',
-  PAYPAL: 'PAYPAL',
-  VN_PAY: 'VN_PAY',
-  FREE: 'FREE'
-} as const
-
-export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
-
-
 export const EnrollmentStatus = {
   ACTIVE: 'ACTIVE',
   COMPLETED: 'COMPLETED',
@@ -93,17 +81,6 @@ export const DayOfWeek = {
 export type DayOfWeek = (typeof DayOfWeek)[keyof typeof DayOfWeek]
 
 
-export const PaymentStatus = {
-  PENDING: 'PENDING',
-  COMPLETED: 'COMPLETED',
-  FAILED: 'FAILED',
-  REFUNDED: 'REFUNDED',
-  CANCELLED: 'CANCELLED'
-} as const
-
-export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
-
-
 export const MediaTypeEnum = {
   VIDEO: 'VIDEO',
   DOCUMENT: 'DOCUMENT',
@@ -123,3 +100,21 @@ export const CourseReviewStatus = {
 } as const
 
 export type CourseReviewStatus = (typeof CourseReviewStatus)[keyof typeof CourseReviewStatus]
+
+
+export const PaymentMethod = {
+  VNPAY: 'VNPAY'
+} as const
+
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
+
+
+export const PaymentStatus = {
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]

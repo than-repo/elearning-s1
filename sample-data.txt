@@ -25,3 +25,12 @@
   "password": "123@ABCabc",
   "role": "INSTRUCTOR"
 }
+//common pw TestPw@123
+
+
+{
+  "fullName": "REVIEWER_ALL",
+  "email": "REVIEWER_ALL@example.com",
+  "password": "123@ABCabc",
+  "role": "REVIEWER"
+}

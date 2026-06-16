@@ -34,6 +34,9 @@ import { GoogleAuthGuard } from './guards/google-auth.guard';
 import type { RequestWithCookies } from './interfaces/request-with-cookies';
 import type { RequestWithUser } from '../../common/interfaces/request-with-user';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { ForgotPasswordDto } from './dtos/forgot-password.dto';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { AccountRecoveryService } from './services/account-recovery.service';
 
 @ApiTags('Auth')
 @Controller({ path: 'auth', version: '1' })
@@ -41,6 +44,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
+    private readonly accountRecoveryService: AccountRecoveryService,
   ) {}
 
   private setRefreshTokenCookie(res: Response, refreshToken: string): void {
@@ -80,7 +84,7 @@ export class AuthController {
   }
 
   @Post('login')
-  @Throttle({ default: { ttl: 60000, limit: 10 } })
+  @Throttle({ default: { ttl: 60000, limit: 100 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login user' })
   @ApiOkResponse({
@@ -136,19 +140,15 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   @ApiOperation({ summary: 'Google OAuth2 callback' })
-  async googleAuthCallback(
-    @Req() req: RequestWithUser,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async googleAuthCallback(@Req() req: RequestWithUser, @Res() res: Response) {
     // req.user contains the JwtPayload from GoogleStrategy
     const result = await this.authService.googleLogin(req.user);
 
-    const { refreshToken, ...response } = result;
+    const { refreshToken } = result;
     this.setRefreshTokenCookie(res, refreshToken);
-    // Note: has not redirect to frontend dashboard yet
-    // res.redirect(${frontendUrl}/auth/success?token=...')`
-    // For now returning Json instead
-    return response;
+
+    const frontendUrl = this.configService.getOrThrow<string>('FRONTEND_URL');
+    return res.redirect(`${frontendUrl}/auth/google/success`);
   }
 
   @Post('logout')
@@ -189,5 +189,27 @@ export class AuthController {
   async logoutAll(@CurrentUser('sub') userId: string) {
     await this.authService.logoutAll(userId);
     return { message: 'Logged out from all devices successfully' };
+  }
+
+  @Post('forgot-password')
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    await this.accountRecoveryService.forgotPassword(dto.email);
+
+    return {
+      message: 'If this email exists, a password reset link has been sent',
+    };
+  }
+
+  @Post('reset-password')
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    await this.accountRecoveryService.resetPassword(dto.token, dto.newPassword);
+
+    return {
+      message: 'Password has been reset successfully',
+    };
   }
 }

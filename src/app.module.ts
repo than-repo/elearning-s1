@@ -9,6 +9,10 @@ import { UsersModule } from './features/users/users.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UploadModule } from './features/upload/upload.module';
 import { CoursesModule } from './features/courses/courses.module';
+import { EnrollmentsModule } from './features/enrollments/enrollments.module';
+import { LearningModule } from './features/learning/learning.module';
+import { PaymentsModule } from './features/payment/payments.module';
+import vnpayConfig from './config/vnpay.config';
 
 @Module({
   imports: [
@@ -26,6 +30,7 @@ import { CoursesModule } from './features/courses/courses.module';
     ConfigModule.forRoot({
       envFilePath: '.development.env',
       isGlobal: true,
+      load: [vnpayConfig],
     }),
     UsersModule,
     PrismaModule,
@@ -33,6 +38,9 @@ import { CoursesModule } from './features/courses/courses.module';
     ScheduleModule.forRoot(),
     UploadModule,
     CoursesModule,
+    EnrollmentsModule,
+    LearningModule,
+    PaymentsModule,
   ],
   controllers: [],
   providers: [

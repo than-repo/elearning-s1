@@ -117,7 +117,9 @@ export class UsersRepository {
   async updateProfile(id: string, data: UserUpdateInput) {
     return this.prisma.user.update({
       where: { id },
-      data,
+      data: {
+        ...data,
+      },
       select: this.userSelect,
     });
   }

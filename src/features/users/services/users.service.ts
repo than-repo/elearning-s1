@@ -73,6 +73,7 @@ export class UsersService {
     }
     const rawData: UserUpdateInput = {
       ...safeData,
+      dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
       passwordHash,
     };
     const cleanedData = cleanData(rawData);

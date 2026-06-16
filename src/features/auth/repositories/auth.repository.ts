@@ -8,6 +8,10 @@ import * as crypto from 'node:crypto';
 import { CreateLocalUserData } from '../interfaces/create-local-user.interface';
 import { CreateRefreshToken } from '../interfaces/create-refresh-token.interface';
 import { CreateGoogleUserData } from '../interfaces/create-google-user.interface';
+import {
+  CreatePasswordResetTokenInput,
+  ResetPasswordInput,
+} from '../interfaces/user.repository.interface';
 
 @Injectable()
 export class AuthRepository {
@@ -231,6 +235,101 @@ export class AuthRepository {
       });
 
       return user;
+    });
+  }
+
+  async createPasswordResetToken(input: CreatePasswordResetTokenInput) {
+    return this.prisma.passwordResetToken.create({
+      data: {
+        userId: input.userId,
+        tokenHash: input.tokenHash,
+        expiresAt: input.expiresAt,
+      },
+    });
+  }
+
+  async invalidateUnusedPasswordResetTokens(userId: string): Promise<void> {
+    await this.prisma.passwordResetToken.updateMany({
+      where: {
+        userId,
+        usedAt: null,
+      },
+      data: {
+        usedAt: new Date(),
+      },
+    });
+  }
+
+  async resetPassword(input: ResetPasswordInput): Promise<boolean> {
+    return this.prisma.$transaction(async (tx) => {
+      const now = new Date();
+
+      const resetToken = await tx.passwordResetToken.findFirst({
+        where: {
+          tokenHash: input.tokenHash,
+          usedAt: null,
+          expiresAt: {
+            gt: now,
+          },
+          user: {
+            isActive: true,
+            passwordHash: {
+              not: null,
+            },
+            identities: {
+              some: {
+                provider: AuthProviderEnum.LOCAL,
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+          userId: true,
+        },
+      });
+
+      if (!resetToken) {
+        return false;
+      }
+
+      const consumedToken = await tx.passwordResetToken.updateMany({
+        where: {
+          id: resetToken.id,
+          usedAt: null,
+          expiresAt: {
+            gt: now,
+          },
+        },
+        data: {
+          usedAt: now,
+        },
+      });
+
+      if (consumedToken.count !== 1) {
+        return false;
+      }
+
+      await tx.user.update({
+        where: {
+          id: resetToken.userId,
+        },
+        data: {
+          passwordHash: input.passwordHash,
+        },
+      });
+
+      await tx.refreshToken.updateMany({
+        where: {
+          userId: resetToken.userId,
+          isRevoked: false,
+        },
+        data: {
+          isRevoked: true,
+        },
+      });
+
+      return true;
     });
   }
 }

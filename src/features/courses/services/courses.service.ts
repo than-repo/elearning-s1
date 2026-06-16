@@ -301,7 +301,7 @@ export class CoursesService {
       level: dto.level,
       price: dto.price,
       language: dto.language,
-
+      thumbnailUrl: dto.thumbnailUrl,
       certificateEnabled: dto.certificateEnabled,
       categoryIds: dto.categoryIds,
     };

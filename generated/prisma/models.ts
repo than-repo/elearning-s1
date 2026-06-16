@@ -11,6 +11,7 @@
 export type * from './models/User.js'
 export type * from './models/UserIdentity.js'
 export type * from './models/RefreshToken.js'
+export type * from './models/PasswordResetToken.js'
 export type * from './models/CourseReview.js'
 export type * from './models/CourseReviewerCategory.js'
 export type * from './models/CourseInstructor.js'

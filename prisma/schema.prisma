@@ -31,15 +31,6 @@ enum AuthProviderEnum {
   GOOGLE
 }
 
-enum PaymentMethod {
-  CREDIT_CARD
-  BANK_TRANSFER
-  E_WALLET
-  PAYPAL
-  VN_PAY
-  FREE
-}
-
 enum EnrollmentStatus {
   ACTIVE
   COMPLETED
@@ -72,14 +63,6 @@ enum DayOfWeek {
   SUNDAY
 }
 
-enum PaymentStatus {
-  PENDING
-  COMPLETED
-  FAILED
-  REFUNDED
-  CANCELLED
-}
-
 enum MediaTypeEnum {
   VIDEO
   DOCUMENT
@@ -110,6 +93,7 @@ model User {
   // Relations
   identities    UserIdentity[]
   refreshTokens RefreshToken[]
+  enrollments   Enrollment[]
 
   payments          Payment[]
   courseInstructors CourseInstructor[] // as instructor
@@ -117,6 +101,7 @@ model User {
   assignedReviewCategories CourseReviewerCategory[] @relation("ReviewerCategories")
   courseReviews            CourseReview[]           @relation("CourseReviewReviewer")
   claimedReviewCourses     Course[]                 @relation("CourseReviewClaimedBy")
+  passwordResetTokens      PasswordResetToken[]
 
   @@map("users")
 }
@@ -153,6 +138,20 @@ model RefreshToken {
   @@index([userId, isRevoked, expiresAt]) // modify it for revokeAll + find
   @@index([tokenHash])
   @@map("refresh_tokens")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique @db.VarChar(64)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([userId, expiresAt])
+  @@map("password_reset_tokens")
 }
 
 // ====================== 4. COURSE MODELS ======================
@@ -251,6 +250,7 @@ model Course {
   // Relations
   sections         CourseSection[]
   enrollments      Enrollment[]
+  payments         Payment[]
   instructors      CourseInstructor[]
   courseCategories CourseCategory[]
 
@@ -377,30 +377,53 @@ model Enrollment {
 
   course  Course   @relation(fields: [courseId], references: [id], onDelete: Restrict)
   payment Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Restrict)
 
   @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@index([status])
   @@map("enrollments")
+}
+
+enum PaymentMethod {
+  VNPAY
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  EXPIRED
 }
 
 model Payment {
   id                String        @id @default(uuid())
   userId            String
   courseId          String
-  amount            Float
+  amount            Int
   currency          String        @default("VND")
-  paymentMethod     PaymentMethod
+  paymentMethod     PaymentMethod @default(VNPAY)
   status            PaymentStatus @default(PENDING)
-  provider          String?
+  provider          String        @default("VNPAY")
+  txnRef            String?       @unique
   providerPaymentId String?
   providerMetadata  Json?
+  paidAt            DateTime?
   isActive          Boolean       @default(true)
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   deletedAt         DateTime?
 
-  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   enrollment Enrollment?
 
+  @@index([userId])
+  @@index([courseId])
+  @@index([userId, courseId])
+  @@index([status])
   @@map("payments")
 }

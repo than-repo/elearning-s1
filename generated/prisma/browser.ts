@@ -33,6 +33,11 @@ export type UserIdentity = Prisma.UserIdentityModel
  */
 export type RefreshToken = Prisma.RefreshTokenModel
 /**
+ * Model PasswordResetToken
+ * 
+ */
+export type PasswordResetToken = Prisma.PasswordResetTokenModel
+/**
  * Model CourseReview
  * 
  */
