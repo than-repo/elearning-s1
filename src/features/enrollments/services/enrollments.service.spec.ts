@@ -14,19 +14,15 @@ jest.mock(
       EXPIRED: 'EXPIRED',
     },
     PaymentMethod: {
-      CREDIT_CARD: 'CREDIT_CARD',
-      BANK_TRANSFER: 'BANK_TRANSFER',
-      E_WALLET: 'E_WALLET',
-      PAYPAL: 'PAYPAL',
-      VN_PAY: 'VN_PAY',
-      FREE: 'FREE',
+      VNPAY: 'VNPAY',
+      SIMULATION: 'SIMULATION',
     },
     PaymentStatus: {
       PENDING: 'PENDING',
-      COMPLETED: 'COMPLETED',
+      PAID: 'PAID',
       FAILED: 'FAILED',
-      REFUNDED: 'REFUNDED',
       CANCELLED: 'CANCELLED',
+      EXPIRED: 'EXPIRED',
     },
   }),
   { virtual: true },
@@ -95,8 +91,8 @@ describe('EnrollmentsService', () => {
         payment: {
           amount: 150000,
           currency: 'VND',
-          paymentMethod: PaymentMethod.VN_PAY,
-          provider: 'mock',
+          paymentMethod: PaymentMethod.SIMULATION,
+          provider: 'SIMULATION',
         },
       });
       expect(result).toMatchObject({
@@ -104,7 +100,7 @@ describe('EnrollmentsService', () => {
         courseId,
         payment: {
           id: enrollment.payment?.id,
-          status: PaymentStatus.COMPLETED,
+          status: PaymentStatus.PAID,
         },
       });
       expect(result).not.toHaveProperty('userId');
@@ -314,8 +310,8 @@ function makePayment() {
     id: '44444444-4444-4444-8444-444444444444',
     amount: 150000,
     currency: 'VND',
-    paymentMethod: PaymentMethod.VN_PAY,
-    status: PaymentStatus.COMPLETED,
+    paymentMethod: PaymentMethod.SIMULATION,
+    status: PaymentStatus.PAID,
     createdAt: new Date('2026-06-12T00:00:00.000Z'),
   };
 }

@@ -40,6 +40,9 @@ export class PaymentRepository implements IPaymentRepository {
       case PrismaPaymentMethod.VNPAY:
         return DomainPaymentMethod.VNPAY;
 
+      case PrismaPaymentMethod.SIMULATION:
+        return DomainPaymentMethod.SIMULATION;
+
       default:
         throw new Error(`Unsupported payment method: ${method}`);
     }

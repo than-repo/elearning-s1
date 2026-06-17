@@ -103,7 +103,8 @@ export type CourseReviewStatus = (typeof CourseReviewStatus)[keyof typeof Course
 
 
 export const PaymentMethod = {
-  VNPAY: 'VNPAY'
+  VNPAY: 'VNPAY',
+  SIMULATION: 'SIMULATION'
 } as const
 
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]

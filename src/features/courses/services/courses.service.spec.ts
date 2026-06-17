@@ -163,7 +163,7 @@ describe('CoursesService', () => {
           isActive: true,
         },
         orderBy: {
-          field: 'createdAt',
+          field: 'publishedAt',
           direction: 'desc',
         },
         limit: 10,

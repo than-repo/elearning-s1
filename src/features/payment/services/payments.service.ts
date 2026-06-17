@@ -9,6 +9,7 @@ import {
 
 import { VnpayService } from './vnpay.service';
 import { CreateVnpayPaymentDto } from '../dtos/create-vnpay-payment.dto';
+import { CreateSimulationPaymentDto } from '../dtos/create-simulation-payment.dto';
 
 import type {
   CreatePaymentInput,
@@ -24,12 +25,17 @@ import { VnpayReturnQuery } from '../interfaces/vnpayreturnquery.interface';
 import {
   VnpayReturnResponseDto,
   VnpayReturnResponseStatus,
+  PaymentResponseDto,
 } from '../dtos/vnpay-return-response.dto';
 import { plainToInstance } from 'class-transformer';
 import {
   VnpayIpnResponseDto,
   VnpayIpnRspCode,
 } from '../dtos/vnpay-inp-response.dto';
+import {
+  SimulationPaymentResponseDto,
+  SimulationPaymentResponseStatus,
+} from '../dtos/simulation-payment-response.dto';
 import { randomUUID } from 'crypto';
 import { PAYMENT_REPOSITORY } from '../repositories/payment.repository.token';
 
@@ -59,7 +65,7 @@ export class PaymentsService {
       throw new BadRequestException('Invalid course price');
     }
 
-    const txnRef = this.generateTxnRef();
+    const txnRef = this.generateTxnRef('PAY');
 
     const payment = await this.iPaymentRepository.create({
       userId,
@@ -74,7 +80,7 @@ export class PaymentsService {
     const paymentUrl = this.vnpayService.createPaymentUrl({
       txnRef,
       amount: payment.amount,
-      orderInfo: `Thanh toan khoa hoc: ${course.id}`,
+      orderInfo: 'Thanh toan khoa hoc',
       ipAddr,
       bankCode: dto.bankCode,
       locale: dto.locale ?? 'vn',
@@ -88,8 +94,114 @@ export class PaymentsService {
     };
   }
 
-  private generateTxnRef(): string {
-    return `PAY_${Date.now()}_${randomUUID()}`;
+  private generateTxnRef(prefix: 'PAY' | 'SIM'): string {
+    if (prefix === 'PAY') {
+      return `${prefix}${Date.now()}${randomUUID()
+        .replace(/-/g, '')
+        .slice(0, 8)
+        .toUpperCase()}`;
+    }
+
+    return `${prefix}_${Date.now()}_${randomUUID()}`;
+  }
+
+  async createSimulationPayment(
+    userId: string,
+    dto: CreateSimulationPaymentDto,
+  ): Promise<SimulationPaymentResponseDto> {
+    const course = await this.iPaymentRepository.findCourseById(dto.courseId);
+
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
+
+    const amount = Number(course.price);
+
+    if (!Number.isInteger(amount) || amount <= 0) {
+      throw new BadRequestException('Invalid course price');
+    }
+
+    const payment = await this.iPaymentRepository.create({
+      userId,
+      courseId: course.id,
+      amount,
+      paymentMethod: PaymentMethod.SIMULATION,
+      status: PaymentStatus.PENDING,
+      provider: 'SIMULATION',
+      txnRef: this.generateTxnRef('SIM'),
+    } satisfies CreatePaymentInput);
+
+    return this.toSimulationPaymentResponseDto('pending', payment);
+  }
+
+  async confirmSimulationPayment(
+    userId: string,
+    paymentId: string,
+  ): Promise<SimulationPaymentResponseDto> {
+    const payment = await this.findOwnedSimulationPayment(userId, paymentId);
+
+    if (payment.status === PaymentStatus.PAID) {
+      return this.toSimulationPaymentResponseDto('already_paid', payment);
+    }
+
+    if (payment.status !== PaymentStatus.PENDING) {
+      throw new BadRequestException('Payment cannot be confirmed');
+    }
+
+    const confirmedAt = new Date();
+    const settlement =
+      await this.iPaymentRepository.settlePaidPaymentAndActivateEnrollment({
+        paymentId: payment.id,
+        providerPaymentId: `SIM-${payment.txnRef ?? payment.id}`,
+        providerMetadata: {
+          provider: 'SIMULATION',
+          action: 'confirm',
+          confirmedAt: confirmedAt.toISOString(),
+        },
+        paidAt: confirmedAt,
+      });
+
+    if (!settlement) {
+      throw new NotFoundException('Payment not found');
+    }
+
+    return this.toSimulationPaymentResponseDto(
+      settlement.status === 'already_paid' ? 'already_paid' : 'success',
+      settlement.payment,
+    );
+  }
+
+  async failSimulationPayment(
+    userId: string,
+    paymentId: string,
+  ): Promise<SimulationPaymentResponseDto> {
+    const payment = await this.findOwnedSimulationPayment(userId, paymentId);
+
+    if (payment.status === PaymentStatus.FAILED) {
+      return this.toSimulationPaymentResponseDto('failed', payment);
+    }
+
+    if (payment.status !== PaymentStatus.PENDING) {
+      throw new BadRequestException('Payment cannot be failed');
+    }
+
+    const failedPayment = await this.iPaymentRepository.markPendingPaymentFailed(
+      payment.id,
+      {
+        providerPaymentId: `SIM-${payment.txnRef ?? payment.id}`,
+        providerMetadata: {
+          provider: 'SIMULATION',
+          action: 'fail',
+          failedAt: new Date().toISOString(),
+        },
+      },
+    );
+
+    if (!failedPayment) {
+      throw new NotFoundException('Payment not found');
+    }
+
+    return this.toSimulationPaymentResponseDto('failed', failedPayment);
   }
 
   async handleVnpayReturn(
@@ -268,21 +380,35 @@ export class PaymentsService {
   ): VnpayReturnResponseDto {
     return plainToInstance(VnpayReturnResponseDto, {
       status,
-      payment: {
-        id: payment.id,
-        userId: payment.userId,
-        courseId: payment.courseId,
-        amount: payment.amount,
-        currency: payment.currency,
-        paymentMethod: payment.paymentMethod,
-        status: payment.status,
-        provider: payment.provider,
-        txnRef: payment.txnRef,
-        providerPaymentId: payment.providerPaymentId,
-        paidAt: payment.paidAt,
-        createdAt: payment.createdAt,
-        updatedAt: payment.updatedAt,
-      },
+      payment: this.toPaymentResponseDto(payment),
+    });
+  }
+
+  private toSimulationPaymentResponseDto(
+    status: SimulationPaymentResponseStatus,
+    payment: PaymentModel,
+  ): SimulationPaymentResponseDto {
+    return plainToInstance(SimulationPaymentResponseDto, {
+      status,
+      payment: this.toPaymentResponseDto(payment),
+    });
+  }
+
+  private toPaymentResponseDto(payment: PaymentModel): PaymentResponseDto {
+    return plainToInstance(PaymentResponseDto, {
+      id: payment.id,
+      userId: payment.userId,
+      courseId: payment.courseId,
+      amount: payment.amount,
+      currency: payment.currency,
+      paymentMethod: payment.paymentMethod,
+      status: payment.status,
+      provider: payment.provider,
+      txnRef: payment.txnRef,
+      providerPaymentId: payment.providerPaymentId,
+      paidAt: payment.paidAt,
+      createdAt: payment.createdAt,
+      updatedAt: payment.updatedAt,
     });
   }
 
@@ -311,5 +437,25 @@ export class PaymentsService {
     }
 
     return vnpAmount === input.paymentAmount * 100;
+  }
+
+  private async findOwnedSimulationPayment(
+    userId: string,
+    paymentId: string,
+  ): Promise<PaymentModel> {
+    const payment = await this.iPaymentRepository.findUniquePayment({
+      id: paymentId,
+    });
+
+    if (
+      !payment ||
+      payment.userId !== userId ||
+      payment.paymentMethod !== PaymentMethod.SIMULATION ||
+      payment.provider !== 'SIMULATION'
+    ) {
+      throw new NotFoundException('Payment not found');
+    }
+
+    return payment;
   }
 }

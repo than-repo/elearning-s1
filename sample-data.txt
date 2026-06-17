@@ -34,3 +34,12 @@
   "password": "123@ABCabc",
   "role": "REVIEWER"
 }
+
+user {
+
+  ykw91875@laoia.com
+  TestPw@123
+}
+
+VNPAY
+@Vnpay2026

@@ -1,0 +1,2 @@
+ALTER TABLE `payments`
+  MODIFY `paymentMethod` ENUM('VNPAY', 'SIMULATION') NOT NULL DEFAULT 'VNPAY';

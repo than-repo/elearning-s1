@@ -150,7 +150,7 @@ export class CoursesService {
     const cleanedWhere = cleanData(where);
 
     const orderBy: CourseOrderByInput = {
-      field: dto.sortField ?? 'createdAt',
+      field: dto.sortField ?? 'publishedAt',
       direction: dto.sortDirection ?? 'desc',
     };
 

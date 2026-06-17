@@ -3,7 +3,6 @@ import type { ConfigType } from '@nestjs/config';
 
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
-import * as qs from 'qs';
 import vnpayConfig from 'src/config/vnpay.config';
 
 export type VnpayLocale = 'vn' | 'en';
@@ -29,7 +28,11 @@ export class VnpayService {
       throw new BadRequestException('Invalid VNPay amount');
     }
 
-    const createDate = this.formatVnpDate(new Date());
+    const now = new Date();
+    const createDate = this.formatVnpDate(now);
+    const expireDate = this.formatVnpDate(
+      new Date(now.getTime() + 15 * 60 * 1000),
+    );
 
     const vnpParams: Record<string, string | number> = {
       vnp_Version: '2.1.0',
@@ -44,6 +47,7 @@ export class VnpayService {
       vnp_ReturnUrl: this.vnpay.returnUrl,
       vnp_IpAddr: params.ipAddr,
       vnp_CreateDate: createDate,
+      vnp_ExpireDate: expireDate,
     };
 
     const bankCode = params.bankCode?.trim();
@@ -52,23 +56,19 @@ export class VnpayService {
       vnpParams.vnp_BankCode = bankCode;
     }
 
-    const sortedParams = this.sortObject(vnpParams);
-
-    const signData = qs.stringify(sortedParams, {
-      encode: false,
-    });
+    const searchParams = this.buildSortedSearchParams(vnpParams);
+    const signData = searchParams.toString();
 
     const secureHash = crypto
       .createHmac('sha512', this.vnpay.hashSecret)
       .update(Buffer.from(signData, 'utf-8'))
       .digest('hex');
 
-    sortedParams.vnp_SecureHash = secureHash;
+    searchParams.append('vnp_SecureHash', secureHash);
 
-    return `${this.vnpay.paymentUrl}?${qs.stringify(sortedParams, {
-      encode: false,
-    })}`;
+    return `${this.vnpay.paymentUrl}?${searchParams.toString()}`;
   }
+
   verifyReturnUrl(query: Record<string, any>): boolean {
     const copiedQuery = { ...query };
 
@@ -77,11 +77,8 @@ export class VnpayService {
     delete copiedQuery.vnp_SecureHash;
     delete copiedQuery.vnp_SecureHashType;
 
-    const sortedParams = this.sortObject(copiedQuery);
-
-    const signData = qs.stringify(sortedParams, {
-      encode: false,
-    });
+    const searchParams = this.buildSortedSearchParams(copiedQuery);
+    const signData = searchParams.toString();
 
     const checkHash = crypto
       .createHmac('sha512', this.vnpay.hashSecret)
@@ -91,8 +88,8 @@ export class VnpayService {
     return secureHash === checkHash;
   }
 
-  private sortObject(obj: Record<string, unknown>): Record<string, string> {
-    const sorted: Record<string, string> = {};
+  private buildSortedSearchParams(obj: Record<string, unknown>): URLSearchParams {
+    const params = new URLSearchParams();
 
     Object.keys(obj)
       .sort()
@@ -103,10 +100,10 @@ export class VnpayService {
           return;
         }
 
-        sorted[key] = encodeURI(this.toVnpayString(value)).replace(/%20/g, '+');
+        params.append(key, this.toVnpayString(value));
       });
 
-    return sorted;
+    return params;
   }
 
   private toVnpayString(value: unknown): string {

@@ -12,6 +12,7 @@ jest.mock(
     },
     PaymentMethod: {
       VNPAY: 'VNPAY',
+      SIMULATION: 'SIMULATION',
     },
     PaymentStatus: {
       PENDING: 'PENDING',
@@ -169,6 +170,38 @@ describe('PaymentRepository', () => {
     });
     expect(result?.status).toBe('paid');
     expect(result?.payment.status).toBe(PaymentStatus.PAID);
+  });
+
+  it('settles a pending simulation payment and preserves the payment method', async () => {
+    tx.payment.findUnique.mockResolvedValue(
+      makePrismaPayment({
+        paymentMethod: PaymentMethod.SIMULATION,
+        provider: 'SIMULATION',
+        status: PaymentStatus.PENDING,
+      }),
+    );
+    tx.payment.update.mockResolvedValue(
+      makePrismaPayment({
+        paymentMethod: PaymentMethod.SIMULATION,
+        provider: 'SIMULATION',
+        status: PaymentStatus.PAID,
+        paidAt,
+      }),
+    );
+    tx.enrollment.findUnique.mockResolvedValue(
+      makePrismaEnrollment({ paymentId }),
+    );
+
+    const result = await repository.settlePaidPaymentAndActivateEnrollment({
+      paymentId,
+      providerPaymentId: 'sim-transaction-1',
+      providerMetadata: { provider: 'SIMULATION' },
+      paidAt,
+    });
+
+    expect(result?.status).toBe('paid');
+    expect(result?.payment.paymentMethod).toBe(PaymentMethod.SIMULATION);
+    expect(result?.payment.provider).toBe('SIMULATION');
   });
 
   it('keeps duplicate paid IPN idempotent and does not update payment again', async () => {

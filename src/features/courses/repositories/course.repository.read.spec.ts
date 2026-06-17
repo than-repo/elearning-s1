@@ -247,6 +247,25 @@ describe('CourseRepository read queries', () => {
     );
   });
 
+  it('findMany supports explicit publishedAt ordering', async () => {
+    prisma.course.findMany.mockResolvedValue([]);
+
+    await repository.findMany({
+      orderBy: {
+        field: 'publishedAt',
+        direction: 'desc',
+      },
+    });
+
+    expect(prisma.course.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderBy: {
+          publishedAt: 'desc',
+        },
+      }),
+    );
+  });
+
   it('findById reads only non-deleted courses with safe details include', async () => {
     prisma.course.findFirst.mockResolvedValue(makeCourseWithDetails());
 

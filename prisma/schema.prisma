@@ -388,6 +388,7 @@ model Enrollment {
 
 enum PaymentMethod {
   VNPAY
+  SIMULATION
 }
 
 enum PaymentStatus {

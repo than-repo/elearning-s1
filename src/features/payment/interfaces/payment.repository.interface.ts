@@ -60,6 +60,7 @@ export interface PaidPaymentSettlementResult {
 
 export enum PaymentMethod {
   VNPAY = 'VNPAY',
+  SIMULATION = 'SIMULATION',
 }
 
 export enum PaymentStatus {

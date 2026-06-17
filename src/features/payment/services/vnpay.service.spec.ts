@@ -14,9 +14,6 @@ import { calculateSecureHash } from 'vnpay/utils';
 
 import { VnpayService } from './vnpay.service';
 
-const expectedSecureHash =
-  'a7a41e2851f95fa5c0e6e087252866a1d9fb3b72acb9fa59a0e699fe72244b6a6f0ceb6777dc27bdd6d4859e1081f02f687d2897ef02083ce1223fd5f8d3a672';
-
 describe('VnpayService', () => {
   afterEach(() => {
     jest.useRealTimers();
@@ -35,9 +32,9 @@ describe('VnpayService', () => {
       } as ConstructorParameters<typeof VnpayService>[0]);
 
       const paymentUrl = service.createPaymentUrl({
-        txnRef: 'ORDER_123',
+        txnRef: 'ORDER123',
         amount: 100000,
-        orderInfo: 'Payment for order ORDER_123',
+        orderInfo: 'Payment for order ORDER123',
         ipAddr: '127.0.0.1',
         locale: 'vn',
       });
@@ -51,16 +48,17 @@ describe('VnpayService', () => {
       expect(query.get('vnp_Amount')).toBe('10000000');
       expect(query.get('vnp_Command')).toBe('pay');
       expect(query.get('vnp_CreateDate')).toBe('20260616083045');
+      expect(query.get('vnp_ExpireDate')).toBe('20260616084545');
       expect(query.get('vnp_CurrCode')).toBe('VND');
       expect(query.get('vnp_IpAddr')).toBe('127.0.0.1');
       expect(query.get('vnp_Locale')).toBe('vn');
-      expect(query.get('vnp_OrderInfo')).toBe('Payment for order ORDER_123');
+      expect(query.get('vnp_OrderInfo')).toBe('Payment for order ORDER123');
       expect(query.get('vnp_OrderType')).toBe('other');
       expect(query.get('vnp_ReturnUrl')).toBe(
         'https://example.com/payments/vnpay/return',
       );
       expect(query.get('vnp_TmnCode')).toBe('TEST12345');
-      expect(query.get('vnp_TxnRef')).toBe('ORDER_123');
+      expect(query.get('vnp_TxnRef')).toBe('ORDER123');
       expect(query.get('vnp_Version')).toBe('2.1.0');
 
       const signData = url.search
@@ -70,6 +68,9 @@ describe('VnpayService', () => {
         .join('&');
 
       expect(signData).not.toContain('undefined');
+      expect(signData).toContain(
+        'vnp_ReturnUrl=https%3A%2F%2Fexample.com%2Fpayments%2Fvnpay%2Freturn',
+      );
 
       const packageOracleHash = calculateSecureHash({
         secureSecret: 'TEST_HASH_SECRET',
@@ -79,7 +80,6 @@ describe('VnpayService', () => {
       });
 
       expect(query.get('vnp_SecureHash')).toBe(packageOracleHash);
-      expect(query.get('vnp_SecureHash')).toBe(expectedSecureHash);
     });
   });
 });

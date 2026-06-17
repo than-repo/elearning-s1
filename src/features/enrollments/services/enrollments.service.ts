@@ -155,8 +155,8 @@ export class EnrollmentsService {
     return {
       amount: course.price,
       currency: 'VND',
-      paymentMethod: PaymentMethod.VNPAY,
-      provider: 'mock',
+      paymentMethod: PaymentMethod.SIMULATION,
+      provider: 'SIMULATION',
     };
   }
 
