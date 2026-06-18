@@ -85,6 +85,8 @@ export class PaymentsController {
     return this.paymentsService.failSimulationPayment(userId, paymentId);
   }
 
+  //VNpay
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.LEARNER)
   @Post('vnpay/create-payment-url')

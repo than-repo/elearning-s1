@@ -88,7 +88,9 @@ export class VnpayService {
     return secureHash === checkHash;
   }
 
-  private buildSortedSearchParams(obj: Record<string, unknown>): URLSearchParams {
+  private buildSortedSearchParams(
+    obj: Record<string, unknown>,
+  ): URLSearchParams {
     const params = new URLSearchParams();
 
     Object.keys(obj)
@@ -100,6 +102,7 @@ export class VnpayService {
           return;
         }
 
+        // Should add encodeURI for security
         params.append(key, this.toVnpayString(value));
       });
 
