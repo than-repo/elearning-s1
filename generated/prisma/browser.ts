@@ -92,3 +92,33 @@ export type Enrollment = Prisma.EnrollmentModel
  * 
  */
 export type Payment = Prisma.PaymentModel
+/**
+ * Model Assessment
+ * 
+ */
+export type Assessment = Prisma.AssessmentModel
+/**
+ * Model AssessmentQuestion
+ * 
+ */
+export type AssessmentQuestion = Prisma.AssessmentQuestionModel
+/**
+ * Model AssessmentAnswer
+ * 
+ */
+export type AssessmentAnswer = Prisma.AssessmentAnswerModel
+/**
+ * Model AssessmentAttempt
+ * 
+ */
+export type AssessmentAttempt = Prisma.AssessmentAttemptModel
+/**
+ * Model AssessmentAttemptAnswer
+ * 
+ */
+export type AssessmentAttemptAnswer = Prisma.AssessmentAttemptAnswerModel
+/**
+ * Model ProjectSubmission
+ * 
+ */
+export type ProjectSubmission = Prisma.ProjectSubmissionModel

@@ -102,6 +102,7 @@ model User {
   courseReviews            CourseReview[]           @relation("CourseReviewReviewer")
   claimedReviewCourses     Course[]                 @relation("CourseReviewClaimedBy")
   passwordResetTokens      PasswordResetToken[]
+  assessmentAttempts       AssessmentAttempt[]
 
   @@map("users")
 }
@@ -219,6 +220,8 @@ model CourseInstructor {
   course     Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
   instructor User   @relation(fields: [instructorId], references: [id], onDelete: Restrict)
 
+  gradedProjectSubmissions ProjectSubmission[] @relation("ProjectSubmissionGrader")
+
   @@unique([courseId, instructorId])
   @@map("course_instructors")
 }
@@ -254,9 +257,12 @@ model Course {
   instructors      CourseInstructor[]
   courseCategories CourseCategory[]
 
-  //reviewer
+  // Reviewer
   reviews         CourseReview[]
   reviewClaimedBy User?          @relation("CourseReviewClaimedBy", fields: [reviewClaimedById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  // Assessment
+  assessments Assessment[]
 
   @@index([slug])
   @@index([status])
@@ -427,4 +433,205 @@ model Payment {
   @@index([userId, courseId])
   @@index([status])
   @@map("payments")
+}
+
+//========================ASSESSMENTS======================
+
+enum AssessmentType {
+  QUIZ
+  PROJECT
+}
+
+enum AssessmentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AssessmentAttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  GRADED
+  PASSED
+  FAILED
+}
+
+model Assessment {
+  id       String @id @default(uuid())
+  courseId String
+
+  title       String
+  description String?          @db.LongText
+  type        AssessmentType
+  status      AssessmentStatus @default(DRAFT)
+
+  // Display order inside lesson/section/course
+  order Int @default(0)
+
+  // Scoring
+  totalPoints  Int  @default(0)
+  passingScore Int? // Example: 70
+
+  // Attempt rules
+  maxAttempts      Int? // null = unlimited
+  timeLimitMinutes Int? // for quiz/final test
+
+  // Availability
+  availableFrom  DateTime?
+  availableUntil DateTime?
+
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  questions AssessmentQuestion[]
+  attempts  AssessmentAttempt[]
+
+  @@index([courseId])
+  @@index([type])
+  @@index([status])
+  @@map("assessments")
+}
+
+enum AssessmentQuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  FILL_IN_THE_BLANK
+  PROJECT
+}
+
+model AssessmentQuestion {
+  id           String @id @default(uuid())
+  assessmentId String
+
+  questionText String                 @db.LongText
+  type         AssessmentQuestionType
+
+  explanation String? @db.LongText
+
+  points Int @default(1)
+  order  Int @default(0)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  assessment     Assessment                @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  answers        AssessmentAnswer[]
+  attemptAnswers AssessmentAttemptAnswer[]
+
+  @@index([assessmentId])
+  @@index([type])
+  @@map("assessment_questions")
+}
+
+model AssessmentAnswer {
+  id                  String  @id @default(uuid())
+  correctOptionAnswer String? @db.Text
+  correctTextAnswer   String? @db.Text
+
+  wrongAnswers Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  question   AssessmentQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+
+  @@unique([questionId])
+  @@index([questionId])
+  @@map("assessment_answers")
+}
+
+model AssessmentAttempt {
+  id String @id @default(uuid())
+
+  attemptNumber Int                     @default(1)
+  status        AssessmentAttemptStatus @default(IN_PROGRESS)
+
+  score    Float? // Final score
+  maxScore Float? // Total possible score
+  passed   Boolean @default(false)
+
+  startedAt   DateTime  @default(now())
+  submittedAt DateTime?
+
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  assessmentId String
+
+  learner           User                      @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  learnerId         String
+  answers           AssessmentAttemptAnswer[]
+  projectSubmission ProjectSubmission?
+
+  @@unique([assessmentId, learnerId, attemptNumber])
+  @@index([assessmentId])
+  @@index([learnerId])
+  @@index([status])
+  @@map("assessment_attempts")
+}
+
+model AssessmentAttemptAnswer {
+  id String @id @default(uuid())
+
+  textAnswer     String? @db.Text
+  answerSnapshot String? @db.Text
+
+  isCorrect    Boolean?
+  pointsEarned Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  attempt   AssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  attemptId String
+
+  question   AssessmentQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+  @@index([questionId])
+  @@map("assessment_attempt_answers")
+}
+
+enum ProjectSubmissionStatus {
+  SUBMITTED
+  REVIEWED
+  NEEDS_CHANGES
+  ACCEPTED
+  REJECTED
+}
+
+model ProjectSubmission {
+  id        String @id @default(uuid())
+  attemptId String @unique
+
+  githubUrl   String?
+  deployUrl   String?
+  documentUrl String? // DOCX/PDF uploaded file URL
+  note        String? @db.LongText
+
+  status ProjectSubmissionStatus @default(SUBMITTED)
+
+  score    Float?
+  feedback String? @db.LongText
+
+  gradedAt DateTime?
+
+  submittedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  attempt AssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  grader   CourseInstructor? @relation("ProjectSubmissionGrader", fields: [graderId], references: [id], onDelete: SetNull)
+  graderId String?
+
+  @@index([status])
+  @@map("project_submissions")
 }

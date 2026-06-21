@@ -119,3 +119,52 @@ export const PaymentStatus = {
 } as const
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
+export const AssessmentType = {
+  QUIZ: 'QUIZ',
+  PROJECT: 'PROJECT'
+} as const
+
+export type AssessmentType = (typeof AssessmentType)[keyof typeof AssessmentType]
+
+
+export const AssessmentStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type AssessmentStatus = (typeof AssessmentStatus)[keyof typeof AssessmentStatus]
+
+
+export const AssessmentAttemptStatus = {
+  IN_PROGRESS: 'IN_PROGRESS',
+  SUBMITTED: 'SUBMITTED',
+  GRADED: 'GRADED',
+  PASSED: 'PASSED',
+  FAILED: 'FAILED'
+} as const
+
+export type AssessmentAttemptStatus = (typeof AssessmentAttemptStatus)[keyof typeof AssessmentAttemptStatus]
+
+
+export const AssessmentQuestionType = {
+  MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
+  TRUE_FALSE: 'TRUE_FALSE',
+  FILL_IN_THE_BLANK: 'FILL_IN_THE_BLANK',
+  PROJECT: 'PROJECT'
+} as const
+
+export type AssessmentQuestionType = (typeof AssessmentQuestionType)[keyof typeof AssessmentQuestionType]
+
+
+export const ProjectSubmissionStatus = {
+  SUBMITTED: 'SUBMITTED',
+  REVIEWED: 'REVIEWED',
+  NEEDS_CHANGES: 'NEEDS_CHANGES',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type ProjectSubmissionStatus = (typeof ProjectSubmissionStatus)[keyof typeof ProjectSubmissionStatus]
