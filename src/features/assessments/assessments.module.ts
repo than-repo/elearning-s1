@@ -17,6 +17,7 @@ import { AssessmentQuestionsRepository } from './repositories/assessment-questio
 import { ASSESSMENT_ANSWERS_REPOSITORY } from './repositories/assessment-answers.repository.token';
 import { DETAILED_ASSESSMENT_REPOSITORY } from './repositories/detailed-assessment.repository.token';
 import { DetailedAssessmentRepository } from './repositories/detailed-assessment.repository';
+import { PrismaService } from 'src/core/database/prisma.service';
 
 @Module({
   providers: [
@@ -45,7 +46,7 @@ import { DetailedAssessmentRepository } from './repositories/detailed-assessment
       useClass: DetailedAssessmentRepository,
     },
   ],
-  imports: [],
+  imports: [PrismaService],
   controllers: [InstructorController],
   exports: [],
 })

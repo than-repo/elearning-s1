@@ -75,20 +75,6 @@ export class CreateAssessmentQuestionDto {
   @Min(1)
   @Max(MAX_QUESTION_POINTS)
   points?: number;
-
-  @ApiPropertyOptional({
-    example: 0,
-    minimum: 0,
-    maximum: MAX_ORDER_VALUE,
-    description:
-      'Display order inside the assessment. If omitted, backend should use next order.',
-  })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(0)
-  @Max(MAX_ORDER_VALUE)
-  order?: number;
 }
 
 export class UpdateAssessmentQuestionDto extends PartialType(

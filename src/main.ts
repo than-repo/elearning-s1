@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import { PrismaClientExceptionFilter } from './common/filters/prisma-client-exception.filter';
 import helmet from 'helmet';
 import { urlencoded } from 'express';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
@@ -30,6 +31,7 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.useGlobalFilters(new PrismaClientExceptionFilter());
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   app.setGlobalPrefix('api');
   app.enableVersioning({

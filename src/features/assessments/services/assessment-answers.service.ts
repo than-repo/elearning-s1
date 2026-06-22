@@ -31,9 +31,9 @@ import { UpsertAssessmentAnswerDto } from '../dtos/answers/assessment-answer.dto
 import { AssessmentAnswerResponseDto } from '../dtos/answers/assessment-answer-response.dto';
 import { ASSESSMENT_VIEW_GROUPS } from '../dtos/assessment-response';
 
-const ASSESSMENT_REPOSITORY = 'ASSESSMENT_REPOSITORY';
-const ASSESSMENT_QUESTIONS_REPOSITORY = 'ASSESSMENT_QUESTIONS_REPOSITORY';
-const ASSESSMENT_ANSWERS_REPOSITORY = 'ASSESSMENT_ANSWERS_REPOSITORY';
+import { ASSESSMENT_REPOSITORY } from '../repositories/assessment.repository.token';
+import { ASSESSMENT_QUESTIONS_REPOSITORY } from '../repositories/assessment-questions.interface.token';
+import { ASSESSMENT_ANSWERS_REPOSITORY } from '../repositories/assessment-answers.repository.token';
 
 type QuestionWithAssessment = {
   question: AssessmentQuestion;
@@ -272,16 +272,16 @@ export class AssessmentAnswersService {
       );
     }
 
-    if (!wrongAnswers || wrongAnswers.length < 2) {
+    if (wrongAnswers && wrongAnswers.length > 0) {
       throw new BadRequestException(
-        'At least 2 wrongAnswers are required for MULTIPLE_CHOICE questions',
+        'wrongAnswers should not be provided for TRUE_FALSE questions',
       );
     }
 
     return {
       correctOptionAnswer: normalizedBooleanAnswer,
       correctTextAnswer: null,
-      wrongAnswers: null,
+      wrongAnswers: [normalizedBooleanAnswer === 'true' ? 'false' : 'true'],
     };
   }
 

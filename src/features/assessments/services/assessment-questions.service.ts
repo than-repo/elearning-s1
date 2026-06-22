@@ -26,6 +26,8 @@ import {
 } from '../dtos/questions/assessment-question.dto';
 import { AssessmentQuestionResponseDto } from '../dtos/questions/assessment-question-response.dto';
 import { ASSESSMENT_VIEW_GROUPS } from '../dtos/assessment-response';
+import { ASSESSMENT_REPOSITORY } from '../repositories/assessment.repository.token';
+import { ASSESSMENT_QUESTIONS_REPOSITORY } from '../repositories/assessment-questions.interface.token';
 
 const QUIZ_ALLOWED_QUESTION_TYPES: readonly AssessmentQuestionType[] = [
   AssessmentQuestionType.MULTIPLE_CHOICE,
@@ -36,9 +38,9 @@ const QUIZ_ALLOWED_QUESTION_TYPES: readonly AssessmentQuestionType[] = [
 @Injectable()
 export class AssessmentQuestionsService {
   constructor(
-    @Inject('ASSESSMENT_REPOSITORY')
+    @Inject(ASSESSMENT_REPOSITORY)
     private readonly iAssessmentRepository: IAssessmentRepository,
-    @Inject('ASSESSMENT_QUESTIONS_REPOSITORY')
+    @Inject(ASSESSMENT_QUESTIONS_REPOSITORY)
     private readonly iAssessmentQuestionRepository: IAssessmentQuestionRepository,
     private readonly assessmentAccessService: AssessmentAccessService,
   ) {}
@@ -78,9 +80,9 @@ export class AssessmentQuestionsService {
       }
     }
 
-    const order =
-      dto.order ??
-      (await this.iAssessmentQuestionRepository.getNextOrder(assessment.id));
+    const order = await this.iAssessmentQuestionRepository.getNextOrder(
+      assessment.id,
+    );
 
     const question =
       await this.iAssessmentQuestionRepository.createQuestionAndSyncTotalPoints(
@@ -148,7 +150,6 @@ export class AssessmentQuestionsService {
               ? (dto.explanation ?? null)
               : undefined,
           points: dto.points,
-          order: dto.order,
         } satisfies UpdateAssessmentQuestionInput,
       );
 

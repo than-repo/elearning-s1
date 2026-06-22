@@ -9,9 +9,12 @@ import {
 } from '../interfaces/assessment.repository.interface';
 import { AssessmentMapper } from '../mappers/assessment.maper';
 import { Prisma } from 'generated/prisma/client';
+import { Inject, Injectable } from '@nestjs/common';
 
+@Injectable()
 export class AssessmentRepository implements IAssessmentRepository {
   constructor(private readonly prisma: PrismaService) {}
+
   async createDraftAssessment(
     input: CreateAssessmentInput,
   ): Promise<Assessment> {

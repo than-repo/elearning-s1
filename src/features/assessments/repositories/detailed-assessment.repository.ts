@@ -8,6 +8,7 @@ import {
 import { PrismaService } from 'src/core/database/prisma.service';
 
 import { AssessmentQuestionType as DomainAssessmentQuestionType } from '../interfaces/assessment-questions.repository.interface';
+import { Injectable } from '@nestjs/common';
 
 export const detailedAssessmentInclude = {
   questions: {
@@ -24,6 +25,7 @@ export type DetailedAssessmentEntity = Prisma.AssessmentGetPayload<{
   include: typeof detailedAssessmentInclude;
 }>;
 
+@Injectable()
 export class DetailedAssessmentRepository implements IDetailedAssessmentRepository {
   constructor(private readonly prisma: PrismaService) {}
 

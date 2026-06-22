@@ -14,8 +14,8 @@ export class AssessmentMapper {
       title: assessmentPrisma.title,
       description: assessmentPrisma.description,
 
-      type: this.toAssessmentType(assessmentPrisma.type),
-      status: this.toAssessmentStatus(assessmentPrisma.status),
+      type: AssessmentMapper.toAssessmentType(assessmentPrisma.type),
+      status: AssessmentMapper.toAssessmentStatus(assessmentPrisma.status),
 
       order: assessmentPrisma.order,
 
@@ -72,6 +72,4 @@ export class AssessmentMapper {
         throw new Error(`Unsupported assessment status: ${status}`);
     }
   }
-
-  static to;
 }
