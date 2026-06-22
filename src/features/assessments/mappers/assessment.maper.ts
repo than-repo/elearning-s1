@@ -72,4 +72,6 @@ export class AssessmentMapper {
         throw new Error(`Unsupported assessment status: ${status}`);
     }
   }
+
+  static to;
 }

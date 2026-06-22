@@ -1,9 +1,7 @@
 // src/features/assessments/interfaces/assessment-questions.repository.interface.ts
 
-import { AssessmentQuestionType } from 'generated/prisma/enums';
-
 export interface IAssessmentQuestionRepository {
-  createQuestion(
+  createQuestionAndSyncTotalPoints(
     input: CreateAssessmentQuestionInput,
   ): Promise<AssessmentQuestion>;
 
@@ -20,17 +18,33 @@ export interface IAssessmentQuestionRepository {
 
   count(where: WhereAssessmentQuestionInput): Promise<number>;
 
-  updateQuestion(
+  updateQuestionAndSyncTotalPoints(
+    assessmentId: string,
     questionId: string,
     input: UpdateAssessmentQuestionInput,
-  ): Promise<AssessmentQuestion>;
+  ): Promise<AssessmentQuestion | null>;
 
-  softDeleteQuestion(questionId: string): Promise<boolean>;
+  softDeleteQuestionAndSyncTotalPoints(
+    assessmentId: string,
+    questionId: string,
+  ): Promise<boolean>;
 
   countActiveQuestions(assessmentId: string): Promise<number>;
 
   sumActiveQuestionPoints(assessmentId: string): Promise<number>;
+
+  syncAssessmentTotalPointsTx(tx: unknown, assessmentId: string): Promise<void>;
 }
+
+export const AssessmentQuestionType = {
+  MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
+  TRUE_FALSE: 'TRUE_FALSE',
+  FILL_IN_THE_BLANK: 'FILL_IN_THE_BLANK',
+  PROJECT: 'PROJECT',
+} as const;
+
+export type AssessmentQuestionType =
+  (typeof AssessmentQuestionType)[keyof typeof AssessmentQuestionType];
 
 export interface CreateAssessmentQuestionInput {
   assessmentId: string;

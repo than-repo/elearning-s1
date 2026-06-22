@@ -7,14 +7,18 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
+
 import {
-  AssessmentQuestionType,
   AssessmentStatus,
   AssessmentType,
-} from 'generated/prisma/enums';
+  type IAssessmentRepository,
+} from '../interfaces/assessment.repository.interface';
+import { AssessmentQuestionType } from '../interfaces/assessment-questions.repository.interface';
 
-import type { IAssessmentRepository } from '../interfaces/assessment.repository.interface';
-import type { IAssessmentQuestionRepository } from '../interfaces/assessment-questions.repository.interface';
+import type {
+  IAssessmentQuestionRepository,
+  UpdateAssessmentQuestionInput,
+} from '../interfaces/assessment-questions.repository.interface';
 import { AssessmentAccessService } from './assessment-access.service';
 import {
   CreateAssessmentQuestionDto,
@@ -78,17 +82,18 @@ export class AssessmentQuestionsService {
       dto.order ??
       (await this.iAssessmentQuestionRepository.getNextOrder(assessment.id));
 
-    const question = await this.iAssessmentQuestionRepository.createQuestion({
-      assessmentId: assessment.id,
-      questionText: dto.questionText,
-      type: dto.type,
-      explanation: dto.explanation ?? null,
-      points: dto.points ?? 1,
-      order,
-      isActive: true,
-    });
-
-    await this.syncAssessmentTotalPoints(assessment.id);
+    const question =
+      await this.iAssessmentQuestionRepository.createQuestionAndSyncTotalPoints(
+        {
+          assessmentId: assessment.id,
+          questionText: dto.questionText,
+          type: dto.type,
+          explanation: dto.explanation ?? null,
+          points: dto.points ?? 1,
+          order,
+          isActive: true,
+        },
+      );
 
     return this.toInstructorResponse(question);
   }
@@ -124,25 +129,31 @@ export class AssessmentQuestionsService {
 
     this.ensureAssessmentIsDraft(assessment.status);
 
-    const nextQuestionType = dto.type ?? question.type;
+    if (dto.type !== undefined && dto.type !== question.type) {
+      throw new BadRequestException(
+        'Question type cannot be changed after creation. Delete and recreate the question instead.',
+      );
+    }
 
-    this.ensureQuestionTypeAllowedForAssessment(
-      assessment.type,
-      nextQuestionType,
-    );
+    this.ensureQuestionTypeAllowedForAssessment(assessment.type, question.type);
 
     const updatedQuestion =
-      await this.iAssessmentQuestionRepository.updateQuestion(question.id, {
-        questionText: dto.questionText,
-        type: dto.type,
-        explanation:
-          dto.explanation !== undefined ? (dto.explanation ?? null) : undefined,
-        points: dto.points,
-        order: dto.order,
-      });
+      await this.iAssessmentQuestionRepository.updateQuestionAndSyncTotalPoints(
+        question.id,
+        assessmentId,
+        {
+          questionText: dto.questionText,
+          explanation:
+            dto.explanation !== undefined
+              ? (dto.explanation ?? null)
+              : undefined,
+          points: dto.points,
+          order: dto.order,
+        } satisfies UpdateAssessmentQuestionInput,
+      );
 
-    if (dto.points !== undefined) {
-      await this.syncAssessmentTotalPoints(assessment.id);
+    if (!updatedQuestion) {
+      throw new NotFoundException('Question not found');
     }
 
     return this.toInstructorResponse(updatedQuestion);
@@ -177,15 +188,15 @@ export class AssessmentQuestionsService {
     }
     this.ensureAssessmentIsDraft(assessment.status);
 
-    const deleted = await this.iAssessmentQuestionRepository.softDeleteQuestion(
-      question.id,
-    );
+    const deleted =
+      await this.iAssessmentQuestionRepository.softDeleteQuestionAndSyncTotalPoints(
+        assessmentId,
+        question.id,
+      );
 
     if (!deleted) {
-      throw new BadRequestException('Can not delete question. Try again');
+      throw new NotFoundException('Can not delete question. Try again');
     }
-
-    await this.syncAssessmentTotalPoints(assessment.id);
 
     return { deleted: true };
   }

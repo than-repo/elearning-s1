@@ -30,6 +30,13 @@ import { PaginatedAsessmentResponse } from '../dtos/pagnated-assessment-response
 import { ASSESSMENT_QUESTIONS_REPOSITORY } from '../repositories/assessment-questions.interface.token';
 import type { IAssessmentQuestionRepository } from '../interfaces/assessment-questions.repository.interface';
 import { ASSESSMENT_REPOSITORY } from '../repositories/assessment.repository.token';
+import {
+  DetailedAssessmentAnswerDto,
+  DetailedAssessmentDto,
+} from '../dtos/detailed-assessment.dto';
+import { DETAILED_ASSESSMENT_REPOSITORY } from '../repositories/detailed-assessment.repository.token';
+import type { IDetailedAssessmentRepository } from '../interfaces/detailed-assessment.interface';
+import { promises } from 'dns';
 
 @Injectable()
 export class AssessmentsService {
@@ -40,6 +47,9 @@ export class AssessmentsService {
     @Inject(ASSESSMENT_QUESTIONS_REPOSITORY)
     private readonly iAssessmentQuestionRepository: IAssessmentQuestionRepository,
     private readonly assessmentAccessService: AssessmentAccessService,
+
+    @Inject(DETAILED_ASSESSMENT_REPOSITORY)
+    private readonly iDetailedAssessmentRepository: IDetailedAssessmentRepository,
   ) {}
 
   async createDraftAssessment(
@@ -234,6 +244,32 @@ export class AssessmentsService {
       },
     };
   }
+  async findDetailedAssessment(
+    instructorId: string,
+    courseId: string,
+    assessmentId: string,
+  ): Promise<DetailedAssessmentDto> {
+    await this.assessmentAccessService.ensureInstructorCanManageAssessment(
+      instructorId,
+      courseId,
+      assessmentId,
+    );
+
+    const detailedAssessment =
+      await this.iDetailedAssessmentRepository.findDetailedAssessment(
+        assessmentId,
+      );
+
+    if (!detailedAssessment) {
+      throw new NotFoundException('Detailed assessment not found');
+    }
+
+    return plainToInstance(DetailedAssessmentDto, detailedAssessment, {
+      excludeExtraneousValues: true,
+      enableImplicitConversion: true,
+    });
+  }
+
   private buildWhereInput(query: AssessmentQueryDto): WhereAssessmentInput {
     return {
       id: query.id,

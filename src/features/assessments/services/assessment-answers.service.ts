@@ -272,9 +272,9 @@ export class AssessmentAnswersService {
       );
     }
 
-    if (wrongAnswers && wrongAnswers.length > 0) {
+    if (!wrongAnswers || wrongAnswers.length < 2) {
       throw new BadRequestException(
-        'wrongAnswers is not allowed for TRUE_FALSE questions',
+        'At least 2 wrongAnswers are required for MULTIPLE_CHOICE questions',
       );
     }
 

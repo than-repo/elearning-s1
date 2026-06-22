@@ -48,6 +48,10 @@ import { AssessmentAnswerResponseDto } from '../dtos/answers/assessment-answer-r
 import { UpsertAssessmentAnswerDto } from '../dtos/answers/assessment-answer.dto';
 import { PaginatedAsessmentResponse } from '../dtos/pagnated-assessment-response.dto';
 import { AssessmentQueryDto } from '../dtos/query-assessment.dto';
+import {
+  DetailedAssessmentAnswerDto,
+  DetailedAssessmentDto,
+} from '../dtos/detailed-assessment.dto';
 
 @Controller({ path: 'instructor/course/:courseId/assessments', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -60,6 +64,24 @@ export class InstructorController {
     private readonly assessmentQuestionsService: AssessmentQuestionsService,
     private readonly assessmentAnswersService: AssessmentAnswersService,
   ) {}
+
+  @ApiOperation({ summary: 'Get detailed assessment' })
+  @ApiOkResponse({ type: DetailedAssessmentDto })
+  @ApiNotFoundResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Get(':assessmentId/detail')
+  async getDetailedAssessment(
+    @CurrentUser('sub') instructorId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('assessmentId', ParseUUIDPipe) assessmentId: string,
+  ): Promise<DetailedAssessmentDto> {
+    return this.assessmentsService.findDetailedAssessment(
+      instructorId,
+      courseId,
+      assessmentId,
+    );
+  }
 
   @ApiOperation({ summary: 'Create Draft Assessment' })
   @ApiCreatedResponse({ type: AssessmentResponseDto })

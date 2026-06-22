@@ -20,22 +20,26 @@ import { AssessmentQuestionsMapper } from '../mappers/assessment-questions.mappe
 export class AssessmentQuestionsRepository implements IAssessmentQuestionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createQuestion(
+  async createQuestionAndSyncTotalPoints(
     input: CreateAssessmentQuestionInput,
   ): Promise<AssessmentQuestion> {
-    const question = await this.prisma.assessmentQuestion.create({
-      data: {
-        assessmentId: input.assessmentId,
-        questionText: input.questionText,
-        type: input.type,
-        explanation: input.explanation ?? null,
-        points: input.points ?? 1,
-        order: input.order ?? 0,
-        isActive: input.isActive ?? true,
-      },
-    });
+    return this.prisma.$transaction(async (tx) => {
+      const question = await tx.assessmentQuestion.create({
+        data: {
+          assessmentId: input.assessmentId,
+          questionText: input.questionText,
+          type: input.type,
+          explanation: input.explanation ?? null,
+          points: input.points ?? 1,
+          order: input.order ?? 0,
+          isActive: input.isActive ?? true,
+        },
+      });
 
-    return AssessmentQuestionsMapper.toAssessmentQuestion(question);
+      await this.syncAssessmentTotalPointsTx(tx, input.assessmentId);
+
+      return AssessmentQuestionsMapper.toAssessmentQuestion(question);
+    });
   }
 
   async getNextOrder(assessmentId: string): Promise<number> {
@@ -93,40 +97,72 @@ export class AssessmentQuestionsRepository implements IAssessmentQuestionReposit
     });
   }
 
-  async updateQuestion(
+  async updateQuestionAndSyncTotalPoints(
     questionId: string,
+    assessmentId: string,
     input: UpdateAssessmentQuestionInput,
-  ): Promise<AssessmentQuestion> {
-    const question = await this.prisma.assessmentQuestion.update({
-      where: {
-        id: questionId,
-      },
-      data: {
-        questionText: input.questionText,
-        type: input.type,
-        explanation: input.explanation,
-        points: input.points,
-        order: input.order,
-        isActive: input.isActive,
-      },
-    });
+  ): Promise<AssessmentQuestion | null> {
+    return this.prisma.$transaction(async (tx) => {
+      const result = await tx.assessmentQuestion.updateMany({
+        where: {
+          id: questionId,
+          assessmentId,
+          deletedAt: null,
+          isActive: true,
+        },
+        data: {
+          questionText: input.questionText,
+          type: input.type,
+          explanation: input.explanation,
+          points: input.points,
+          order: input.order,
+          isActive: input.isActive,
+        },
+      });
 
-    return AssessmentQuestionsMapper.toAssessmentQuestion(question);
+      if (result.count === 0) {
+        return null;
+      }
+
+      const question = await tx.assessmentQuestion.findFirstOrThrow({
+        where: {
+          id: questionId,
+          assessmentId,
+          deletedAt: null,
+        },
+      });
+
+      await this.syncAssessmentTotalPointsTx(tx, assessmentId);
+
+      return AssessmentQuestionsMapper.toAssessmentQuestion(question);
+    });
   }
 
-  async softDeleteQuestion(questionId: string): Promise<boolean> {
-    const result = await this.prisma.assessmentQuestion.updateMany({
-      where: {
-        id: questionId,
-        deletedAt: null,
-      },
-      data: {
-        deletedAt: new Date(),
-        isActive: false,
-      },
-    });
+  async softDeleteQuestionAndSyncTotalPoints(
+    assessmentId: string,
+    questionId: string,
+  ): Promise<boolean> {
+    return this.prisma.$transaction(async (tx) => {
+      const result = await tx.assessmentQuestion.updateMany({
+        where: {
+          id: questionId,
+          assessmentId,
+          deletedAt: null,
+        },
+        data: {
+          deletedAt: new Date(),
+          isActive: false,
+        },
+      });
 
-    return result.count > 0;
+      if (result.count === 0) {
+        return false;
+      }
+
+      await this.syncAssessmentTotalPointsTx(tx, assessmentId);
+
+      return true;
+    });
   }
 
   async countActiveQuestions(assessmentId: string): Promise<number> {
@@ -256,5 +292,28 @@ export class AssessmentQuestionsRepository implements IAssessmentQuestionReposit
     return {
       [orderBy.field]: orderBy.direction,
     };
+  }
+
+  async syncAssessmentTotalPointsTx(
+    tx: Prisma.TransactionClient,
+    assessmentId: string,
+  ): Promise<void> {
+    const result = await tx.assessmentQuestion.aggregate({
+      where: {
+        assessmentId,
+        isActive: true,
+        deletedAt: null,
+      },
+
+      _sum: { points: true },
+    });
+    await tx.assessment.update({
+      where: {
+        id: assessmentId,
+      },
+      data: {
+        totalPoints: result._sum.points ?? 0,
+      },
+    });
   }
 }
