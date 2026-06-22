@@ -149,6 +149,26 @@ export const AssessmentAttemptStatus = {
 export type AssessmentAttemptStatus = (typeof AssessmentAttemptStatus)[keyof typeof AssessmentAttemptStatus]
 
 
+export const AssessmentReviewTiming = {
+  NEVER: 'NEVER',
+  AFTER_SUBMIT: 'AFTER_SUBMIT',
+  AFTER_GRADED: 'AFTER_GRADED',
+  AFTER_ASSESSMENT_CLOSED: 'AFTER_ASSESSMENT_CLOSED',
+  MANUAL: 'MANUAL'
+} as const
+
+export type AssessmentReviewTiming = (typeof AssessmentReviewTiming)[keyof typeof AssessmentReviewTiming]
+
+
+export const AssessmentReviewContent = {
+  SCORE_ONLY: 'SCORE_ONLY',
+  SCORE_AND_ANSWERS: 'SCORE_AND_ANSWERS',
+  FULL_REVIEW: 'FULL_REVIEW'
+} as const
+
+export type AssessmentReviewContent = (typeof AssessmentReviewContent)[keyof typeof AssessmentReviewContent]
+
+
 export const AssessmentQuestionType = {
   MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
   TRUE_FALSE: 'TRUE_FALSE',

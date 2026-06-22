@@ -33,10 +33,10 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/features/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/features/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/features/auth/guards/roles.guard';
-import { CreateAssessmentDto } from '../dtos/create-assessment.dto';
+import { CreateAssessmentDto } from '../dtos/assessment/create-assessment.dto';
 import { AssessmentsService } from '../services/assessments.service';
-import { AssessmentResponseDto } from '../dtos/assessment-response';
-import { UpdateAssessmentDto } from '../dtos/update-assessment.dto';
+import { AssessmentResponseDto } from '../dtos/assessment/assessment-response';
+import { UpdateAssessmentDto } from '../dtos/assessment/update-assessment.dto';
 import {
   CreateAssessmentQuestionDto,
   UpdateAssessmentQuestionDto,
@@ -46,12 +46,10 @@ import { AssessmentQuestionsService } from '../services/assessment-questions.ser
 import { AssessmentAnswersService } from '../services/assessment-answers.service';
 import { AssessmentAnswerResponseDto } from '../dtos/answers/assessment-answer-response.dto';
 import { UpsertAssessmentAnswerDto } from '../dtos/answers/assessment-answer.dto';
-import { PaginatedAsessmentResponse } from '../dtos/pagnated-assessment-response.dto';
-import { AssessmentQueryDto } from '../dtos/query-assessment.dto';
-import {
-  DetailedAssessmentAnswerDto,
-  DetailedAssessmentDto,
-} from '../dtos/detailed-assessment.dto';
+import { PaginatedAsessmentResponse } from '../dtos/assessment/pagnated-assessment-response.dto';
+import { AssessmentQueryDto } from '../dtos/assessment/query-assessment.dto';
+import { DetailedAssessmentDto } from '../dtos/assessment/detailed-assessment.dto';
+import { UpdatePublishedAssessmentDto } from '../dtos/assessment/update-published-assessment.dto';
 
 @Controller({ path: 'instructor/course/:courseId/assessments', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -128,12 +126,52 @@ export class InstructorController {
     @Param('courseId', ParseUUIDPipe) courseId: string,
     @Param('assessmentId', ParseUUIDPipe) assessmentId: string,
     @Body() dto: UpdateAssessmentDto,
-  ) {
+  ): Promise<AssessmentResponseDto> {
     return this.assessmentsService.updateDraftAssessment(
       instructorId,
       courseId,
       assessmentId,
       dto,
+    );
+  }
+
+  @ApiOperation({ summary: 'Update Publish Assessment' })
+  @ApiOkResponse({ type: AssessmentResponseDto })
+  @ApiBadRequestResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiNotFoundResponse()
+  @Patch(':assessmentId/published-assessment')
+  async updatePublishAssessment(
+    @CurrentUser('sub') instructorId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('assessmentId', ParseUUIDPipe) assessmentId: string,
+    @Body() dto: UpdatePublishedAssessmentDto,
+  ): Promise<AssessmentResponseDto> {
+    return this.assessmentsService.updatePublishAssessment(
+      instructorId,
+      courseId,
+      assessmentId,
+      dto,
+    );
+  }
+
+  @ApiOperation({ summary: 'Update Status Assessment into Published' })
+  @ApiOkResponse({ type: AssessmentResponseDto })
+  @ApiBadRequestResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiNotFoundResponse()
+  @Patch(':assessmentId/publish')
+  async publishAssessment(
+    @CurrentUser('sub') instructorId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('assessmentId', ParseUUIDPipe) assessmentId: string,
+  ): Promise<AssessmentResponseDto> {
+    return this.assessmentsService.publishAssessment(
+      instructorId,
+      courseId,
+      assessmentId,
     );
   }
 

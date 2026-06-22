@@ -20,7 +20,7 @@ import {
   AssessmentStatus,
   AssessmentType,
   OrderDirection,
-} from '../interfaces/assessment.repository.interface';
+} from '../../interfaces/assessment.repository.interface';
 
 export const ASSESSMENT_QUERY_DEFAULTS = {
   PAGE: 1,

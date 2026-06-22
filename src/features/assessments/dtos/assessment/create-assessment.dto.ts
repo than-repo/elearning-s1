@@ -132,19 +132,6 @@ export class CreateAssessmentDto {
   type!: AssessmentType;
 
   @ApiPropertyOptional({
-    example: 100,
-    minimum: 0,
-    maximum: 100,
-    description: 'Total Score',
-  })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(0)
-  @Max(Max_TOTAL_SCORE)
-  totalScore?: number;
-
-  @ApiPropertyOptional({
     example: 70,
     minimum: 0,
     maximum: 100,

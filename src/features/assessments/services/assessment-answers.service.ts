@@ -29,7 +29,7 @@ import type {
 import { AssessmentAccessService } from './assessment-access.service';
 import { UpsertAssessmentAnswerDto } from '../dtos/answers/assessment-answer.dto';
 import { AssessmentAnswerResponseDto } from '../dtos/answers/assessment-answer-response.dto';
-import { ASSESSMENT_VIEW_GROUPS } from '../dtos/assessment-response';
+import { ASSESSMENT_VIEW_GROUPS } from '../dtos/assessment/assessment-response';
 
 import { ASSESSMENT_REPOSITORY } from '../repositories/assessment.repository.token';
 import { ASSESSMENT_QUESTIONS_REPOSITORY } from '../repositories/assessment-questions.interface.token';

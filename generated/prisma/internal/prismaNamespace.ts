@@ -2104,6 +2104,8 @@ export const AssessmentScalarFieldEnum = {
   timeLimitMinutes: 'timeLimitMinutes',
   availableFrom: 'availableFrom',
   availableUntil: 'availableUntil',
+  reviewTiming: 'reviewTiming',
+  reviewContent: 'reviewContent',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -2600,6 +2602,20 @@ export type EnumAssessmentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$P
  * Reference to a field of type 'AssessmentStatus'
  */
 export type EnumAssessmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AssessmentStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'AssessmentReviewTiming'
+ */
+export type EnumAssessmentReviewTimingFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AssessmentReviewTiming'>
+    
+
+
+/**
+ * Reference to a field of type 'AssessmentReviewContent'
+ */
+export type EnumAssessmentReviewContentFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AssessmentReviewContent'>
     
 
 

@@ -10,6 +10,11 @@ export interface IAssessmentRepository {
     input: UpdateAssessmentInput,
   ): Promise<Assessment>;
 
+  updatePublishAssessment(
+    assessmentId: string,
+    input: UpdatePublishedAssessmentInput,
+  ): Promise<Assessment>;
+
   softDeleteAssessment(assessmentId: string): Promise<boolean>;
 
   findMany(
@@ -64,6 +69,19 @@ export interface UpdateAssessmentInput {
   isActive?: boolean;
 }
 
+export type UpdatePublishedAssessmentInput = {
+  maxAttempts?: number | null;
+  timeLimitMinutes?: number | null;
+
+  availableFrom?: Date | null;
+  availableUntil?: Date | null;
+
+  assessmentReviewTiming?: AssessmentReviewTiming;
+  assessmentReviewContent?: AssessmentReviewContent;
+
+  isActive?: boolean;
+};
+
 export const AssessmentType = {
   QUIZ: 'QUIZ',
   PROJECT: 'PROJECT',
@@ -100,6 +118,9 @@ export interface Assessment {
 
   availableFrom: Date | null;
   availableUntil: Date | null;
+
+  assessmentReviewTiming: AssessmentReviewTiming;
+  assessmentReviewContent: AssessmentReviewContent;
 
   isActive: boolean;
 
@@ -161,3 +182,23 @@ export interface OrderAssessmentInput {
   field: AssessmentOrderField;
   direction: OrderDirection;
 }
+
+export const AssessmentReviewTiming = {
+  NEVER: 'NEVER',
+  AFTER_SUBMIT: 'AFTER_SUBMIT',
+  AFTER_GRADED: 'AFTER_GRADED',
+  AFTER_ASSESSMENT_CLOSED: 'AFTER_ASSESSMENT_CLOSED',
+  MANUAL: 'MANUAL',
+} as const;
+
+export type AssessmentReviewTiming =
+  (typeof AssessmentReviewTiming)[keyof typeof AssessmentReviewTiming];
+
+export const AssessmentReviewContent = {
+  SCORE_ONLY: 'SCORE_ONLY',
+  SCORE_AND_ANSWERS: 'SCORE_AND_ANSWERS',
+  FULL_REVIEW: 'FULL_REVIEW',
+} as const;
+
+export type AssessmentReviewContent =
+  (typeof AssessmentReviewContent)[keyof typeof AssessmentReviewContent];

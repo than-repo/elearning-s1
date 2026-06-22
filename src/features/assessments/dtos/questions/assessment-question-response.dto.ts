@@ -3,7 +3,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { AssessmentQuestionType } from 'generated/prisma/enums';
-import { ASSESSMENT_VIEW_GROUPS } from '../assessment-response';
+import { ASSESSMENT_VIEW_GROUPS } from '../assessment/assessment-response';
 
 const ALL_ASSESSMENT_GROUPS = [
   ASSESSMENT_VIEW_GROUPS.LEARNER,

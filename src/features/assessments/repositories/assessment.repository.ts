@@ -5,6 +5,7 @@ import {
   IAssessmentRepository,
   OrderAssessmentInput,
   UpdateAssessmentInput,
+  UpdatePublishedAssessmentInput,
   WhereAssessmentInput,
 } from '../interfaces/assessment.repository.interface';
 import { AssessmentMapper } from '../mappers/assessment.maper';
@@ -68,6 +69,18 @@ export class AssessmentRepository implements IAssessmentRepository {
   async updateDraftAssessment(
     assessmentId: string,
     input: UpdateAssessmentInput,
+  ): Promise<Assessment> {
+    const assessment = await this.prisma.assessment.update({
+      where: { id: assessmentId },
+      data: { ...input },
+    });
+
+    return AssessmentMapper.toAssessment(assessment);
+  }
+
+  async updatePublishAssessment(
+    assessmentId: string,
+    input: UpdatePublishedAssessmentInput,
   ): Promise<Assessment> {
     const assessment = await this.prisma.assessment.update({
       where: { id: assessmentId },

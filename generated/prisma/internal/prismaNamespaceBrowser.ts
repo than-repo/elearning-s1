@@ -345,6 +345,8 @@ export const AssessmentScalarFieldEnum = {
   timeLimitMinutes: 'timeLimitMinutes',
   availableFrom: 'availableFrom',
   availableUntil: 'availableUntil',
+  reviewTiming: 'reviewTiming',
+  reviewContent: 'reviewContent',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',

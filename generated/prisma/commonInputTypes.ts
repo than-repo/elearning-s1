@@ -491,6 +491,20 @@ export type EnumAssessmentStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumAssessmentStatusFilter<$PrismaModel> | $Enums.AssessmentStatus
 }
 
+export type EnumAssessmentReviewTimingFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssessmentReviewTiming | Prisma.EnumAssessmentReviewTimingFieldRefInput<$PrismaModel>
+  in?: $Enums.AssessmentReviewTiming[]
+  notIn?: $Enums.AssessmentReviewTiming[]
+  not?: Prisma.NestedEnumAssessmentReviewTimingFilter<$PrismaModel> | $Enums.AssessmentReviewTiming
+}
+
+export type EnumAssessmentReviewContentFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssessmentReviewContent | Prisma.EnumAssessmentReviewContentFieldRefInput<$PrismaModel>
+  in?: $Enums.AssessmentReviewContent[]
+  notIn?: $Enums.AssessmentReviewContent[]
+  not?: Prisma.NestedEnumAssessmentReviewContentFilter<$PrismaModel> | $Enums.AssessmentReviewContent
+}
+
 export type EnumAssessmentTypeWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.AssessmentType | Prisma.EnumAssessmentTypeFieldRefInput<$PrismaModel>
   in?: $Enums.AssessmentType[]
@@ -509,6 +523,26 @@ export type EnumAssessmentStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAssessmentStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAssessmentStatusFilter<$PrismaModel>
+}
+
+export type EnumAssessmentReviewTimingWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssessmentReviewTiming | Prisma.EnumAssessmentReviewTimingFieldRefInput<$PrismaModel>
+  in?: $Enums.AssessmentReviewTiming[]
+  notIn?: $Enums.AssessmentReviewTiming[]
+  not?: Prisma.NestedEnumAssessmentReviewTimingWithAggregatesFilter<$PrismaModel> | $Enums.AssessmentReviewTiming
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAssessmentReviewTimingFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAssessmentReviewTimingFilter<$PrismaModel>
+}
+
+export type EnumAssessmentReviewContentWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssessmentReviewContent | Prisma.EnumAssessmentReviewContentFieldRefInput<$PrismaModel>
+  in?: $Enums.AssessmentReviewContent[]
+  notIn?: $Enums.AssessmentReviewContent[]
+  not?: Prisma.NestedEnumAssessmentReviewContentWithAggregatesFilter<$PrismaModel> | $Enums.AssessmentReviewContent
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAssessmentReviewContentFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAssessmentReviewContentFilter<$PrismaModel>
 }
 
 export type EnumAssessmentQuestionTypeFilter<$PrismaModel = never> = {
@@ -1058,6 +1092,20 @@ export type NestedEnumAssessmentStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumAssessmentStatusFilter<$PrismaModel> | $Enums.AssessmentStatus
 }
 
+export type NestedEnumAssessmentReviewTimingFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssessmentReviewTiming | Prisma.EnumAssessmentReviewTimingFieldRefInput<$PrismaModel>
+  in?: $Enums.AssessmentReviewTiming[]
+  notIn?: $Enums.AssessmentReviewTiming[]
+  not?: Prisma.NestedEnumAssessmentReviewTimingFilter<$PrismaModel> | $Enums.AssessmentReviewTiming
+}
+
+export type NestedEnumAssessmentReviewContentFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssessmentReviewContent | Prisma.EnumAssessmentReviewContentFieldRefInput<$PrismaModel>
+  in?: $Enums.AssessmentReviewContent[]
+  notIn?: $Enums.AssessmentReviewContent[]
+  not?: Prisma.NestedEnumAssessmentReviewContentFilter<$PrismaModel> | $Enums.AssessmentReviewContent
+}
+
 export type NestedEnumAssessmentTypeWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.AssessmentType | Prisma.EnumAssessmentTypeFieldRefInput<$PrismaModel>
   in?: $Enums.AssessmentType[]
@@ -1076,6 +1124,26 @@ export type NestedEnumAssessmentStatusWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAssessmentStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAssessmentStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumAssessmentReviewTimingWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssessmentReviewTiming | Prisma.EnumAssessmentReviewTimingFieldRefInput<$PrismaModel>
+  in?: $Enums.AssessmentReviewTiming[]
+  notIn?: $Enums.AssessmentReviewTiming[]
+  not?: Prisma.NestedEnumAssessmentReviewTimingWithAggregatesFilter<$PrismaModel> | $Enums.AssessmentReviewTiming
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAssessmentReviewTimingFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAssessmentReviewTimingFilter<$PrismaModel>
+}
+
+export type NestedEnumAssessmentReviewContentWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssessmentReviewContent | Prisma.EnumAssessmentReviewContentFieldRefInput<$PrismaModel>
+  in?: $Enums.AssessmentReviewContent[]
+  notIn?: $Enums.AssessmentReviewContent[]
+  not?: Prisma.NestedEnumAssessmentReviewContentWithAggregatesFilter<$PrismaModel> | $Enums.AssessmentReviewContent
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAssessmentReviewContentFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAssessmentReviewContentFilter<$PrismaModel>
 }
 
 export type NestedEnumAssessmentQuestionTypeFilter<$PrismaModel = never> = {

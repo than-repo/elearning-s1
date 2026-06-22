@@ -1,11 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
+import { DomainJsonValue } from '../../interfaces/detailed-assessment.interface';
+import { AssessmentQuestionType } from '../../interfaces/assessment-questions.repository.interface';
 import {
   AssessmentStatus,
   AssessmentType,
-} from '../interfaces/assessment.repository.interface';
-import { AssessmentQuestionType } from '../interfaces/assessment-questions.repository.interface';
-import { DomainJsonValue } from '../interfaces/detailed-assessment.interface';
+} from '../../interfaces/assessment.repository.interface';
 
 export class DetailedAssessmentAnswerDto {
   @ApiProperty()

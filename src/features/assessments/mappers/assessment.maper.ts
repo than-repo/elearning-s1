@@ -28,6 +28,9 @@ export class AssessmentMapper {
       availableFrom: assessmentPrisma.availableFrom,
       availableUntil: assessmentPrisma.availableUntil,
 
+      assessmentReviewTiming: assessmentPrisma.reviewTiming,
+      assessmentReviewContent: assessmentPrisma.reviewContent,
+
       isActive: assessmentPrisma.isActive,
 
       createdAt: assessmentPrisma.createdAt,

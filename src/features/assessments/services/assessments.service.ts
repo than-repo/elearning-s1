@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Inject,
   Injectable,
   NotFoundException,
@@ -9,34 +10,34 @@ import {
   AssessmentType,
   OrderAssessmentInput,
   UpdateAssessmentInput,
+  UpdatePublishedAssessmentInput,
   WhereAssessmentInput,
   type CreateAssessmentInput,
   type IAssessmentRepository,
 } from '../interfaces/assessment.repository.interface';
-import { CreateAssessmentDto } from '../dtos/create-assessment.dto';
+import { CreateAssessmentDto } from '../dtos/assessment/create-assessment.dto';
 import { AssessmentAccessService } from './assessment-access.service';
 import {
   ASSESSMENT_VIEW_GROUPS,
   AssessmentResponseDto,
-} from '../dtos/assessment-response';
+} from '../dtos/assessment/assessment-response';
 import { plainToInstance } from 'class-transformer';
-import { UpdateAssessmentDto } from '../dtos/update-assessment.dto';
+import { UpdateAssessmentDto } from '../dtos/assessment/update-assessment.dto';
 import {
   ASSESSMENT_QUERY_DEFAULTS,
   AssessmentQueryDto,
-} from '../dtos/query-assessment.dto';
-import { PaginatedAsessmentResponse } from '../dtos/pagnated-assessment-response.dto';
+} from '../dtos/assessment/query-assessment.dto';
+import { PaginatedAsessmentResponse } from '../dtos/assessment/pagnated-assessment-response.dto';
 
 import { ASSESSMENT_QUESTIONS_REPOSITORY } from '../repositories/assessment-questions.interface.token';
 import type { IAssessmentQuestionRepository } from '../interfaces/assessment-questions.repository.interface';
 import { ASSESSMENT_REPOSITORY } from '../repositories/assessment.repository.token';
-import {
-  DetailedAssessmentAnswerDto,
-  DetailedAssessmentDto,
-} from '../dtos/detailed-assessment.dto';
+
 import { DETAILED_ASSESSMENT_REPOSITORY } from '../repositories/detailed-assessment.repository.token';
 import type { IDetailedAssessmentRepository } from '../interfaces/detailed-assessment.interface';
 import { promises } from 'dns';
+import { DetailedAssessmentDto } from '../dtos/assessment/detailed-assessment.dto';
+import { UpdatePublishedAssessmentDto } from '../dtos/assessment/update-published-assessment.dto';
 
 @Injectable()
 export class AssessmentsService {
@@ -96,12 +97,13 @@ export class AssessmentsService {
       groups: [ASSESSMENT_VIEW_GROUPS.INSTRUCTOR],
     });
   }
+
   async updateDraftAssessment(
     instructorId: string,
     courseId: string,
     assessmentId: string,
     dto: UpdateAssessmentDto,
-  ) {
+  ): Promise<AssessmentResponseDto> {
     await this.assessmentAccessService.ensureInstructorCanManageAssessment(
       instructorId,
       courseId,
@@ -175,6 +177,141 @@ export class AssessmentsService {
       groups: [ASSESSMENT_VIEW_GROUPS.INSTRUCTOR],
     });
   }
+
+  async updatePublishAssessment(
+    instructorId: string,
+    courseId: string,
+    assessmentId: string,
+    dto: UpdatePublishedAssessmentDto,
+  ): Promise<AssessmentResponseDto> {
+    await this.assessmentAccessService.ensureInstructorCanManageAssessment(
+      instructorId,
+      courseId,
+      assessmentId,
+    );
+
+    const assessment =
+      await this.iAssessmentRepository.findAssessmentById(assessmentId);
+
+    if (!assessment) {
+      throw new NotFoundException('Assessment not found');
+    }
+
+    if (assessment.courseId !== courseId) {
+      throw new NotFoundException('Assessment not found in course');
+    }
+
+    if (assessment.status !== AssessmentStatus.PUBLISHED) {
+      throw new BadRequestException(
+        'Only PUBLISHED assessments can be updated with this endpoint',
+      );
+    }
+
+    if (
+      assessment.type !== AssessmentType.QUIZ &&
+      dto.timeLimitMinutes !== undefined
+    ) {
+      throw new BadRequestException(
+        'timeLimitMinutes is only allowed for QUIZ assessments',
+      );
+    }
+
+    const availableFromForValidation =
+      dto.availableFrom === undefined
+        ? assessment.availableFrom
+        : dto.availableFrom === null
+          ? null
+          : new Date(dto.availableFrom);
+
+    const availableUntilForValidation =
+      dto.availableUntil === undefined
+        ? assessment.availableUntil
+        : dto.availableUntil === null
+          ? null
+          : new Date(dto.availableUntil);
+
+    this.validateAvailabilityWindow(
+      availableFromForValidation ?? undefined,
+      availableUntilForValidation ?? undefined,
+    );
+
+    const input = {
+      maxAttempts: dto.maxAttempts,
+
+      timeLimitMinutes:
+        assessment.type === AssessmentType.QUIZ
+          ? dto.timeLimitMinutes
+          : undefined,
+
+      availableFrom:
+        dto.availableFrom === undefined
+          ? undefined
+          : dto.availableFrom === null
+            ? null
+            : new Date(dto.availableFrom),
+
+      availableUntil:
+        dto.availableUntil === undefined
+          ? undefined
+          : dto.availableUntil === null
+            ? null
+            : new Date(dto.availableUntil),
+
+      isActive: dto.isActive,
+    } satisfies UpdatePublishedAssessmentInput;
+
+    const updatedAssessment =
+      await this.iAssessmentRepository.updatePublishAssessment(
+        assessmentId,
+        input,
+      );
+
+    if (!updatedAssessment) {
+      throw new BadRequestException('Cannot update assessment. Try again');
+    }
+
+    return plainToInstance(AssessmentResponseDto, updatedAssessment, {
+      excludeExtraneousValues: true,
+      groups: [ASSESSMENT_VIEW_GROUPS.INSTRUCTOR],
+    });
+  }
+
+  async publishAssessment(
+    instructorId: string,
+    courseId: string,
+    assessmentId: string,
+  ): Promise<AssessmentResponseDto> {
+    await this.assessmentAccessService.ensureInstructorCanManageAssessment(
+      instructorId,
+      courseId,
+      assessmentId,
+    );
+
+    const assessment =
+      await this.iAssessmentRepository.findAssessmentById(assessmentId);
+
+    if (!assessment) {
+      throw new NotFoundException('Assessment not found');
+    }
+
+    if (assessment.status !== AssessmentStatus.DRAFT) {
+      throw new ConflictException('Assessment is already published');
+    }
+    const updatedAssessment =
+      await this.iAssessmentRepository.updateDraftAssessment(assessmentId, {
+        status: AssessmentStatus.PUBLISHED,
+      } satisfies UpdateAssessmentInput);
+
+    if (!updatedAssessment) {
+      throw new BadRequestException('Cannot update assessment. Try again');
+    }
+
+    return plainToInstance(AssessmentResponseDto, updatedAssessment, {
+      excludeExtraneousValues: true,
+      groups: [ASSESSMENT_VIEW_GROUPS.INSTRUCTOR],
+    });
+  }
+
   async deleteAssessment(
     instructorId: string,
     courseId: string,

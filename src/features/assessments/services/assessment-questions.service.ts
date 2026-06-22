@@ -25,7 +25,7 @@ import {
   UpdateAssessmentQuestionDto,
 } from '../dtos/questions/assessment-question.dto';
 import { AssessmentQuestionResponseDto } from '../dtos/questions/assessment-question-response.dto';
-import { ASSESSMENT_VIEW_GROUPS } from '../dtos/assessment-response';
+import { ASSESSMENT_VIEW_GROUPS } from '../dtos/assessment/assessment-response';
 import { ASSESSMENT_REPOSITORY } from '../repositories/assessment.repository.token';
 import { ASSESSMENT_QUESTIONS_REPOSITORY } from '../repositories/assessment-questions.interface.token';
 

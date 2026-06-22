@@ -456,6 +456,20 @@ enum AssessmentAttemptStatus {
   FAILED
 }
 
+enum AssessmentReviewTiming {
+  NEVER
+  AFTER_SUBMIT
+  AFTER_GRADED
+  AFTER_ASSESSMENT_CLOSED
+  MANUAL
+}
+
+enum AssessmentReviewContent {
+  SCORE_ONLY
+  SCORE_AND_ANSWERS
+  FULL_REVIEW
+}
+
 model Assessment {
   id       String @id @default(uuid())
   courseId String
@@ -479,6 +493,10 @@ model Assessment {
   // Availability
   availableFrom  DateTime?
   availableUntil DateTime?
+
+  //Review
+  reviewTiming  AssessmentReviewTiming  @default(AFTER_GRADED)
+  reviewContent AssessmentReviewContent @default(SCORE_ONLY)
 
   isActive  Boolean   @default(true)
   createdAt DateTime  @default(now())
