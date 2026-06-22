@@ -13,6 +13,7 @@ import { EnrollmentsModule } from './features/enrollments/enrollments.module';
 import { LearningModule } from './features/learning/learning.module';
 import { PaymentsModule } from './features/payment/payments.module';
 import vnpayConfig from './config/vnpay.config';
+import { AssessmentsModule } from './features/assessments/assessments.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import vnpayConfig from './config/vnpay.config';
     EnrollmentsModule,
     LearningModule,
     PaymentsModule,
+    AssessmentsModule,
   ],
   controllers: [],
   providers: [
