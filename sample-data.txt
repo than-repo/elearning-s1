@@ -27,6 +27,9 @@
 }
 //common pw TestPw@123
 
+INSTRUCTOR_A@example.com
+123@ABCabc
+
 
 {
   "fullName": "REVIEWER_ALL",

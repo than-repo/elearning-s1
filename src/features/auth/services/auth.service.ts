@@ -199,7 +199,7 @@ export class AuthService {
   }
 
   async logout(refreshToken: string): Promise<{ message: string }> {
-    // Try to revoke the token (it may already be expired/revoked — we don't throw)
+    // Try to revoke the token (it may already be expired/revoked — don't throw)
     const record =
       await this.authRepository.findRefreshTokenByToken(refreshToken);
     if (record) {

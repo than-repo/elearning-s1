@@ -50,6 +50,7 @@ import { PaginatedAsessmentResponse } from '../dtos/assessment/paginated-assessm
 import { AssessmentQueryDto } from '../dtos/assessment/query-assessment.dto';
 import { DetailedAssessmentDto } from '../dtos/assessment/detailed-assessment.dto';
 import { UpdatePublishedAssessmentDto } from '../dtos/assessment/update-published-assessment.dto';
+import { UpdatedPublishedAssessmentResponseDto } from '../dtos/assessment/updated-published-assessment-response.dto';
 
 @Controller({ path: 'instructor/course/:courseId/assessments', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -147,7 +148,7 @@ export class InstructorAssessmentsController {
     @Param('courseId', ParseUUIDPipe) courseId: string,
     @Param('assessmentId', ParseUUIDPipe) assessmentId: string,
     @Body() dto: UpdatePublishedAssessmentDto,
-  ): Promise<AssessmentResponseDto> {
+  ): Promise<UpdatedPublishedAssessmentResponseDto> {
     return this.assessmentsService.updatePublishAssessment(
       instructorId,
       courseId,

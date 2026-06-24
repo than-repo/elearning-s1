@@ -38,6 +38,7 @@ import type { IDetailedAssessmentRepository } from '../interfaces/detailed-asses
 import { promises } from 'dns';
 import { DetailedAssessmentDto } from '../dtos/assessment/detailed-assessment.dto';
 import { UpdatePublishedAssessmentDto } from '../dtos/assessment/update-published-assessment.dto';
+import { UpdatedPublishedAssessmentResponseDto } from '../dtos/assessment/updated-published-assessment-response.dto';
 
 @Injectable()
 export class AssessmentsService {
@@ -183,7 +184,7 @@ export class AssessmentsService {
     courseId: string,
     assessmentId: string,
     dto: UpdatePublishedAssessmentDto,
-  ): Promise<AssessmentResponseDto> {
+  ): Promise<UpdatedPublishedAssessmentResponseDto> {
     await this.assessmentAccessService.ensureInstructorCanManageAssessment(
       instructorId,
       courseId,
@@ -270,10 +271,14 @@ export class AssessmentsService {
       throw new BadRequestException('Cannot update assessment. Try again');
     }
 
-    return plainToInstance(AssessmentResponseDto, updatedAssessment, {
-      excludeExtraneousValues: true,
-      groups: [ASSESSMENT_VIEW_GROUPS.INSTRUCTOR],
-    });
+    return plainToInstance(
+      UpdatedPublishedAssessmentResponseDto,
+      updatedAssessment,
+      {
+        excludeExtraneousValues: true,
+        groups: [ASSESSMENT_VIEW_GROUPS.INSTRUCTOR],
+      },
+    );
   }
 
   async publishAssessment(

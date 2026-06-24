@@ -63,7 +63,7 @@ export class LearnerAssessmentsController {
   ) {}
 
   @Get()
-  @Throttle({ default: { ttl: 60, limit: 30 } })
+  @Throttle({ default: { ttl: 60, limit: 300 } })
   @ApiOperation({ summary: 'Get learner course assessments' })
   @ApiParam({ name: 'courseId', type: String })
   @ApiOkResponse({ type: LearnerCourseAssessmentsDto })
@@ -90,7 +90,7 @@ export class LearnerAssessmentsController {
    * - Locked / not available
    */
   @Get(':assessmentId')
-  @Throttle({ default: { ttl: 60, limit: 30 } })
+  @Throttle({ default: { ttl: 60, limit: 300 } })
   @ApiOperation({ summary: 'Get learner assessment entry page' })
   @ApiParam({ name: 'courseId', type: String })
   @ApiParam({ name: 'assessmentId', type: String })
@@ -259,7 +259,7 @@ export class LearnerAssessmentsController {
    * Does not return questions, learner answers, or correct answers.
    */
   @Get(':assessmentId/attempts')
-  @Throttle({ default: { ttl: 60, limit: 30 } })
+  @Throttle({ default: { ttl: 60, limit: 300 } })
   @ApiOperation({ summary: 'Get learner assessment attempt history' })
   @ApiParam({ name: 'courseId', type: String })
   @ApiParam({ name: 'assessmentId', type: String })
@@ -290,7 +290,7 @@ export class LearnerAssessmentsController {
    * FE must not decide whether correct answers are visible.
    */
   @Get(':assessmentId/attempts/:attemptId/result')
-  @Throttle({ default: { ttl: 60, limit: 30 } })
+  @Throttle({ default: { ttl: 60, limit: 300 } })
   @ApiOperation({ summary: 'Get learner attempt result or review' })
   @ApiParam({ name: 'courseId', type: String })
   @ApiParam({ name: 'assessmentId', type: String })
