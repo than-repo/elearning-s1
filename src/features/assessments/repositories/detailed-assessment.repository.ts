@@ -68,6 +68,9 @@ export class DetailedAssessmentRepository implements IDetailedAssessmentReposito
       availableFrom: assessmentPrisma.availableFrom ?? null,
       availableUntil: assessmentPrisma.availableUntil ?? null,
 
+      reviewTiming: assessmentPrisma.reviewTiming,
+      reviewContent: assessmentPrisma.reviewContent,
+
       isActive: assessmentPrisma.isActive,
 
       createdAt: assessmentPrisma.createdAt,
