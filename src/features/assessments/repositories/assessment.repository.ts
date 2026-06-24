@@ -8,7 +8,7 @@ import {
   UpdatePublishedAssessmentInput,
   WhereAssessmentInput,
 } from '../interfaces/assessment.repository.interface';
-import { AssessmentMapper } from '../mappers/assessment.maper';
+import { AssessmentMapper } from '../mappers/assessment.mapper';
 import { Prisma } from 'generated/prisma/client';
 import { Inject, Injectable } from '@nestjs/common';
 

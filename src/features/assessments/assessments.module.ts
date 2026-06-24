@@ -1,6 +1,5 @@
 import { Controller, Module } from '@nestjs/common';
 import { AssessmentsService } from './services/assessments.service';
-import { InstructorController } from './controllers/instructor.controller';
 import { ASSESSMENT_REPOSITORY } from './repositories/assessment.repository.token';
 import { AssessmentRepository } from './repositories/assessment.repository';
 
@@ -18,6 +17,12 @@ import { ASSESSMENT_ANSWERS_REPOSITORY } from './repositories/assessment-answers
 import { DETAILED_ASSESSMENT_REPOSITORY } from './repositories/detailed-assessment.repository.token';
 import { DetailedAssessmentRepository } from './repositories/detailed-assessment.repository';
 import { PrismaService } from 'src/core/database/prisma.service';
+import { InstructorAssessmentsController } from './controllers/instructor-assessments.controller';
+import { LearnerAssessmentsService } from './services/learner-assessments.service';
+import { ATTEMPT_REPOSITORY } from './repositories/attempt.repository.token';
+import { AttemptRepository } from './repositories/attempt.repository';
+import { LearnerAssessmentsController } from './controllers/learner-assessments.controller';
+import { PrismaModule } from 'src/core/database/prisma.module';
 
 @Module({
   providers: [
@@ -25,6 +30,7 @@ import { PrismaService } from 'src/core/database/prisma.service';
     AssessmentAccessService,
     AssessmentAnswersService,
     AssessmentQuestionsService,
+    LearnerAssessmentsService,
     {
       provide: ASSESSMENT_REPOSITORY,
       useClass: AssessmentRepository,
@@ -45,9 +51,13 @@ import { PrismaService } from 'src/core/database/prisma.service';
       provide: DETAILED_ASSESSMENT_REPOSITORY,
       useClass: DetailedAssessmentRepository,
     },
+    {
+      provide: ATTEMPT_REPOSITORY,
+      useClass: AttemptRepository,
+    },
   ],
-  imports: [PrismaService],
-  controllers: [InstructorController],
+  imports: [PrismaModule],
+  controllers: [InstructorAssessmentsController, LearnerAssessmentsController],
   exports: [],
 })
 export class AssessmentsModule {}

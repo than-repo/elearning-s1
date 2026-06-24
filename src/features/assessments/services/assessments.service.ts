@@ -27,7 +27,7 @@ import {
   ASSESSMENT_QUERY_DEFAULTS,
   AssessmentQueryDto,
 } from '../dtos/assessment/query-assessment.dto';
-import { PaginatedAsessmentResponse } from '../dtos/assessment/pagnated-assessment-response.dto';
+import { PaginatedAsessmentResponse } from '../dtos/assessment/paginated-assessment-response.dto';
 
 import { ASSESSMENT_QUESTIONS_REPOSITORY } from '../repositories/assessment-questions.interface.token';
 import type { IAssessmentQuestionRepository } from '../interfaces/assessment-questions.repository.interface';

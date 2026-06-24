@@ -46,7 +46,7 @@ import { AssessmentQuestionsService } from '../services/assessment-questions.ser
 import { AssessmentAnswersService } from '../services/assessment-answers.service';
 import { AssessmentAnswerResponseDto } from '../dtos/answers/assessment-answer-response.dto';
 import { UpsertAssessmentAnswerDto } from '../dtos/answers/assessment-answer.dto';
-import { PaginatedAsessmentResponse } from '../dtos/assessment/pagnated-assessment-response.dto';
+import { PaginatedAsessmentResponse } from '../dtos/assessment/paginated-assessment-response.dto';
 import { AssessmentQueryDto } from '../dtos/assessment/query-assessment.dto';
 import { DetailedAssessmentDto } from '../dtos/assessment/detailed-assessment.dto';
 import { UpdatePublishedAssessmentDto } from '../dtos/assessment/update-published-assessment.dto';
@@ -56,7 +56,7 @@ import { UpdatePublishedAssessmentDto } from '../dtos/assessment/update-publishe
 @Roles(UserRole.INSTRUCTOR)
 @ApiTags('Assessment - Instructor')
 @Throttle({ default: { ttl: 60, limit: 5 } })
-export class InstructorController {
+export class InstructorAssessmentsController {
   constructor(
     private readonly assessmentsService: AssessmentsService,
     private readonly assessmentQuestionsService: AssessmentQuestionsService,

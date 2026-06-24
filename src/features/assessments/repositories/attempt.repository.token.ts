@@ -1,0 +1,1 @@
+export const ATTEMPT_REPOSITORY = Symbol('ATTEMPT_REPOSITORY');
