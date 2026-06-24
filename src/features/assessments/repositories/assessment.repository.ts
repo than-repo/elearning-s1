@@ -84,7 +84,18 @@ export class AssessmentRepository implements IAssessmentRepository {
   ): Promise<Assessment> {
     const assessment = await this.prisma.assessment.update({
       where: { id: assessmentId },
-      data: { ...input },
+      data: {
+        maxAttempts: input.maxAttempts,
+        timeLimitMinutes: input.timeLimitMinutes,
+
+        availableFrom: input.availableFrom,
+        availableUntil: input.availableUntil,
+
+        reviewTiming: input.assessmentReviewTiming,
+        reviewContent: input.assessmentReviewContent,
+
+        isActive: input.isActive,
+      },
     });
 
     return AssessmentMapper.toAssessment(assessment);

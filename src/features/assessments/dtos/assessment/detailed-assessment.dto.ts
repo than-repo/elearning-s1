@@ -6,6 +6,11 @@ import {
   AssessmentStatus,
   AssessmentType,
 } from '../../interfaces/assessment.repository.interface';
+import {
+  AssessmentReviewContent,
+  AssessmentReviewTiming,
+} from 'generated/prisma/enums';
+import { IsEnum } from 'class-validator';
 
 export class DetailedAssessmentAnswerDto {
   @ApiProperty()
@@ -163,6 +168,14 @@ export class DetailedAssessmentDto {
   @Expose()
   @Type(() => DetailedAssessmentQuestionDto)
   questions!: DetailedAssessmentQuestionDto[];
+
+  @ApiProperty({ enum: AssessmentReviewTiming })
+  @Expose()
+  reviewTiming!: AssessmentReviewTiming;
+
+  @ApiProperty({ enum: AssessmentReviewContent })
+  @Expose()
+  reviewContent!: AssessmentReviewContent;
 
   @ApiProperty()
   @Expose()

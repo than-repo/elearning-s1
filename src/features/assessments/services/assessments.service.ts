@@ -258,6 +258,9 @@ export class AssessmentsService {
             ? null
             : new Date(dto.availableUntil),
 
+      assessmentReviewTiming: dto.assessmentReviewTiming,
+      assessmentReviewContent: dto.assessmentReviewContent,
+
       isActive: dto.isActive,
     } satisfies UpdatePublishedAssessmentInput;
 

@@ -1,5 +1,7 @@
 import { AssessmentQuestionType } from './assessment-questions.repository.interface';
 import {
+  AssessmentReviewContent,
+  AssessmentReviewTiming,
   AssessmentStatus,
   AssessmentType,
 } from './assessment.repository.interface';
@@ -42,6 +44,9 @@ export interface DetailedAssessment {
 
   availableFrom: Date | null;
   availableUntil: Date | null;
+
+  reviewTiming: AssessmentReviewTiming;
+  reviewContent: AssessmentReviewContent;
 
   isActive: boolean;
 
