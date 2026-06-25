@@ -31,15 +31,19 @@ export class CategoryQueryDto {
   @IsUUID()
   parentId?: string;
 
-  @ApiPropertyOptional({
-    description: 'Filter active status',
-    example: true,
-  })
-  @IsOptional()
-  @Transform(({ value }) => {
-    if (value === true || value === 'true') return true;
+  @Transform(({ obj, key }) => {
+    const value = obj[key];
 
-    if (value === false || value === 'false') return false;
+    if (value === undefined || value === null || value === '') return undefined;
+
+    if (typeof value === 'boolean') return value;
+
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+
+      if (normalized === 'true') return true;
+      if (normalized === 'false') return false;
+    }
 
     return value;
   })
@@ -51,10 +55,19 @@ export class CategoryQueryDto {
     example: false,
   })
   @IsOptional()
-  @Transform(({ value }) => {
-    if (value === true || value === 'true') return true;
+  @Transform(({ obj, key }) => {
+    const value = obj[key];
 
-    if (value === false || value === 'false') return false;
+    if (value === undefined || value === null || value === '') return undefined;
+
+    if (typeof value === 'boolean') return value;
+
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+
+      if (normalized === 'true') return true;
+      if (normalized === 'false') return false;
+    }
 
     return value;
   })
