@@ -33,19 +33,31 @@ export class CategoryQueryDto {
 
   @ApiPropertyOptional({
     description: 'Filter active status',
-    example: 'true',
+    example: true,
   })
   @IsOptional()
-  @Transform(({ value }) => value === 'true')
+  @Transform(({ value }) => {
+    if (value === true || value === 'true') return true;
+
+    if (value === false || value === 'false') return false;
+
+    return value;
+  })
   @IsBoolean()
   isActive?: boolean;
 
   @ApiPropertyOptional({
     description: 'Include soft deleted categories',
-    example: 'false',
+    example: false,
   })
   @IsOptional()
-  @Transform(({ value }) => value === 'true')
+  @Transform(({ value }) => {
+    if (value === true || value === 'true') return true;
+
+    if (value === false || value === 'false') return false;
+
+    return value;
+  })
   @IsBoolean()
   includeDeleted?: boolean;
 

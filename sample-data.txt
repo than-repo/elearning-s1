@@ -1,15 +1,12 @@
-{
-  "fullName": "Test User",
-  "email": "test@example.com",
-  "password": "12345678"
-}
 
-{
-  "email": "johndoe@example.com",
-  "password": "John@12345"
-}
+  johndoe@example.com
+  John@12345
 
-//Admin
+
+  ykw91875@laoia.com
+  TestPw@123
+
+//=============================================Admin
 {
   "fullName": "Admin 1",
   "email": "Admin1@example.com",
@@ -18,7 +15,7 @@
 }
 //@123abcABC
 
-//instructor
+//=========================================instructor
 {
   "fullName": "INSTRUCTOR_1",
   "email": "INSTRUCTOR_1@example.com",
@@ -30,7 +27,7 @@
 INSTRUCTOR_A@example.com
 123@ABCabc
 
-
+//=============================reviewer
 {
   "fullName": "REVIEWER_ALL",
   "email": "REVIEWER_ALL@example.com",
@@ -38,10 +35,7 @@ INSTRUCTOR_A@example.com
   "role": "REVIEWER"
 }
 
-user {
-  ykw91875@laoia.com
-  TestPw@123
-}
+
 
 VNPAY
 @Vnpay2026
