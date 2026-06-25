@@ -1320,8 +1320,10 @@ export class LearnerAssessmentsService {
       });
     }
 
-    const passingScore = params.passingScore ?? maxScore;
-    const passed = score >= passingScore;
+    const passingPercentage = params.passingScore ?? 100;
+    const requiredScore = (maxScore * passingPercentage) / 100;
+
+    const passed = score >= requiredScore;
 
     return {
       score,

@@ -48,6 +48,7 @@ export class CategoryQueryDto {
     return value;
   })
   @IsBoolean()
+  @IsOptional()
   isActive?: boolean;
 
   @ApiPropertyOptional({
