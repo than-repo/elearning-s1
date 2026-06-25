@@ -54,6 +54,7 @@ import { FileMediaResponseDto } from '../dtos/file-media/file-media-response.dto
 import { QueryFileMediaDto } from '../dtos/file-media/query-file-media.dto';
 import { UpdateFileMediaDto } from '../dtos/file-media/update-file-media.dto';
 import { FileMediaService } from '../services/file-media.service';
+import { InstructorCourseLatestReviewResponseDto } from '../dtos/course/instructor-course-review.dto';
 
 @Controller({ path: 'instructor/courses', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -68,6 +69,27 @@ export class InstructorCoursesController {
     private readonly fileMediaService: FileMediaService,
   ) {}
 
+  //Review information
+  @Get(':courseId/reviews/latest')
+  @ApiOperation({
+    summary: 'Get latest reviewer note for own course - Instructor',
+  })
+  @ApiOkResponse({ type: InstructorCourseLatestReviewResponseDto })
+  @ApiBadRequestResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiNotFoundResponse()
+  async getLatestReviewForCourse(
+    @CurrentUser('sub') instructorId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+  ): Promise<InstructorCourseLatestReviewResponseDto> {
+    return this.coursesService.getLatestReviewForInstructorCourse(
+      instructorId,
+      courseId,
+    );
+  }
+
+  //======================== Course
   @Get()
   @ApiOperation({ summary: 'Get my courses - Instructor' })
   @ApiOkResponse({ type: PaginatedCourseResponseDto })

@@ -33,6 +33,9 @@ import { slugify } from 'src/common/utils/slugify.util';
 import { CATEGORY_REPOSITORY } from '../repositories/category-repository.token';
 import { UpdateCourseDto } from '../dtos/course/update-course.dto';
 import { CourseAccessService } from './course-access.service';
+import { COURSE_REVIEW_REPOSITORY } from '../repositories/course-review-repository.token';
+import type { ICourseReviewRepository } from '../interfaces/course-review.repository.interface';
+import { InstructorCourseLatestReviewResponseDto } from '../dtos/course/instructor-course-review.dto';
 
 const MAX_SLUG_RETRY_ATTEMPTS = 3;
 
@@ -46,7 +49,44 @@ export class CoursesService {
 
     @Inject(CATEGORY_REPOSITORY)
     private readonly iCategoryRepository: ICategoryRepository,
+
+    @Inject(COURSE_REVIEW_REPOSITORY)
+    private readonly iCourseReviewRepository: ICourseReviewRepository,
   ) {}
+
+  async getLatestReviewForInstructorCourse(
+    instructorId: string,
+    courseId: string,
+  ): Promise<InstructorCourseLatestReviewResponseDto> {
+    const course = await this.iCourseRepository.findById(courseId);
+
+    if (!course) {
+      throw new NotFoundException('COURSE_NOT_FOUND');
+    }
+
+    await this.courseAccessService.ensureInstructorCanManageCourse(
+      courseId,
+      instructorId,
+    );
+
+    const latestReview =
+      await this.iCourseReviewRepository.findLatestCompletedReviewByCourseId(
+        courseId,
+      );
+
+    if (!latestReview) {
+      throw new NotFoundException('COURSE_REVIEW_NOT_FOUND');
+    }
+
+    return plainToInstance(
+      InstructorCourseLatestReviewResponseDto,
+      latestReview,
+      {
+        excludeExtraneousValues: true,
+      },
+    );
+  }
+
   private async generateUniqueSlug(
     title: string,
     courseId?: string,

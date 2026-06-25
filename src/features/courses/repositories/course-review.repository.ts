@@ -20,6 +20,7 @@ import {
   FindAvailableReviewCoursesParams,
   FindReviewableCoursesParams,
   ICourseReviewRepository,
+  InstructorCourseLatestReviewModel,
 } from '../interfaces/course-review.repository.interface';
 
 import {
@@ -27,6 +28,7 @@ import {
   ReviewerCourseSortField,
   SortDirection,
 } from '../dtos/course/reviewer-course-query.dto';
+import { InstructorCourseLatestReviewResponseDto } from '../dtos/course/instructor-course-review.dto';
 
 const availableReviewCourseInclude = {
   courseCategories: {
@@ -460,6 +462,61 @@ export class CourseReviewRepository implements ICourseReviewRepository {
         course,
       };
     });
+  }
+
+  async findLatestCompletedReviewByCourseId(
+    courseId: string,
+  ): Promise<InstructorCourseLatestReviewModel | null> {
+    const review = await this.prisma.courseReview.findFirst({
+      where: {
+        courseId,
+        reviewedAt: {
+          not: null,
+        },
+        status: {
+          in: [
+            CourseReviewStatus.APPROVED,
+            CourseReviewStatus.CHANGES_REQUESTED,
+            CourseReviewStatus.REJECTED,
+          ],
+        },
+      },
+      select: {
+        id: true,
+        courseId: true,
+        status: true,
+        reviewNote: true,
+        submittedAt: true,
+        reviewedAt: true,
+        course: {
+          select: {
+            status: true,
+          },
+        },
+      },
+      orderBy: [
+        {
+          reviewedAt: 'desc',
+        },
+        {
+          submittedAt: 'desc',
+        },
+      ],
+    });
+
+    if (!review) {
+      return null;
+    }
+
+    return {
+      reviewId: review.id,
+      courseId: review.courseId,
+      courseStatus: review.course.status,
+      reviewStatus: review.status,
+      reviewNote: review.reviewNote,
+      submittedAt: review.submittedAt,
+      reviewedAt: review.reviewedAt,
+    };
   }
 
   private buildReviewableCourseWhere(params: {

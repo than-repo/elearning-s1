@@ -216,6 +216,16 @@ export type ClaimCourseForReviewResult =
       status: 'already_claimed';
     };
 
+export interface InstructorCourseLatestReviewModel {
+  reviewId: string;
+  courseId: string;
+  courseStatus: CourseStatus;
+  reviewStatus: CourseReviewStatus;
+  reviewNote?: string | null;
+  submittedAt: Date;
+  reviewedAt?: Date | null;
+}
+
 export interface ICourseReviewRepository {
   findAvailableCourses(
     params: FindAvailableReviewCoursesParams,
@@ -252,4 +262,8 @@ export interface ICourseReviewRepository {
   submitReviewDecision(
     input: CourseReviewDecisionInput,
   ): Promise<CourseReviewDecisionModel | null>;
+
+  findLatestCompletedReviewByCourseId(
+    courseId: string,
+  ): Promise<InstructorCourseLatestReviewModel | null>;
 }

@@ -35,6 +35,14 @@ INSTRUCTOR_A@example.com
   "role": "REVIEWER"
 }
 
+Reviewer BackendA
+reviewerbackenda@gmail.com
+123@ABCabc
+
+Reviewer FrontEndA
+reviewerfrontenda@gmail.com
+123@ABCabc
+
 
 
 VNPAY
