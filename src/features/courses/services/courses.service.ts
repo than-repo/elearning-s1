@@ -159,11 +159,21 @@ export class CoursesService {
       return false;
     }
 
+    if (error.code !== 'P2002') {
+      return false;
+    }
+
     const target = error.meta?.target;
 
-    return (
-      error.code === 'P2002' && Array.isArray(target) && target.includes('slug')
-    );
+    if (Array.isArray(target)) {
+      return target.includes('slug');
+    }
+
+    if (typeof target === 'string') {
+      return target.includes('slug') || target === 'courses_slug_key';
+    }
+
+    return false;
   }
 
   async findAllPublic(

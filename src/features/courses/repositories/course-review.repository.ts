@@ -1,3 +1,4 @@
+import { CourseReview } from './../../../../generated/prisma/client';
 // src/features/courses/repositories/prisma-course-review.repository.ts
 
 import { Injectable } from '@nestjs/common';
@@ -195,50 +196,83 @@ export class CourseReviewRepository implements ICourseReviewRepository {
   }): Prisma.CourseWhereInput {
     const search = params.search?.trim();
 
-    return {
-      ...this.buildReviewableCourseScope(params.reviewerId),
-      status: CourseStatus.IN_REVIEW,
-      reviewClaimedById: null,
+    const filters: Prisma.CourseWhereInput[] = [
+      {
+        ...this.buildReviewableCourseScope(params.reviewerId),
 
-      ...(params.level
-        ? {
-            level: params.level,
-          }
-        : {}),
+        status: CourseStatus.IN_REVIEW,
+        reviewClaimedById: null,
 
-      ...(search
-        ? {
-            OR: [
-              {
-                title: {
-                  contains: search,
-                },
-              },
-              {
-                shortDescription: {
-                  contains: search,
-                },
-              },
-              {
-                description: {
-                  contains: search,
-                },
-              },
-            ],
-          }
-        : {}),
+        ...(params.level
+          ? {
+              level: params.level,
+            }
+          : {}),
 
-      courseCategories: {
-        some: {
-          ...this.buildAuthorizedCourseCategoryScope(params.reviewerId),
+        courseCategories: {
+          some: {
+            ...this.buildAuthorizedCourseCategoryScope(params.reviewerId),
 
-          ...(params.categoryId
-            ? {
-                categoryId: params.categoryId,
-              }
-            : {}),
+            ...(params.categoryId
+              ? {
+                  categoryId: params.categoryId,
+                }
+              : {}),
+          },
         },
       },
+
+      this.buildChangesRequestedReviewerAccessScope(params.reviewerId),
+    ];
+
+    if (search) {
+      filters.push({
+        OR: [
+          {
+            title: {
+              contains: search,
+            },
+          },
+          {
+            shortDescription: {
+              contains: search,
+            },
+          },
+          {
+            description: {
+              contains: search,
+            },
+          },
+        ],
+      });
+    }
+
+    return {
+      AND: filters,
+    };
+  }
+
+  private buildChangesRequestedReviewerAccessScope(
+    reviewerId: string,
+  ): Prisma.CourseWhereInput {
+    return {
+      OR: [
+        {
+          reviews: {
+            none: {
+              status: CourseReviewStatus.CHANGES_REQUESTED,
+            },
+          },
+        },
+        {
+          reviews: {
+            some: {
+              reviewerId,
+              status: CourseReviewStatus.CHANGES_REQUESTED,
+            },
+          },
+        },
+      ],
     };
   }
 
@@ -263,6 +297,9 @@ export class CourseReviewRepository implements ICourseReviewRepository {
           id: courseId,
           ...this.buildReviewableCourseScope(reviewerId),
           status: CourseStatus.IN_REVIEW,
+
+          ...this.buildChangesRequestedReviewerAccessScope(reviewerId),
+
           courseCategories: {
             some: this.buildAuthorizedCourseCategoryScope(reviewerId),
           },
@@ -290,8 +327,9 @@ export class CourseReviewRepository implements ICourseReviewRepository {
       const claimResult = await tx.course.updateMany({
         where: {
           id: courseId,
-          status: CourseStatus.IN_REVIEW,
-          reviewClaimedById: null,
+          ...this.buildAvailableReviewCourseWhere({
+            reviewerId,
+          }),
         },
         data: {
           reviewClaimedById: reviewerId,
@@ -517,6 +555,26 @@ export class CourseReviewRepository implements ICourseReviewRepository {
       submittedAt: review.submittedAt,
       reviewedAt: review.reviewedAt,
     };
+  }
+
+  async findMyChangedRequest(
+    reviewerId: string,
+  ): Promise<AvailableReviewCourseModel[]> {
+    const availableCourses = await this.prisma.courseReview.findMany({
+      where: {
+        reviewerId,
+        status: CourseReviewStatus.CHANGES_REQUESTED,
+      },
+      include: {
+        course: {
+          include: availableReviewCourseInclude,
+        },
+      },
+    });
+
+    return availableCourses.map((review) =>
+      this.toAvailableReviewCourseModel(review.course),
+    );
   }
 
   private buildReviewableCourseWhere(params: {

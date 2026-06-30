@@ -31,6 +31,10 @@ export class CategoryQueryDto {
   @IsUUID()
   parentId?: string;
 
+  @ApiPropertyOptional({
+    description: 'Filter by isActive',
+    example: true,
+  })
   @Transform(({ obj, key }) => {
     const value = obj[key];
 

@@ -266,4 +266,8 @@ export interface ICourseReviewRepository {
   findLatestCompletedReviewByCourseId(
     courseId: string,
   ): Promise<InstructorCourseLatestReviewModel | null>;
+
+  findMyChangedRequest(
+    reviewerId: string,
+  ): Promise<AvailableReviewCourseModel[]>;
 }

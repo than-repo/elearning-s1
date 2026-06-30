@@ -60,7 +60,7 @@ export class ReviewerCoursesService {
 
     const sortDirection = dto.sortDirection ?? SortDirection.DESC;
 
-    const [courses, total] = await Promise.all([
+    let [courses, total] = await Promise.all([
       this.courseReviewRepository.findAvailableCourses({
         reviewerId,
         search,
@@ -203,9 +203,13 @@ export class ReviewerCoursesService {
       );
     }
 
-    return plainToInstance(ReviewerCourseReviewWorkspaceResponseDto, reviewTask, {
-      excludeExtraneousValues: true,
-    });
+    return plainToInstance(
+      ReviewerCourseReviewWorkspaceResponseDto,
+      reviewTask,
+      {
+        excludeExtraneousValues: true,
+      },
+    );
   }
 
   async submitReviewDecision(

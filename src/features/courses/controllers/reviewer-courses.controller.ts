@@ -111,10 +111,7 @@ export class ReviewerCoursesController {
     @CurrentUser('sub') reviewerId: string,
     @Param('reviewId', ParseUUIDPipe) reviewId: string,
   ): Promise<ReviewerCourseReviewWorkspaceResponseDto> {
-    return this.reviewerCoursesService.getReviewWorkspace(
-      reviewerId,
-      reviewId,
-    );
+    return this.reviewerCoursesService.getReviewWorkspace(reviewerId, reviewId);
   }
 
   @Patch(':reviewId/decision')
