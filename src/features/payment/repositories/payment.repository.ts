@@ -12,6 +12,7 @@ import {
   PaymentMethod as DomainPaymentMethod,
   PaymentStatus as DomainPaymentStatus,
   FindUniquePaymentInput,
+  FindLearnerPaymentHistoryInput,
   SettlePaidPaymentAndActivateEnrollmentInput,
   UpdatePaymentInput,
   LearnerPaymentHistoryItem,
@@ -368,18 +369,28 @@ export class PaymentRepository implements IPaymentRepository {
 
   //Find payment history
   async findLearnerPaymentHistory(
-    learnerId: string,
+    input: FindLearnerPaymentHistoryInput,
   ): Promise<LearnerPaymentHistoryItem[]> {
     const payments = await this.prisma.payment.findMany({
       where: {
-        userId: learnerId,
+        userId: input.learnerId,
       },
       select: paymentSelectForLearner,
       orderBy: {
         createdAt: 'desc',
       },
+      skip: input.offset,
+      take: input.limit,
     });
 
     return payments.map((payment) => this.toPaymentsHistory(payment));
+  }
+
+  async countLearnerPayments(learnerId: string): Promise<number> {
+    return this.prisma.payment.count({
+      where: {
+        userId: learnerId,
+      },
+    });
   }
 }

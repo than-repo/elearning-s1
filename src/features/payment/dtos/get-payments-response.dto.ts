@@ -7,14 +7,32 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUrl,
   IsUUID,
+  Max,
   Min,
 } from 'class-validator';
 import {
   PaymentMethod,
   PaymentStatus,
 } from '../interfaces/payment.repository.interface';
+import { PaginationMetaDto } from '../../courses/dtos/paginated-response.dto';
+
+export class GetPaymentsQueryDto {
+  @ApiPropertyOptional({ example: 10, minimum: 1, maximum: 50 })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  @IsOptional()
+  limit?: number;
+
+  @ApiPropertyOptional({ example: 1, minimum: 1 })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  page?: number;
+}
 
 export class LearnerPaymentCourseDto {
   @ApiProperty({
@@ -121,5 +139,13 @@ export class GetPaymentsResponseDto {
   @Expose()
   @Type(() => LearnerPaymentItemDto)
   @IsNotEmpty()
-  payments!: LearnerPaymentItemDto[];
+  data!: LearnerPaymentItemDto[];
+
+  @ApiProperty({
+    type: () => PaginationMetaDto,
+  })
+  @Expose()
+  @Type(() => PaginationMetaDto)
+  @IsNotEmpty()
+  meta!: PaginationMetaDto;
 }

@@ -38,7 +38,14 @@ import {
 } from '../dtos/simulation-payment-response.dto';
 import { randomUUID } from 'crypto';
 import { PAYMENT_REPOSITORY } from '../repositories/payment.repository.token';
-import { GetPaymentsResponseDto } from '../dtos/get-payments-response.dto';
+import {
+  GetPaymentsQueryDto,
+  GetPaymentsResponseDto,
+  LearnerPaymentItemDto,
+} from '../dtos/get-payments-response.dto';
+
+const DEFAULT_PAYMENT_LIMIT = 10;
+const MAX_PAYMENT_LIMIT = 50;
 
 @Injectable()
 export class PaymentsService {
@@ -333,17 +340,41 @@ export class PaymentsService {
     }
   }
 
-  async getLearnerPayments(learnerId: string): Promise<GetPaymentsResponseDto> {
-    const payments =
-      await this.iPaymentRepository.findLearnerPaymentHistory(learnerId);
-
-    return plainToInstance(
-      GetPaymentsResponseDto,
-      { payments },
-      {
-        excludeExtraneousValues: true,
-      },
+  async getLearnerPayments(
+    learnerId: string,
+    query: GetPaymentsQueryDto = {},
+  ): Promise<GetPaymentsResponseDto> {
+    const page = Math.max(query.page ?? 1, 1);
+    const limit = Math.min(
+      Math.max(query.limit ?? DEFAULT_PAYMENT_LIMIT, 1),
+      MAX_PAYMENT_LIMIT,
     );
+    const offset = (page - 1) * limit;
+
+    const [payments, total] = await Promise.all([
+      this.iPaymentRepository.findLearnerPaymentHistory({
+        learnerId,
+        limit,
+        offset,
+      }),
+      this.iPaymentRepository.countLearnerPayments(learnerId),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: plainToInstance(LearnerPaymentItemDto, payments, {
+        excludeExtraneousValues: true,
+      }),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
   }
 
   private normalizeVnpayQuery(query: VnpayReturnQuery): Record<string, string> {

@@ -134,6 +134,12 @@ export type FindUniquePaymentInput =
     };
 
 // Payment history
+export interface FindLearnerPaymentHistoryInput {
+  learnerId: string;
+  limit: number;
+  offset: number;
+}
+
 export interface LearnerPaymentHistoryCourse {
   id: string;
   title: string;
@@ -174,6 +180,8 @@ export interface IPaymentRepository {
   ): Promise<PaymentModel | null>;
 
   findLearnerPaymentHistory(
-    learnerId: string,
+    input: FindLearnerPaymentHistoryInput,
   ): Promise<LearnerPaymentHistoryItem[]>;
+
+  countLearnerPayments(learnerId: string): Promise<number>;
 }
