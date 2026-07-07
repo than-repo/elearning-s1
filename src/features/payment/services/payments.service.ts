@@ -38,6 +38,7 @@ import {
 } from '../dtos/simulation-payment-response.dto';
 import { randomUUID } from 'crypto';
 import { PAYMENT_REPOSITORY } from '../repositories/payment.repository.token';
+import { GetPaymentsResponseDto } from '../dtos/get-payments-response.dto';
 
 @Injectable()
 export class PaymentsService {
@@ -185,17 +186,15 @@ export class PaymentsService {
       throw new BadRequestException('Payment cannot be failed');
     }
 
-    const failedPayment = await this.iPaymentRepository.markPendingPaymentFailed(
-      payment.id,
-      {
+    const failedPayment =
+      await this.iPaymentRepository.markPendingPaymentFailed(payment.id, {
         providerPaymentId: `SIM-${payment.txnRef ?? payment.id}`,
         providerMetadata: {
           provider: 'SIMULATION',
           action: 'fail',
           failedAt: new Date().toISOString(),
         },
-      },
-    );
+      });
 
     if (!failedPayment) {
       throw new NotFoundException('Payment not found');
@@ -315,13 +314,11 @@ export class PaymentsService {
         );
       }
 
-      const failedPayment = await this.iPaymentRepository.markPendingPaymentFailed(
-        payment.id,
-        {
+      const failedPayment =
+        await this.iPaymentRepository.markPendingPaymentFailed(payment.id, {
           providerPaymentId: safeQuery.vnp_TransactionNo ?? null,
           providerMetadata: safeQuery,
-        },
-      );
+        });
 
       if (failedPayment?.status !== PaymentStatus.FAILED) {
         return this.toVnpayIpnResponseDto(
@@ -334,6 +331,19 @@ export class PaymentsService {
     } catch (error) {
       return this.toVnpayIpnResponseDto('99', 'Unknown error');
     }
+  }
+
+  async getLearnerPayments(learnerId: string): Promise<GetPaymentsResponseDto> {
+    const payments =
+      await this.iPaymentRepository.findLearnerPaymentHistory(learnerId);
+
+    return plainToInstance(
+      GetPaymentsResponseDto,
+      { payments },
+      {
+        excludeExtraneousValues: true,
+      },
+    );
   }
 
   private normalizeVnpayQuery(query: VnpayReturnQuery): Record<string, string> {

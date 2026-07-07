@@ -31,6 +31,7 @@ import { SkipResponseFormatting } from 'src/common/decorators/skip-response-form
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from 'generated/prisma/enums';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { GetPaymentsResponseDto } from './dtos/get-payments-response.dto';
 
 @Throttle({ default: { ttl: 60, limit: 5 } })
 @ApiTags('Payments')
@@ -138,5 +139,14 @@ export class PaymentsController {
     @Query() query: Record<string, string | string[] | undefined>,
   ): Promise<VnpayIpnResponseDto> {
     return this.paymentsService.handleVnpayIpn(query);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.LEARNER)
+  async getMyPayments(
+    @CurrentUser('sub') learner: string,
+  ): Promise<GetPaymentsResponseDto> {
+    return this.paymentsService.getLearnerPayments(learner);
   }
 }

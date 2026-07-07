@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 
 import { PrismaService } from 'src/core/database/prisma.service';
 import {
@@ -14,6 +14,7 @@ import {
   FindUniquePaymentInput,
   SettlePaidPaymentAndActivateEnrollmentInput,
   UpdatePaymentInput,
+  LearnerPaymentHistoryItem,
 } from '../interfaces/payment.repository.interface';
 
 import {
@@ -25,9 +26,51 @@ import {
   PaymentMethod as PrismaPaymentMethod,
   PaymentStatus as PrismaPaymentStatus,
 } from 'generated/prisma/client';
+
+const paymentSelectForLearner = {
+  id: true,
+  amount: true,
+  currency: true,
+  paymentMethod: true,
+  status: true,
+  paidAt: true,
+  createdAt: true,
+  course: {
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      thumbnailUrl: true,
+    },
+  },
+} satisfies Prisma.PaymentSelect;
+
+export type PrismaPaymentsHistory = Prisma.PaymentGetPayload<{
+  select: typeof paymentSelectForLearner;
+}>;
+
 @Injectable()
 export class PaymentRepository implements IPaymentRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  private toPaymentsHistory(
+    paymentPrisma: PrismaPaymentsHistory,
+  ): LearnerPaymentHistoryItem {
+    return {
+      id: paymentPrisma.id,
+      amount: paymentPrisma.amount,
+      currency: paymentPrisma.currency,
+      paymentMethod: paymentPrisma.paymentMethod,
+      status: paymentPrisma.status,
+      paidAt: paymentPrisma.paidAt,
+      createdAt: paymentPrisma.createdAt,
+      course: {
+        id: paymentPrisma.course.id,
+        title: paymentPrisma.course.title,
+        slug: paymentPrisma.course.slug,
+      },
+    };
+  }
 
   private toCourse(course: PrismaCourse): CourseModel {
     return {
@@ -321,5 +364,22 @@ export class PaymentRepository implements IPaymentRepository {
     });
 
     return this.findUniquePayment({ id: paymentId });
+  }
+
+  //Find payment history
+  async findLearnerPaymentHistory(
+    learnerId: string,
+  ): Promise<LearnerPaymentHistoryItem[]> {
+    const payments = await this.prisma.payment.findMany({
+      where: {
+        userId: learnerId,
+      },
+      select: paymentSelectForLearner,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return payments.map((payment) => this.toPaymentsHistory(payment));
   }
 }

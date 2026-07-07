@@ -1,3 +1,4 @@
+import { CourseInstructor } from './../../../../generated/prisma/browser';
 // ======================== Course ====================
 export const CourseStatus = {
   DRAFT: 'DRAFT',
@@ -58,18 +59,22 @@ export interface PaidPaymentSettlementResult {
   payment: PaymentModel;
 }
 
-export enum PaymentMethod {
-  VNPAY = 'VNPAY',
-  SIMULATION = 'SIMULATION',
-}
+export const PaymentMethod = {
+  VNPAY: 'VNPAY',
+  SIMULATION: 'SIMULATION',
+} as const;
 
-export enum PaymentStatus {
-  PENDING = 'PENDING',
-  PAID = 'PAID',
-  FAILED = 'FAILED',
-  CANCELLED = 'CANCELLED',
-  EXPIRED = 'EXPIRED',
-}
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
+
+export const PaymentStatus = {
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED',
+  EXPIRED: 'EXPIRED',
+} as const;
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
 
 export type JsonPrimitive = string | number | boolean | null;
 
@@ -127,6 +132,25 @@ export type FindUniquePaymentInput =
       id?: never;
       txnRef?: never;
     };
+
+// Payment history
+export interface LearnerPaymentHistoryCourse {
+  id: string;
+  title: string;
+  slug: string;
+}
+
+export interface LearnerPaymentHistoryItem {
+  id: string;
+  amount: number;
+  currency: string;
+  paymentMethod: PaymentMethod;
+  status: PaymentStatus;
+  paidAt: Date | null;
+  createdAt: Date;
+  course: LearnerPaymentHistoryCourse;
+}
+
 export interface IPaymentRepository {
   findCourseById(courseId: string): Promise<CourseModel | null>;
   create(input: CreatePaymentInput): Promise<PaymentModel>;
@@ -148,4 +172,8 @@ export interface IPaymentRepository {
     paymentId: string,
     input: MarkPendingPaymentFailedInput,
   ): Promise<PaymentModel | null>;
+
+  findLearnerPaymentHistory(
+    learnerId: string,
+  ): Promise<LearnerPaymentHistoryItem[]>;
 }
